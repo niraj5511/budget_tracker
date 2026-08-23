@@ -1,0 +1,49 @@
+.transaction-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 16px;
+  border-left: 3px solid transparent;
+  border-radius: 8px;
+  background: var(--bg);
+}
+
+.transaction-item.is-income {
+  border-left-color: var(--income);
+}
+
+.transaction-item.is-expense {
+  border-left-color: var(--expense);
+}
+
+.transaction-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.transaction-description {
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
+.transaction-date {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.transaction-amount {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.is-income .transaction-amount {
+  color: var(--income);
+}
+
+.is-expense .transaction-amount {
+  color: var(--expense);
+}

@@ -1,3 +1,5 @@
+import TransactionList from './components/TransactionList'
+import sampleTransactions from './data/sampleTransactions'
 import './App.css'
 
 function App() {
@@ -9,7 +11,7 @@ function App() {
       </header>
 
       <main className="app-main">
-        <p className="placeholder">Nothing here yet — we build this step by step.</p>
+        <TransactionList transactions={sampleTransactions} />
       </main>
     </div>
   )
