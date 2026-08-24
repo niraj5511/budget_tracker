@@ -14,6 +14,10 @@ function App() {
     setTransactions((prev) => [transaction, ...prev])
   }
 
+  function handleDeleteTransaction(id) {
+    setTransactions((prev) => prev.filter((transaction) => transaction.id !== id))
+  }
+
   // ISO date strings compare lexicographically, so this is a plain string
   // sort. Copy first: sort() mutates, and state must not be touched.
   const sortedTransactions = [...transactions].sort((a, b) =>
@@ -30,7 +34,10 @@ function App() {
       <main>
         <BalanceSummary transactions={transactions} />
         <TransactionForm onAddTransaction={handleAddTransaction} />
-        <TransactionList transactions={sortedTransactions} />
+        <TransactionList
+          transactions={sortedTransactions}
+          onDeleteTransaction={handleDeleteTransaction}
+        />
       </main>
     </div>
   )

@@ -1,7 +1,7 @@
 import TransactionItem from './TransactionItem'
 import './TransactionList.css'
 
-function TransactionList({ transactions }) {
+function TransactionList({ transactions, onDeleteTransaction }) {
   return (
     <section className="transaction-list-section">
       <h2 className="transaction-list-title">Transactions</h2>
@@ -11,7 +11,11 @@ function TransactionList({ transactions }) {
       ) : (
         <ul className="transaction-list">
           {transactions.map((transaction) => (
-            <TransactionItem key={transaction.id} transaction={transaction} />
+            <TransactionItem
+              key={transaction.id}
+              transaction={transaction}
+              onDelete={onDeleteTransaction}
+            />
           ))}
         </ul>
       )}
