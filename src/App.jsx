@@ -1,9 +1,25 @@
+import { useState } from 'react'
 import BalanceSummary from './components/BalanceSummary'
+import TransactionForm from './components/TransactionForm'
 import TransactionList from './components/TransactionList'
 import sampleTransactions from './data/sampleTransactions'
 import './App.css'
 
 function App() {
+  const [transactions, setTransactions] = useState(sampleTransactions)
+
+  function handleAddTransaction(transaction) {
+    // Prepend, so that among transactions sharing a date the newest addition
+    // sorts first - Array.prototype.sort is stable, so it keeps this order.
+    setTransactions((prev) => [transaction, ...prev])
+  }
+
+  // ISO date strings compare lexicographically, so this is a plain string
+  // sort. Copy first: sort() mutates, and state must not be touched.
+  const sortedTransactions = [...transactions].sort((a, b) =>
+    b.date.localeCompare(a.date),
+  )
+
   return (
     <div className="app">
       <header className="app-header">
@@ -12,8 +28,9 @@ function App() {
       </header>
 
       <main>
-        <BalanceSummary transactions={sampleTransactions} />
-        <TransactionList transactions={sampleTransactions} />
+        <BalanceSummary transactions={transactions} />
+        <TransactionForm onAddTransaction={handleAddTransaction} />
+        <TransactionList transactions={sortedTransactions} />
       </main>
     </div>
   )

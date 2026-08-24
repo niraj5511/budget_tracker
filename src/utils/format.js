@@ -23,3 +23,13 @@ export function formatDate(isoDate) {
   const [year, month, day] = isoDate.split('-').map(Number)
   return dateFormatter.format(new Date(year, month - 1, day))
 }
+
+/** Today as 'YYYY-MM-DD', for the date input's default value. */
+export function todayIso() {
+  // Built from local parts, not `toISOString()`, which returns the UTC date
+  // and so rolls over to tomorrow late in the evening in Nepal (UTC+5:45).
+  const now = new Date()
+  const month = String(now.getMonth() + 1).padStart(2, '0')
+  const day = String(now.getDate()).padStart(2, '0')
+  return `${now.getFullYear()}-${month}-${day}`
+}
