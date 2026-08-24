@@ -1,12 +1,21 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import BalanceSummary from './components/BalanceSummary'
 import TransactionForm from './components/TransactionForm'
 import TransactionList from './components/TransactionList'
 import sampleTransactions from './data/sampleTransactions'
+import { loadTransactions, saveTransactions } from './utils/storage'
 import './App.css'
 
 function App() {
-  const [transactions, setTransactions] = useState(sampleTransactions)
+  // Passed as a function so storage is read once on mount rather than on
+  // every render. The samples are only a first-run seed.
+  const [transactions, setTransactions] = useState(() =>
+    loadTransactions(sampleTransactions),
+  )
+
+  useEffect(() => {
+    saveTransactions(transactions)
+  }, [transactions])
 
   function handleAddTransaction(transaction) {
     // Prepend, so that among transactions sharing a date the newest addition
