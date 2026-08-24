@@ -1,0 +1,63 @@
+.balance-summary {
+  margin: 0 0 20px;
+  display: grid;
+  /* auto-fit drops to one column when two 200px tiles no longer fit,
+     so the layout follows the container instead of a magic breakpoint. */
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.stat-tile {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 18px 20px;
+  min-width: 0;
+}
+
+.stat-tile--hero {
+  grid-column: 1 / -1;
+}
+
+.stat-label {
+  font-size: 13px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--text-muted);
+}
+
+/* Proportional figures, not tabular: these are large standalone numbers,
+   so equal-width digits would make them look loose. */
+.balance-value,
+.stat-value {
+  margin: 4px 0 0;
+  font-weight: 600;
+}
+
+/* The one hero figure on the page. */
+.balance-value {
+  font-size: clamp(32px, 9vw, 48px);
+  line-height: 1.1;
+  letter-spacing: -1.5px;
+  color: var(--text);
+}
+
+.balance-value.is-negative {
+  color: var(--expense);
+}
+
+.stat-value {
+  font-size: 22px;
+}
+
+/* Colour marks the direction, but the label and the +/- sign carry it too,
+   so the meaning never depends on colour alone. */
+.stat-value.is-income {
+  color: var(--income);
+}
+
+.stat-value.is-expense {
+  color: var(--expense);
+}

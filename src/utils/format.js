@@ -10,9 +10,10 @@ const dateFormatter = new Intl.DateTimeFormat('en-GB', {
   year: 'numeric',
 })
 
-/** 4250.5 -> 'Rs. 4,250.50' */
+/** 4250.5 -> 'Rs. 4,250.50'; -2400.75 -> '-Rs. 2,400.75' */
 export function formatCurrency(amount) {
-  return `Rs. ${numberFormatter.format(amount)}`
+  const sign = amount < 0 ? '-' : ''
+  return `${sign}Rs. ${numberFormatter.format(Math.abs(amount))}`
 }
 
 /** '2026-08-05' -> '5 Aug 2026' */

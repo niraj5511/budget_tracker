@@ -1,3 +1,12 @@
+/* Each block owns its own card surface, so App just stacks them. */
+.transaction-list-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 20px;
+}
+
 .transaction-list-title {
   font-size: 15px;
   font-weight: 600;
