@@ -17,6 +17,15 @@
   border-left-color: var(--expense);
 }
 
+/* The form is one card away from the list, so the row it holds has to be
+   identifiable - otherwise a long list leaves you guessing. Outline only: the
+   row background stays put, or the category chip and the icon hover states
+   (both surface-coloured) would disappear into it. */
+.transaction-item.is-being-edited {
+  outline: 2px solid var(--accent);
+  outline-offset: -1px;
+}
+
 .transaction-info {
   display: flex;
   flex-direction: column;
@@ -64,8 +73,9 @@
   gap: 10px;
 }
 
-/* Always visible rather than hover-only, so it works on touch and by
-   keyboard; recessive by default so it doesn't compete with the amount. */
+/* Always visible rather than hover-only, so they work on touch and by
+   keyboard; recessive by default so they don't compete with the amount. */
+.transaction-edit,
 .transaction-delete {
   display: grid;
   place-items: center;
@@ -80,9 +90,27 @@
   cursor: pointer;
 }
 
+.transaction-edit svg,
 .transaction-delete svg {
   width: 16px;
   height: 16px;
+}
+
+.transaction-edit:hover {
+  background: var(--surface);
+  color: var(--accent);
+}
+
+.transaction-edit:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+  color: var(--accent);
+}
+
+/* Holds the accent while this row is loaded in the form, pairing with the
+   row's own highlight. */
+.transaction-edit[aria-pressed='true'] {
+  color: var(--accent);
 }
 
 .transaction-delete:hover {

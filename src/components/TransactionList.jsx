@@ -1,7 +1,12 @@
 import TransactionItem from './TransactionItem'
 import './TransactionList.css'
 
-function TransactionList({ transactions, onDeleteTransaction }) {
+function TransactionList({
+  transactions,
+  editingId,
+  onEditTransaction,
+  onDeleteTransaction,
+}) {
   return (
     <section className="transaction-list-section">
       <h2 className="transaction-list-title">Transactions</h2>
@@ -14,6 +19,8 @@ function TransactionList({ transactions, onDeleteTransaction }) {
             <TransactionItem
               key={transaction.id}
               transaction={transaction}
+              isEditing={transaction.id === editingId}
+              onEdit={onEditTransaction}
               onDelete={onDeleteTransaction}
             />
           ))}

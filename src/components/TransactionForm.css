@@ -16,8 +16,14 @@
 
 .transaction-form-title,
 .form-field--wide,
-.form-submit {
+.form-actions {
   grid-column: 1 / -1;
+}
+
+/* Marks the form while it holds an existing row, so a filled-in form is
+   never mistaken for a half-typed new one. */
+.transaction-form.is-editing {
+  border-color: var(--accent);
 }
 
 .transaction-form-title {
@@ -137,8 +143,13 @@
   outline-offset: 1px;
 }
 
+.form-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .form-submit {
-  justify-self: start;
   font: inherit;
   font-size: 15px;
   font-weight: 600;
@@ -156,5 +167,28 @@
 
 .form-submit:focus-visible {
   outline: 2px solid var(--text);
+  outline-offset: 2px;
+}
+
+/* Quieter than the submit: leaving an edit is the lesser action. */
+.form-cancel {
+  font: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 18px;
+  cursor: pointer;
+}
+
+.form-cancel:hover {
+  color: var(--text);
+  border-color: var(--text-muted);
+}
+
+.form-cancel:focus-visible {
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
 }

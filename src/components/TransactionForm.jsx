@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { categoriesFor, DEFAULT_CATEGORY } from '../data/categories'
 import { todayIso } from '../utils/format'
 import './TransactionForm.css'
@@ -12,6 +12,19 @@ function createEmptyForm() {
     type: 'expense',
     category: DEFAULT_CATEGORY,
     date: todayIso(),
+  }
+}
+
+// Inputs hold strings, so a stored amount has to be widened back out.
+function createFormState(transaction) {
+  if (!transaction) return createEmptyForm()
+
+  return {
+    description: transaction.description,
+    amount: String(transaction.amount),
+    type: transaction.type,
+    category: transaction.category,
+    date: transaction.date,
   }
 }
 
@@ -35,9 +48,32 @@ function validate({ description, amount, date }) {
   return errors
 }
 
-function TransactionForm({ onAddTransaction }) {
-  const [form, setForm] = useState(createEmptyForm)
+/**
+ * Adds a transaction, or edits one when `transaction` is supplied. App gives
+ * this component a `key` that changes per edited row, so React remounts it
+ * with fresh state instead of the component having to sync props into state.
+ */
+function TransactionForm({ transaction, onSubmit, onCancel }) {
+  const isEditing = Boolean(transaction)
+  const [form, setForm] = useState(() => createFormState(transaction))
   const [errors, setErrors] = useState({})
+  const formRef = useRef(null)
+  const descriptionRef = useRef(null)
+
+  // The row being edited can be far down the list, well below the form. Bring
+  // the form to the user rather than leaving them to hunt for it. The remount
+  // means this runs once each time editing starts.
+  useEffect(() => {
+    if (!isEditing) return
+
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    formRef.current?.scrollIntoView({
+      behavior: reduceMotion ? 'auto' : 'smooth',
+      block: 'center',
+    })
+    // preventScroll, or focus would fight the smooth scroll above.
+    descriptionRef.current?.focus({ preventScroll: true })
+  }, [isEditing])
 
   function handleChange(event) {
     const { name, value } = event.target
@@ -55,6 +91,10 @@ function TransactionForm({ onAddTransaction }) {
     setErrors((prev) => ({ ...prev, [name]: undefined }))
   }
 
+  function handleKeyDown(event) {
+    if (isEditing && event.key === 'Escape') onCancel()
+  }
+
   function handleSubmit(event) {
     event.preventDefault()
 
@@ -62,8 +102,9 @@ function TransactionForm({ onAddTransaction }) {
     setErrors(nextErrors)
     if (Object.keys(nextErrors).length > 0) return
 
-    onAddTransaction({
-      id: crypto.randomUUID(),
+    // Values only - App owns ids and decides whether this replaces a row or
+    // becomes a new one.
+    onSubmit({
       description: form.description.trim(),
       // Round to paisa so a stray '10.999' can't drift the totals.
       amount: Math.round(Number(form.amount) * 100) / 100,
@@ -72,13 +113,25 @@ function TransactionForm({ onAddTransaction }) {
       date: form.date,
     })
 
-    setForm(createEmptyForm())
-    setErrors({})
+    // Saving an edit hands control back to App, which remounts this form
+    // empty. Only the add case has to clear up after itself.
+    if (!isEditing) {
+      setForm(createEmptyForm())
+      setErrors({})
+    }
   }
 
   return (
-    <form className="transaction-form" onSubmit={handleSubmit} noValidate>
-      <h2 className="transaction-form-title">Add transaction</h2>
+    <form
+      className={`transaction-form${isEditing ? ' is-editing' : ''}`}
+      ref={formRef}
+      onSubmit={handleSubmit}
+      onKeyDown={handleKeyDown}
+      noValidate
+    >
+      <h2 className="transaction-form-title">
+        {isEditing ? 'Edit transaction' : 'Add transaction'}
+      </h2>
 
       <fieldset className="form-field">
         <legend className="form-label">Type</legend>
@@ -132,6 +185,7 @@ function TransactionForm({ onAddTransaction }) {
           id="description"
           name="description"
           type="text"
+          ref={descriptionRef}
           placeholder="e.g. Groceries"
           value={form.description}
           onChange={handleChange}
@@ -189,9 +243,16 @@ function TransactionForm({ onAddTransaction }) {
         )}
       </div>
 
-      <button className="form-submit" type="submit">
-        Add transaction
-      </button>
+      <div className="form-actions">
+        <button className="form-submit" type="submit">
+          {isEditing ? 'Save changes' : 'Add transaction'}
+        </button>
+        {isEditing && (
+          <button className="form-cancel" type="button" onClick={onCancel}>
+            Cancel
+          </button>
+        )}
+      </div>
     </form>
   )
 }
