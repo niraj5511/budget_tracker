@@ -10,6 +10,11 @@ const dateFormatter = new Intl.DateTimeFormat('en-GB', {
   year: 'numeric',
 })
 
+const monthFormatter = new Intl.DateTimeFormat('en-GB', {
+  month: 'long',
+  year: 'numeric',
+})
+
 /** 4250.5 -> 'Rs. 4,250.50'; -2400.75 -> '-Rs. 2,400.75' */
 export function formatCurrency(amount) {
   const sign = amount < 0 ? '-' : ''
@@ -24,8 +29,14 @@ export function formatDate(isoDate) {
   return dateFormatter.format(new Date(year, month - 1, day))
 }
 
-/** Today as 'YYYY-MM-DD', for the date input's default value. */
-export function todayIso() {
+/** '2026-08' -> 'August 2026' */
+export function formatMonth(monthKey) {
+  // Day 1 of the month, built locally for the same reason as formatDate.
+  const [year, month] = monthKey.split('-').map(Number)
+  return monthFormatter.format(new Date(year, month - 1, 1))
+}
+
+/** Today as 'YYYY-MM-DD', for the date input's default value. */export function todayIso() {
   // Built from local parts, not `toISOString()`, which returns the UTC date
   // and so rolls over to tomorrow late in the evening in Nepal (UTC+5:45).
   const now = new Date()
