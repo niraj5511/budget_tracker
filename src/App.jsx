@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import BalanceSummary from './components/BalanceSummary'
+import CategoryBreakdown from './components/CategoryBreakdown'
 import MonthFilter from './components/MonthFilter'
 import TransactionForm from './components/TransactionForm'
 import TransactionList from './components/TransactionList'
@@ -52,10 +53,10 @@ function App() {
 
   // "Current balance" is only true of everything; for one month the figure is
   // that month's income minus its expenses, which is a different claim.
+  const periodLabel =
+    activeMonth === ALL_MONTHS ? 'All time' : formatMonth(activeMonth)
   const balanceLabel =
-    activeMonth === ALL_MONTHS
-      ? 'Current balance'
-      : `Net for ${formatMonth(activeMonth)}`
+    activeMonth === ALL_MONTHS ? 'Current balance' : `Net for ${periodLabel}`
 
   return (
     <div className="app">
@@ -77,6 +78,10 @@ function App() {
         <BalanceSummary
           transactions={visibleTransactions}
           balanceLabel={balanceLabel}
+        />
+        <CategoryBreakdown
+          transactions={visibleTransactions}
+          periodLabel={periodLabel}
         />
         <TransactionForm onAddTransaction={handleAddTransaction} />
         <TransactionList
