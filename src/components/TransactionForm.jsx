@@ -1,11 +1,18 @@
 import { useState } from 'react'
+import { categoriesFor, DEFAULT_CATEGORY } from '../data/categories'
 import { todayIso } from '../utils/format'
 import './TransactionForm.css'
 
 // A function, not a constant: the default date must be today at the moment
 // the form resets, not whenever the module happened to load.
 function createEmptyForm() {
-  return { description: '', amount: '', type: 'expense', date: todayIso() }
+  return {
+    description: '',
+    amount: '',
+    type: 'expense',
+    category: DEFAULT_CATEGORY,
+    date: todayIso(),
+  }
 }
 
 function validate({ description, amount, date }) {
@@ -34,7 +41,15 @@ function TransactionForm({ onAddTransaction }) {
 
   function handleChange(event) {
     const { name, value } = event.target
-    setForm((prev) => ({ ...prev, [name]: value }))
+    setForm((prev) => {
+      const next = { ...prev, [name]: value }
+      // Switching type swaps the category list underneath, so a selection
+      // carried over from the other type may no longer be on offer.
+      if (name === 'type' && !categoriesFor(value).includes(next.category)) {
+        next.category = DEFAULT_CATEGORY
+      }
+      return next
+    })
     // Clear this field's error as soon as it's edited, so the message
     // doesn't linger while the user is fixing it.
     setErrors((prev) => ({ ...prev, [name]: undefined }))
@@ -53,6 +68,7 @@ function TransactionForm({ onAddTransaction }) {
       // Round to paisa so a stray '10.999' can't drift the totals.
       amount: Math.round(Number(form.amount) * 100) / 100,
       type: form.type,
+      category: form.category,
       date: form.date,
     })
 
@@ -64,7 +80,7 @@ function TransactionForm({ onAddTransaction }) {
     <form className="transaction-form" onSubmit={handleSubmit} noValidate>
       <h2 className="transaction-form-title">Add transaction</h2>
 
-      <fieldset className="form-field form-field--wide">
+      <fieldset className="form-field">
         <legend className="form-label">Type</legend>
         <div className="type-toggle">
           <label className="type-option type-option--expense">
@@ -89,6 +105,24 @@ function TransactionForm({ onAddTransaction }) {
           </label>
         </div>
       </fieldset>
+
+      <div className="form-field">
+        <label className="form-label" htmlFor="category">
+          Category
+        </label>
+        <select
+          id="category"
+          name="category"
+          value={form.category}
+          onChange={handleChange}
+        >
+          {categoriesFor(form.type).map((category) => (
+            <option key={category} value={category}>
+              {category}
+            </option>
+          ))}
+        </select>
+      </div>
 
       <div className="form-field form-field--wide">
         <label className="form-label" htmlFor="description">

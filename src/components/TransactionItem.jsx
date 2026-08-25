@@ -2,14 +2,17 @@ import { formatCurrency, formatDate } from '../utils/format'
 import './TransactionItem.css'
 
 function TransactionItem({ transaction, onDelete }) {
-  const { id, description, amount, type, date } = transaction
+  const { id, description, amount, type, category, date } = transaction
   const isIncome = type === 'income'
 
   return (
     <li className={`transaction-item ${isIncome ? 'is-income' : 'is-expense'}`}>
       <div className="transaction-info">
         <span className="transaction-description">{description}</span>
-        <span className="transaction-date">{formatDate(date)}</span>
+        <span className="transaction-meta">
+          <span className="transaction-category">{category}</span>
+          <span className="transaction-date">{formatDate(date)}</span>
+        </span>
       </div>
 
       <div className="transaction-actions">

@@ -5,11 +5,12 @@
  *     description: string, what the money was for
  *     amount: number,      always positive - `type` carries the direction
  *     type: string,        'income' | 'expense'
+ *     category: string,    from data/categories.js, scoped to `type`
  *     date: string,        'YYYY-MM-DD'
  *   }
  *
- * Hardcoded for now; the add-transaction form replaces this later.
- * Newest first - the list renders them in array order.
+ * Only a first-run seed now: once anything is saved, storage.js supplies the
+ * list instead. Newest first - the list renders them in array order.
  */
 const sampleTransactions = [
   {
@@ -17,6 +18,7 @@ const sampleTransactions = [
     description: 'Coffee with friends',
     amount: 680,
     type: 'expense',
+    category: 'Food',
     date: '2026-08-14',
   },
   {
@@ -24,6 +26,7 @@ const sampleTransactions = [
     description: 'Internet bill',
     amount: 1500,
     type: 'expense',
+    category: 'Utilities',
     date: '2026-08-10',
   },
   {
@@ -31,6 +34,7 @@ const sampleTransactions = [
     description: 'Freelance project',
     amount: 12000,
     type: 'income',
+    category: 'Freelance',
     date: '2026-08-09',
   },
   {
@@ -38,6 +42,7 @@ const sampleTransactions = [
     description: 'Groceries',
     amount: 4250.5,
     type: 'expense',
+    category: 'Food',
     date: '2026-08-05',
   },
   {
@@ -45,6 +50,7 @@ const sampleTransactions = [
     description: 'Room rent',
     amount: 18000,
     type: 'expense',
+    category: 'Rent',
     date: '2026-08-02',
   },
   {
@@ -52,6 +58,7 @@ const sampleTransactions = [
     description: 'Monthly salary',
     amount: 55000,
     type: 'income',
+    category: 'Salary',
     date: '2026-08-01',
   },
 ]

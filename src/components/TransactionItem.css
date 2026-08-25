@@ -29,6 +29,24 @@
   overflow-wrap: anywhere;
 }
 
+/* Wraps rather than squeezing the amount when the category name is long. */
+.transaction-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+}
+
+.transaction-category {
+  font-size: 12px;
+  color: var(--text-muted);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 1px 8px;
+  white-space: nowrap;
+}
+
 .transaction-date {
   font-size: 13px;
   color: var(--text-muted);
