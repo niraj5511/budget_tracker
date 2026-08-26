@@ -67,9 +67,7 @@ function TransactionForm({ transaction, onSubmit, onCancel }) {
   const formRef = useRef(null)
   const descriptionRef = useRef(null)
 
-  // The row being edited can be far down the list, well below the form. Bring
-  // the form to the user rather than leaving them to hunt for it. The remount
-  // means this runs once each time editing starts.
+  
   useEffect(() => {
     if (!isEditing) return
 
