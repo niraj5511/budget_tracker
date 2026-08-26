@@ -1,3 +1,5 @@
+import { formatBsMonthSpan } from './nepaliDate'
+
 // en-IN gives the lakh/crore grouping Nepal uses: 1,25,000.00
 const numberFormatter = new Intl.NumberFormat('en-IN', {
   minimumFractionDigits: 2,
@@ -34,6 +36,20 @@ export function formatMonth(monthKey) {
   // Day 1 of the month, built locally for the same reason as formatDate.
   const [year, month] = monthKey.split('-').map(Number)
   return monthFormatter.format(new Date(year, month - 1, 1))
+}
+
+/**
+ * '2026-08' -> 'Shrawan-Bhadra 2083 · August 2026'
+ *
+ * Bikram Sambat leads, since that is the calendar the entries are kept in, but
+ * the Gregorian month stays: it is what the filter actually groups on, so
+ * hiding it would make the two-month BS span look like a mistake.
+ */
+export function formatMonthLabel(monthKey) {
+  const span = formatBsMonthSpan(monthKey)
+  const gregorian = formatMonth(monthKey)
+
+  return span ? `${span} · ${gregorian}` : gregorian
 }
 
 /** Today as 'YYYY-MM-DD', for the date input's default value. */

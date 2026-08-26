@@ -1,4 +1,4 @@
-import { formatMonth } from '../utils/format'
+import { formatMonthLabel } from '../utils/format'
 import { ALL_MONTHS } from '../utils/months'
 import './MonthFilter.css'
 
@@ -17,7 +17,7 @@ function MonthFilter({ months, value, onChange }) {
         <option value={ALL_MONTHS}>All time</option>
         {months.map((month) => (
           <option key={month} value={month}>
-            {formatMonth(month)}
+            {formatMonthLabel(month)}
           </option>
         ))}
       </select>

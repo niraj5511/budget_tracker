@@ -96,6 +96,12 @@
   color: var(--expense);
 }
 
+/* Sits where an error would, under the field it describes. */
+.form-hint {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
 /* Segmented control: real radios, visually replaced by their labels. */
 .type-toggle {
   display: flex;

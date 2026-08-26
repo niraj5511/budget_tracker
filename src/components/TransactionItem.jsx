@@ -1,9 +1,11 @@
 import { formatCurrency, formatDate } from '../utils/format'
+import { formatBsDate } from '../utils/nepaliDate'
 import './TransactionItem.css'
 
 function TransactionItem({ transaction, isEditing, onEdit, onDelete }) {
   const { id, description, amount, type, category, date } = transaction
   const isIncome = type === 'income'
+  const bsDate = formatBsDate(date)
 
   return (
     <li
@@ -15,7 +17,15 @@ function TransactionItem({ transaction, isEditing, onEdit, onDelete }) {
         <span className="transaction-description">{description}</span>
         <span className="transaction-meta">
           <span className="transaction-category">{category}</span>
-          <span className="transaction-date">{formatDate(date)}</span>
+          {/* Nepali date leads, Gregorian trails it. A date outside the BS
+              table has no Nepali form, so the Gregorian one stands alone
+              rather than the row losing its date entirely. */}
+          <span className="transaction-date">
+            {bsDate ?? formatDate(date)}
+            {bsDate && (
+              <span className="transaction-date-ad">{formatDate(date)}</span>
+            )}
+          </span>
         </span>
       </div>
 

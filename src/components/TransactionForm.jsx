@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { categoriesFor, DEFAULT_CATEGORY } from '../data/categories'
 import { todayIso } from '../utils/format'
+import { formatBsDate } from '../utils/nepaliDate'
 import './TransactionForm.css'
 
 // A function, not a constant: the default date must be today at the moment
@@ -59,6 +60,10 @@ function TransactionForm({ transaction, onSubmit, onCancel }) {
   const [errors, setErrors] = useState({})
   const formRef = useRef(null)
   const descriptionRef = useRef(null)
+
+  // Null while the field is empty or half-typed, and for dates the BS table
+  // doesn't cover - in both cases there is simply no hint to show.
+  const bsDate = formatBsDate(form.date)
 
   // The row being edited can be far down the list, well below the form. Bring
   // the form to the user rather than leaving them to hunt for it. The remount
@@ -234,11 +239,21 @@ function TransactionForm({ transaction, onSubmit, onCancel }) {
           value={form.date}
           onChange={handleChange}
           aria-invalid={Boolean(errors.date)}
-          aria-describedby={errors.date ? 'date-error' : undefined}
+          aria-describedby={
+            errors.date ? 'date-error' : bsDate ? 'date-bs' : undefined
+          }
         />
         {errors.date && (
           <p className="form-error" id="date-error">
             {errors.date}
+          </p>
+        )}
+        {/* The native picker only speaks Gregorian, so the Nepali date is
+            echoed back to confirm what was actually chosen. Hidden while an
+            error is showing, so the two don't stack under one field. */}
+        {!errors.date && bsDate && (
+          <p className="form-hint" id="date-bs">
+            {bsDate}
           </p>
         )}
       </div>
