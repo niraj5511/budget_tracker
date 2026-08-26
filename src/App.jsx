@@ -5,8 +5,8 @@ import MonthFilter from './components/MonthFilter'
 import TransactionForm from './components/TransactionForm'
 import TransactionList from './components/TransactionList'
 import sampleTransactions from './data/sampleTransactions'
-import { formatMonthLabel } from './utils/format'
 import { ALL_MONTHS, availableMonths, filterByMonth } from './utils/months'
+import { formatBsMonth } from './utils/nepaliDate'
 import { loadTransactions, saveTransactions } from './utils/storage'
 import './App.css'
 
@@ -72,7 +72,7 @@ function App() {
   )
 
   const periodLabel =
-    activeMonth === ALL_MONTHS ? 'All time' : formatMonthLabel(activeMonth)
+    activeMonth === ALL_MONTHS ? 'All time' : formatBsMonth(activeMonth)
 
   return (
     <div className="app">

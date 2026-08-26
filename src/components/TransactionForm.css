@@ -34,7 +34,7 @@
   color: var(--text-muted);
 }
 
-/* Also resets the <fieldset> the type toggle uses. */
+/* Also resets the two <fieldset>s - the type toggle and the date. */
 .form-field {
   display: flex;
   flex-direction: column;
@@ -54,7 +54,6 @@
 
 .transaction-form input[type='text'],
 .transaction-form input[type='number'],
-.transaction-form input[type='date'],
 .transaction-form select {
   font: inherit;
   font-size: 15px;
@@ -94,12 +93,6 @@
 .form-error {
   font-size: 13px;
   color: var(--expense);
-}
-
-/* Sits where an error would, under the field it describes. */
-.form-hint {
-  font-size: 13px;
-  color: var(--text-muted);
 }
 
 /* Segmented control: real radios, visually replaced by their labels. */

@@ -1,5 +1,5 @@
-import { formatMonthLabel } from '../utils/format'
 import { ALL_MONTHS } from '../utils/months'
+import { formatBsMonth } from '../utils/nepaliDate'
 import './MonthFilter.css'
 
 function MonthFilter({ months, value, onChange }) {
@@ -17,7 +17,7 @@ function MonthFilter({ months, value, onChange }) {
         <option value={ALL_MONTHS}>All time</option>
         {months.map((month) => (
           <option key={month} value={month}>
-            {formatMonthLabel(month)}
+            {formatBsMonth(month)}
           </option>
         ))}
       </select>

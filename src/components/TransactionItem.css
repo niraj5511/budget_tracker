@@ -61,18 +61,6 @@
   color: var(--text-muted);
 }
 
-/* The Gregorian date trails the Nepali one, a shade smaller so the pair reads
-   as one date. Same colour, deliberately: fading it further would drop it
-   under 4.5:1 on this background, and it is the only date some rows have. */
-.transaction-date-ad {
-  font-size: 12px;
-}
-
-.transaction-date-ad::before {
-  content: '·';
-  margin: 0 5px;
-}
-
 .transaction-amount {
   font-variant-numeric: tabular-nums;
   font-weight: 600;

@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { categoriesFor, DEFAULT_CATEGORY } from '../data/categories'
 import { todayIso } from '../utils/format'
-import { formatBsDate } from '../utils/nepaliDate'
+import { toBs } from '../utils/nepaliDate'
+import NepaliDateField from './NepaliDateField'
 import './TransactionForm.css'
 
 // A function, not a constant: the default date must be today at the moment
@@ -25,7 +26,10 @@ function createFormState(transaction) {
     amount: String(transaction.amount),
     type: transaction.type,
     category: transaction.category,
-    date: transaction.date,
+    // The date field can only express dates the BS table covers. A stored date
+    // outside it has no Nepali form to show, so the field starts from today
+    // rather than sitting blank and unusable.
+    date: toBs(transaction.date) ? transaction.date : todayIso(),
   }
 }
 
@@ -42,7 +46,9 @@ function validate({ description, amount, date }) {
     errors.amount = 'Amount must be greater than 0.'
   }
 
-  if (!date) {
+  // Not just "is it set": a date the calendar cannot express would save as a
+  // row whose date never renders.
+  if (!toBs(date)) {
     errors.date = 'Pick a date.'
   }
 
@@ -60,10 +66,6 @@ function TransactionForm({ transaction, onSubmit, onCancel }) {
   const [errors, setErrors] = useState({})
   const formRef = useRef(null)
   const descriptionRef = useRef(null)
-
-  // Null while the field is empty or half-typed, and for dates the BS table
-  // doesn't cover - in both cases there is simply no hint to show.
-  const bsDate = formatBsDate(form.date)
 
   // The row being edited can be far down the list, well below the form. Bring
   // the form to the user rather than leaving them to hunt for it. The remount
@@ -98,6 +100,13 @@ function TransactionForm({ transaction, onSubmit, onCancel }) {
 
   function handleKeyDown(event) {
     if (isEditing && event.key === 'Escape') onCancel()
+  }
+
+  // The date field reports a whole ISO date rather than one field's value, so
+  // it gets its own handler instead of going through handleChange.
+  function handleDateChange(date) {
+    setForm((prev) => ({ ...prev, date }))
+    setErrors((prev) => ({ ...prev, date: undefined }))
   }
 
   function handleSubmit(event) {
@@ -228,35 +237,22 @@ function TransactionForm({ transaction, onSubmit, onCancel }) {
         )}
       </div>
 
-      <div className="form-field">
-        <label className="form-label" htmlFor="date">
-          Date
-        </label>
-        <input
-          id="date"
-          name="date"
-          type="date"
+      {/* A fieldset, like the type toggle: one label has to cover three
+          controls, and a <label for> can only point at one of them. */}
+      <fieldset className="form-field">
+        <legend className="form-label">Date</legend>
+        <NepaliDateField
           value={form.date}
-          onChange={handleChange}
-          aria-invalid={Boolean(errors.date)}
-          aria-describedby={
-            errors.date ? 'date-error' : bsDate ? 'date-bs' : undefined
-          }
+          invalid={Boolean(errors.date)}
+          describedBy={errors.date ? 'date-error' : undefined}
+          onChange={handleDateChange}
         />
         {errors.date && (
           <p className="form-error" id="date-error">
             {errors.date}
           </p>
         )}
-        {/* The native picker only speaks Gregorian, so the Nepali date is
-            echoed back to confirm what was actually chosen. Hidden while an
-            error is showing, so the two don't stack under one field. */}
-        {!errors.date && bsDate && (
-          <p className="form-hint" id="date-bs">
-            {bsDate}
-          </p>
-        )}
-      </div>
+      </fieldset>
 
       <div className="form-actions">
         <button className="form-submit" type="submit">

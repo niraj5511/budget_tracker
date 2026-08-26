@@ -7,6 +7,7 @@ import {
 
 const MS_PER_DAY = 86400000
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/
+const BS_MONTH_KEY = /^(\d{4})-(\d{2})$/
 
 /**
  * Days elapsed from the epoch to Baisakh 1 of each BS year, indexed the same
@@ -23,31 +24,22 @@ for (const lengths of BS_MONTH_LENGTHS) {
 /** One past the last day the table can describe. */
 const TOTAL_DAYS = elapsed
 
+/** Midnight UTC on the epoch date, the fixed point both directions pivot on. */
+const EPOCH_UTC = (() => {
+  const [year, month, day] = BS_EPOCH_AD.split('-').map(Number)
+  return Date.UTC(year, month - 1, day)
+})()
+
 /**
- * Whole days between the epoch and an AD date.
- *
- * `Date.UTC` is safe here even though the rest of the app avoids Date
- * arithmetic: both endpoints are UTC midnights, so their difference is an
- * exact multiple of a day whatever the local zone. The bug that motivated the
- * string-only convention comes from reading a UTC instant back out in local
- * time, and nothing here does that.
+ * `Date.UTC` and `toISOString` are safe in this module even though the rest of
+ * the app avoids Date arithmetic: every instant here is a UTC midnight, so
+ * differences are exact whole days and the ISO string is the intended date.
+ * The bug that motivated the string-only convention comes from reading a UTC
+ * instant back out in *local* time, which nothing here does.
  */
 function daysFromEpoch(isoDate) {
   const [year, month, day] = isoDate.split('-').map(Number)
-  const [epochYear, epochMonth, epochDay] = BS_EPOCH_AD.split('-').map(Number)
-
-  return (
-    (Date.UTC(year, month - 1, day) -
-      Date.UTC(epochYear, epochMonth - 1, epochDay)) /
-    MS_PER_DAY
-  )
-}
-
-/** Last day of an AD month, as a number. '2026-08' -> 31 */
-function lastDayOfAdMonth(monthKey) {
-  const [year, month] = monthKey.split('-').map(Number)
-  // Day 0 of the next month is the last day of this one.
-  return new Date(Date.UTC(year, month, 0)).getUTCDate()
+  return (Date.UTC(year, month - 1, day) - EPOCH_UTC) / MS_PER_DAY
 }
 
 /**
@@ -56,11 +48,11 @@ function lastDayOfAdMonth(monthKey) {
  * @param {string} isoDate 'YYYY-MM-DD'
  * @returns {{ year: number, month: number, day: number } | null} `month` is
  *   1-12, Baisakh first. Null when the date is malformed or falls outside the
- *   table - callers show the AD date alone rather than a guess.
+ *   table, so callers can tell "no Nepali form" from a real date.
  */
 export function toBs(isoDate) {
-  // The form hands over partial and empty values while the user is typing, so
-  // the shape is checked rather than assumed.
+  // Inputs arrive half-typed and empty from form state, so the shape is
+  // checked rather than assumed.
   if (typeof isoDate !== 'string' || !ISO_DATE.test(isoDate)) return null
 
   const offset = daysFromEpoch(isoDate)
@@ -84,6 +76,48 @@ export function toBs(isoDate) {
   }
 }
 
+/**
+ * The inverse of `toBs`. Returns an ISO AD date, or null if that Nepali date
+ * does not exist - Mangsir 30 in a 29-day Mangsir, or a year off the table.
+ */
+export function fromBs(year, month, day) {
+  const lengths = BS_MONTH_LENGTHS[year - BS_EPOCH_YEAR]
+  if (!lengths || month < 1 || month > 12) return null
+  if (day < 1 || day > lengths[month - 1]) return null
+
+  let offset = yearStarts[year - BS_EPOCH_YEAR] + day - 1
+  for (let index = 0; index < month - 1; index += 1) {
+    offset += lengths[index]
+  }
+
+  return new Date(EPOCH_UTC + offset * MS_PER_DAY).toISOString().slice(0, 10)
+}
+
+/** How many days a given BS month has: 29-32, or null if off the table. */
+export function bsMonthLength(year, month) {
+  const lengths = BS_MONTH_LENGTHS[year - BS_EPOCH_YEAR]
+  if (!lengths || month < 1 || month > 12) return null
+
+  return lengths[month - 1]
+}
+
+/** Every BS year the table covers, most recent first. */
+export function bsYears() {
+  return BS_MONTH_LENGTHS.map((_, index) => BS_EPOCH_YEAR + index).reverse()
+}
+
+/**
+ * The BS month a date belongs to, as 'YYYY-MM'. Zero-padded so the keys sort
+ * lexicographically, the same trick the transaction list uses for dates.
+ * Null for dates with no Nepali form.
+ */
+export function bsMonthKey(isoDate) {
+  const bs = toBs(isoDate)
+  if (!bs) return null
+
+  return `${bs.year}-${String(bs.month).padStart(2, '0')}`
+}
+
 /** '2026-08-26' -> '10 Bhadra 2083', or null if unconvertible. */
 export function formatBsDate(isoDate) {
   const bs = toBs(isoDate)
@@ -92,29 +126,11 @@ export function formatBsDate(isoDate) {
   return `${bs.day} ${BS_MONTHS[bs.month - 1]} ${bs.year}`
 }
 
-/**
- * The BS months an AD month covers. '2026-08' -> 'Shrawan-Bhadra 2083'
- *
- * A range, not a single name, because a BS month never lines up with an AD
- * one - August 2026 starts in Shrawan and ends in Bhadra. Naming only one of
- * them would quietly mislabel half the rows in the filter.
- */
-export function formatBsMonthSpan(monthKey) {
-  const lastDay = String(lastDayOfAdMonth(monthKey)).padStart(2, '0')
-  const first = toBs(`${monthKey}-01`)
-  const last = toBs(`${monthKey}-${lastDay}`)
-  if (!first || !last) return null
+/** '2083-05' -> 'Bhadra 2083' */
+export function formatBsMonth(monthKey) {
+  const match = BS_MONTH_KEY.exec(monthKey)
+  if (!match) return monthKey
 
-  const firstMonth = BS_MONTHS[first.month - 1]
-  const lastMonth = BS_MONTHS[last.month - 1]
-
-  // Crossing Chaitra into Baisakh changes the year too, so each end needs its
-  // own year printed.
-  if (first.year !== last.year) {
-    return `${firstMonth} ${first.year} - ${lastMonth} ${last.year}`
-  }
-
-  return firstMonth === lastMonth
-    ? `${firstMonth} ${first.year}`
-    : `${firstMonth}-${lastMonth} ${first.year}`
+  const month = Number(match[2])
+  return `${BS_MONTHS[month - 1]} ${match[1]}`
 }

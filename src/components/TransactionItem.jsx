@@ -1,4 +1,4 @@
-import { formatCurrency, formatDate } from '../utils/format'
+import { formatCurrency } from '../utils/format'
 import { formatBsDate } from '../utils/nepaliDate'
 import './TransactionItem.css'
 
@@ -17,15 +17,10 @@ function TransactionItem({ transaction, isEditing, onEdit, onDelete }) {
         <span className="transaction-description">{description}</span>
         <span className="transaction-meta">
           <span className="transaction-category">{category}</span>
-          {/* Nepali date leads, Gregorian trails it. A date outside the BS
-              table has no Nepali form, so the Gregorian one stands alone
-              rather than the row losing its date entirely. */}
-          <span className="transaction-date">
-            {bsDate ?? formatDate(date)}
-            {bsDate && (
-              <span className="transaction-date-ad">{formatDate(date)}</span>
-            )}
-          </span>
+          {/* A date outside the BS table has no Nepali form, and there is no
+              Gregorian fallback to drop back to any more, so such a row
+              carries no date rather than an empty one. */}
+          {bsDate && <span className="transaction-date">{bsDate}</span>}
         </span>
       </div>
 

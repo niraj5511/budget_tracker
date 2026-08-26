@@ -23,9 +23,6 @@
   border-radius: 8px;
   padding: 7px 32px 7px 12px;
   cursor: pointer;
-  /* Both calendars in one option runs long, so let the control shrink inside
-     the flex row instead of pushing the label off the edge. */
-  min-width: 0;
 
   /* Hand-drawn arrow, matching the form's category select. */
   appearance: none;
