@@ -2,18 +2,11 @@ import { formatCurrency } from '../utils/format'
 import { calculateTotals } from '../utils/totals'
 import './BalanceSummary.css'
 
-function BalanceSummary({ transactions, balanceLabel }) {
-  const { income, expense, balance } = calculateTotals(transactions)
+function BalanceSummary({ transactions }) {
+  const { income, expense } = calculateTotals(transactions)
 
   return (
     <dl className="balance-summary">
-      <div className="stat-tile stat-tile--hero">
-        <dt className="stat-label">{balanceLabel}</dt>
-        <dd className={`balance-value${balance < 0 ? ' is-negative' : ''}`}>
-          {formatCurrency(balance)}
-        </dd>
-      </div>
-
       <div className="stat-tile">
         <dt className="stat-label">Income</dt>
         <dd className="stat-value is-income">+ {formatCurrency(income)}</dd>

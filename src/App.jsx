@@ -71,12 +71,8 @@ function App() {
     b.date.localeCompare(a.date),
   )
 
-  // "Current balance" is only true of everything; for one month the figure is
-  // that month's income minus its expenses, which is a different claim.
   const periodLabel =
     activeMonth === ALL_MONTHS ? 'All time' : formatMonth(activeMonth)
-  const balanceLabel =
-    activeMonth === ALL_MONTHS ? 'Current balance' : `Net for ${periodLabel}`
 
   return (
     <div className="app">
@@ -95,10 +91,7 @@ function App() {
             onChange={setSelectedMonth}
           />
         )}
-        <BalanceSummary
-          transactions={visibleTransactions}
-          balanceLabel={balanceLabel}
-        />
+        <BalanceSummary transactions={visibleTransactions} />
         <CategoryBreakdown
           transactions={visibleTransactions}
           periodLabel={periodLabel}

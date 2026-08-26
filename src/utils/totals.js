@@ -1,11 +1,11 @@
 /**
- * Sums a transaction list into the three headline numbers.
+ * Sums a transaction list into its income and expense totals.
  * Amounts are always positive, so `type` decides which bucket they land in.
  *
- * @returns {{ income: number, expense: number, balance: number }}
+ * @returns {{ income: number, expense: number }}
  */
 export function calculateTotals(transactions) {
-  const { income, expense } = transactions.reduce(
+  return transactions.reduce(
     (totals, transaction) => {
       if (transaction.type === 'income') {
         totals.income += transaction.amount
@@ -16,6 +16,4 @@ export function calculateTotals(transactions) {
     },
     { income: 0, expense: 0 },
   )
-
-  return { income, expense, balance: income - expense }
 }

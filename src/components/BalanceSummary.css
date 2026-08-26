@@ -16,10 +16,6 @@
   min-width: 0;
 }
 
-.stat-tile--hero {
-  grid-column: 1 / -1;
-}
-
 .stat-label {
   font-size: 13px;
   font-weight: 500;
@@ -28,28 +24,12 @@
   color: var(--text-muted);
 }
 
-/* Proportional figures, not tabular: these are large standalone numbers,
-   so equal-width digits would make them look loose. */
-.balance-value,
+/* Proportional figures, not tabular: these are standalone numbers, so
+   equal-width digits would make them look loose. */
 .stat-value {
   margin: 4px 0 0;
-  font-weight: 600;
-}
-
-/* The one hero figure on the page. */
-.balance-value {
-  font-size: clamp(32px, 9vw, 48px);
-  line-height: 1.1;
-  letter-spacing: -1.5px;
-  color: var(--text);
-}
-
-.balance-value.is-negative {
-  color: var(--expense);
-}
-
-.stat-value {
   font-size: 22px;
+  font-weight: 600;
 }
 
 /* Colour marks the direction, but the label and the +/- sign carry it too,

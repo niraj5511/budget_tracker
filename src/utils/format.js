@@ -36,7 +36,8 @@ export function formatMonth(monthKey) {
   return monthFormatter.format(new Date(year, month - 1, 1))
 }
 
-/** Today as 'YYYY-MM-DD', for the date input's default value. */export function todayIso() {
+/** Today as 'YYYY-MM-DD', for the date input's default value. */
+export function todayIso() {
   // Built from local parts, not `toISOString()`, which returns the UTC date
   // and so rolls over to tomorrow late in the evening in Nepal (UTC+5:45).
   const now = new Date()
