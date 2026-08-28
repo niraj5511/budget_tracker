@@ -54,10 +54,6 @@ function App() {
 
   const months = availableMonths(transactions)
 
-  // A month stops being an option once its last transaction is deleted, and
-  // adding a transaction in a new month is only visible under "All time".
-  // Fall back rather than filter by a month that no longer exists, which
-  // would strand the user on an empty list with a blank select.
   const activeMonth =
     selectedMonth !== ALL_MONTHS && !months.includes(selectedMonth)
       ? ALL_MONTHS
