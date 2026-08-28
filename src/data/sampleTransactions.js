@@ -1,17 +1,3 @@
-/**
- * A transaction looks like:
- *   {
- *     id: string,          unique key
- *     description: string, what the money was for
- *     amount: number,      always positive - `type` carries the direction
- *     type: string,        'income' | 'expense'
- *     category: string,    from data/categories.js, scoped to `type`
- *     date: string,        'YYYY-MM-DD'
- *   }
- *
- * Only a first-run seed now: once anything is saved, storage.js supplies the
- * list instead. Newest first - the list renders them in array order.
- */
 const sampleTransactions = [
   {
     id: 't6',
