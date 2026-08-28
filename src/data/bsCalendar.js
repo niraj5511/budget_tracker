@@ -1,16 +1,3 @@
-/**
- * Bikram Sambat month lengths, BS 2000-2090.
- *
- * BS months run 29-32 days and the sequence is not derivable from a rule - it
- * is published per year, so this has to be a lookup table. Twelve entries per
- * year, Baisakh through Chaitra.
- *
- * Transcribed from the published table in nepali-date-converter 3.4.0, and
- * generated rather than hand-typed so no digit is a typo. Dates outside this
- * range have no BS equivalent here, and the converter returns null for them
- * rather than guessing.
- */
-
 /** First year the table covers. Index 0 of BS_MONTH_LENGTHS. */
 export const BS_EPOCH_YEAR = 2000
 
