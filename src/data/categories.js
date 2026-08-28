@@ -1,9 +1,3 @@
-/**
- * Categories are split by type on purpose: 'Rent' is never income and
- * 'Salary' is never an expense, so one shared list would only invite
- * nonsense data. Both sets end in 'Other', which keeps them closed - useful
- * later, when a breakdown chart needs a finite legend.
- */
 export const INCOME_CATEGORIES = [
   'Salary',
   'Freelance',
