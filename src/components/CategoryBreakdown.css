@@ -1,10 +1,9 @@
 .breakdown {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  padding: 20px;
   margin-bottom: 20px;
+}
+
+.breakdown-header {
+  margin-bottom: 12px;
 }
 
 .breakdown-title {
@@ -21,73 +20,11 @@
   margin-top: 2px;
 }
 
-.breakdown-empty {
-  color: var(--text-muted);
-  padding: 18px 0 4px;
-}
-
-.breakdown-rows {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  margin-top: 18px;
-  list-style: none;
-}
-
-.breakdown-row {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-/* Name and amount share a line above the bar. Keeping them out of the plot
-   means a long category name can never squeeze or clip the bar, and the bar
-   gets the full card width - more pixels per rupee to compare with. */
-.breakdown-row-head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
+/* Two cards side by side on wide screens, stacked on narrow ones - same
+   auto-fit trick the balance tiles use, so it never needs a manual
+   breakpoint. */
+.breakdown-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 12px;
-}
-
-.breakdown-category {
-  font-size: 14px;
-  overflow-wrap: anywhere;
-}
-
-.breakdown-amount {
-  font-size: 14px;
-  font-weight: 600;
-  white-space: nowrap;
-  /* A column of numbers that should align down the right edge - the one
-     place tabular figures belong. */
-  font-variant-numeric: tabular-nums;
-}
-
-/* One colour for every bar: this is a single series, so the category is
-   carried by its label, not by hue. No track behind the bar either - a track
-   implies a meaningful ceiling, and the largest category is not a budget.
-   min-width keeps a tiny category from vanishing entirely. */
-.breakdown-bar {
-  height: 10px;
-  min-width: 3px;
-  background: var(--expense);
-  /* Square where it leaves the baseline, rounded at the data end. */
-  border-radius: 0 4px 4px 0;
-}
-
-.breakdown-total {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  margin-top: 18px;
-  padding-top: 14px;
-  border-top: 1px solid var(--border);
-  font-size: 14px;
-  color: var(--text-muted);
-}
-
-.breakdown-total strong {
-  color: var(--text);
-  font-variant-numeric: tabular-nums;
 }
