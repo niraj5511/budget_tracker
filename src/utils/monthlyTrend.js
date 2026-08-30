@@ -26,6 +26,6 @@ export function monthlyTrend(transactions) {
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([key, { income, expense }]) => {
       const [monthName] = formatBsMonth(key).split(' ')
-      return { month: monthName, label: formatBsMonth(key), income, expense }
+      return { key, month: monthName, label: formatBsMonth(key), income, expense }
     })
 }
