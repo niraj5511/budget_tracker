@@ -9,8 +9,12 @@ import {
   YAxis,
 } from 'recharts'
 import { formatCurrency } from '../utils/format'
+import { ALL_MONTHS } from '../utils/months'
 import { monthlyTrend } from '../utils/monthlyTrend'
 import './MonthlyTrendChart.css'
+
+/** How many trailing months to show when no single month is selected. */
+const RECENT_MONTHS_COUNT = 6
 
 function ChartTooltip({ active, payload }) {
   if (!active || !payload?.length) return null
@@ -30,12 +34,18 @@ function ChartTooltip({ active, payload }) {
 }
 
 /**
- * Always plots the full transaction history, not the month-filtered view -
- * a trend needs more than one point on the timeline to mean anything, and
- * that's independent of which single month the rest of the page is showing.
+ * Built from the full transaction history so a single selected month still
+ * has neighbouring months to compare against - but which slice of that
+ * history is shown follows the same month filter as the rest of the page:
+ * one bar-pair for a specific month, or the trailing months for "All time".
  */
-function MonthlyTrendChart({ transactions }) {
-  const data = monthlyTrend(transactions)
+function MonthlyTrendChart({ transactions, activeMonth }) {
+  const allData = monthlyTrend(transactions)
+
+  const data =
+    activeMonth === ALL_MONTHS
+      ? allData.slice(-RECENT_MONTHS_COUNT)
+      : allData.filter((row) => row.key === activeMonth)
 
   return (
     <section className="trend-card">
