@@ -93,7 +93,10 @@ function App() {
             onChange={setSelectedMonth}
           />
         )}
-        <MonthlyTrendChart transactions={transactions} />
+        <MonthlyTrendChart
+          transactions={transactions}
+          activeMonth={activeMonth}
+        />
         <BalanceSummary transactions={visibleTransactions} />
         <CategoryBreakdown
           transactions={visibleTransactions}
