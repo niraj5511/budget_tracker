@@ -3,6 +3,7 @@ import BalanceSummary from "./components/BalanceSummary";
 import CategoryBreakdown from "./components/CategoryBreakdown";
 import MonthFilter from "./components/MonthFilter";
 import MonthlyTrendChart from "./components/MonthlyTrendChart";
+import Navbar from "./components/Navbar";
 import TransactionForm from "./components/TransactionForm";
 import TransactionList from "./components/TransactionList";
 import sampleTransactions from "./data/sampleTransactions";
@@ -78,12 +79,9 @@ function App() {
 
   return (
     <div className="app">
-      <header className="app-header">
-        <h1>Budget Tracker</h1>
-        <p className="app-tagline">Keep an eye on where your money goes.</p>
-      </header>
+      <Navbar />
 
-      <main>
+      <main className="app-main">
         {/* With nothing saved there is nothing to filter, and the select
             would offer "All time" as its only option. */}
         {months.length > 0 && (
