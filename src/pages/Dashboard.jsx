@@ -1,0 +1,35 @@
+import BalanceSummary from '../components/BalanceSummary'
+import CategoryBreakdown from '../components/CategoryBreakdown'
+import MonthFilter from '../components/MonthFilter'
+import MonthlyTrendChart from '../components/MonthlyTrendChart'
+
+function Dashboard({
+  months,
+  activeMonth,
+  onMonthChange,
+  transactions,
+  visibleTransactions,
+  periodLabel,
+}) {
+  return (
+    <div className="page">
+      {/* With nothing saved there is nothing to filter, and the select
+          would offer "All time" as its only option. */}
+      {months.length > 0 && (
+        <MonthFilter
+          months={months}
+          value={activeMonth}
+          onChange={onMonthChange}
+        />
+      )}
+      <MonthlyTrendChart transactions={transactions} activeMonth={activeMonth} />
+      <BalanceSummary transactions={visibleTransactions} />
+      <CategoryBreakdown
+        transactions={visibleTransactions}
+        periodLabel={periodLabel}
+      />
+    </div>
+  )
+}
+
+export default Dashboard
