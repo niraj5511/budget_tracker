@@ -4,12 +4,13 @@
   z-index: 10;
   background: var(--surface);
   border-bottom: 1px solid var(--border);
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
 }
 
 .navbar-inner {
   max-width: 720px;
   margin: 0 auto;
-  padding: 16px 20px;
+  padding: 14px 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -19,21 +20,47 @@
 
 .navbar-brand {
   display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.navbar-mark {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background: var(--accent);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+}
+
+.navbar-brand-text {
+  display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 1px;
   min-width: 0;
 }
 
 .navbar-title {
-  font-size: 19px;
+  font-size: 18px;
   font-weight: 600;
   letter-spacing: -0.3px;
   color: var(--text);
+  line-height: 1.2;
 }
 
 .navbar-tagline {
   font-size: 12px;
   color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .navbar-links {
@@ -42,21 +69,30 @@
 }
 
 .navbar-link {
-  padding: 8px 14px;
-  border-radius: var(--radius);
+  padding: 8px 2px 6px;
+  margin: 0 10px;
   font-size: 14px;
   font-weight: 500;
   color: var(--text-muted);
   text-decoration: none;
-  transition: background-color 0.15s, color 0.15s;
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s, border-color 0.15s;
 }
 
 .navbar-link:hover {
-  background: var(--bg);
   color: var(--text);
 }
 
 .navbar-link.is-active {
-  background: var(--accent);
-  color: #ffffff;
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+/* Below ~460px the tagline starts crowding the nav links against the brand
+   mark, so it's the first thing to go - the title alone still identifies
+   the app. */
+@media (max-width: 460px) {
+  .navbar-tagline {
+    display: none;
+  }
 }

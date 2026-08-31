@@ -11,10 +11,15 @@ function Navbar() {
     <header className="navbar">
       <div className="navbar-inner">
         <div className="navbar-brand">
-          <span className="navbar-title">Budget Tracker</span>
-          <span className="navbar-tagline">
-            Keep an eye on where your money goes.
+          <span className="navbar-mark" aria-hidden="true">
+            Rs
           </span>
+          <div className="navbar-brand-text">
+            <span className="navbar-title">Budget Tracker</span>
+            <span className="navbar-tagline">
+              Keep an eye on where your money goes.
+            </span>
+          </div>
         </div>
 
         <nav className="navbar-links" aria-label="Main">
