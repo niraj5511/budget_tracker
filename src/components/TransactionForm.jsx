@@ -141,9 +141,14 @@ function TransactionForm({ transaction, onSubmit, onCancel }) {
       onKeyDown={handleKeyDown}
       noValidate
     >
-      <h2 className="transaction-form-title">
-        {isEditing ? 'Edit transaction' : 'Add transaction'}
-      </h2>
+      <div className="transaction-form-header">
+        <h2 className="transaction-form-title">
+          {isEditing ? 'Edit transaction' : 'Add transaction'}
+        </h2>
+        {/* Backs up the border-colour cue on .is-editing with text, so the
+            state isn't carried by colour alone. */}
+        {isEditing && <span className="editing-badge">Editing</span>}
+      </div>
 
       <fieldset className="form-field">
         <legend className="form-label">Type</legend>
@@ -213,21 +218,26 @@ function TransactionForm({ transaction, onSubmit, onCancel }) {
 
       <div className="form-field">
         <label className="form-label" htmlFor="amount">
-          Amount (Rs.)
+          Amount
         </label>
-        <input
-          id="amount"
-          name="amount"
-          type="number"
-          min="0"
-          step="0.01"
-          inputMode="decimal"
-          placeholder="0.00"
-          value={form.amount}
-          onChange={handleChange}
-          aria-invalid={Boolean(errors.amount)}
-          aria-describedby={errors.amount ? 'amount-error' : undefined}
-        />
+        <div className="amount-input-wrap">
+          <span className="amount-prefix" aria-hidden="true">
+            Rs.
+          </span>
+          <input
+            id="amount"
+            name="amount"
+            type="number"
+            min="0"
+            step="0.01"
+            inputMode="decimal"
+            placeholder="0.00"
+            value={form.amount}
+            onChange={handleChange}
+            aria-invalid={Boolean(errors.amount)}
+            aria-describedby={errors.amount ? 'amount-error' : undefined}
+          />
+        </div>
         {errors.amount && (
           <p className="form-error" id="amount-error">
             {errors.amount}
