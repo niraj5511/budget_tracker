@@ -10,10 +10,50 @@
 .stat-tile {
   background: var(--surface);
   border: 1px solid var(--border);
+  border-left: 3px solid transparent;
   border-radius: var(--radius);
   box-shadow: var(--shadow);
-  padding: 18px 20px;
+  padding: 16px 20px;
   min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.stat-tile:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(16, 24, 40, 0.08), 0 4px 8px rgba(16, 24, 40, 0.1);
+}
+
+.stat-tile.is-income {
+  border-left-color: var(--income);
+}
+
+.stat-tile.is-expense {
+  border-left-color: var(--expense);
+}
+
+.stat-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.stat-tile.is-income .stat-icon {
+  background: color-mix(in srgb, var(--income) 14%, transparent);
+  color: var(--income);
+}
+
+.stat-tile.is-expense .stat-icon {
+  background: color-mix(in srgb, var(--expense) 14%, transparent);
+  color: var(--expense);
 }
 
 .stat-label {
