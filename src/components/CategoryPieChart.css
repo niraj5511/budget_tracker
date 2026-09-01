@@ -5,6 +5,11 @@
   box-shadow: var(--shadow);
   padding: 18px 20px;
   min-width: 0;
+  transition: box-shadow 0.15s;
+}
+
+.pie-card:hover {
+  box-shadow: 0 2px 4px rgba(16, 24, 40, 0.08), 0 4px 8px rgba(16, 24, 40, 0.1);
 }
 
 .pie-title {
@@ -55,7 +60,7 @@
 .pie-legend-swatch {
   width: 10px;
   height: 10px;
-  border-radius: 3px;
+  border-radius: 50%;
   flex-shrink: 0;
 }
 
@@ -79,5 +84,13 @@
   border-top: 1px solid var(--border);
   display: flex;
   justify-content: space-between;
-  font-size: 14px;
+  align-items: baseline;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.pie-total strong {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
 }
