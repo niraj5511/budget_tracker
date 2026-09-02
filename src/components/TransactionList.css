@@ -7,13 +7,29 @@
   padding: 20px;
 }
 
+.transaction-list-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
 .transaction-list-title {
   font-size: 15px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.6px;
   color: var(--text-muted);
-  margin-bottom: 14px;
+}
+
+.transaction-count {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 1px 9px;
 }
 
 .transaction-list {

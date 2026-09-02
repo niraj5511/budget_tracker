@@ -9,7 +9,12 @@ function TransactionList({
 }) {
   return (
     <section className="transaction-list-section">
-      <h2 className="transaction-list-title">Transactions</h2>
+      <div className="transaction-list-header">
+        <h2 className="transaction-list-title">Transactions</h2>
+        {transactions.length > 0 && (
+          <span className="transaction-count">{transactions.length}</span>
+        )}
+      </div>
 
       {transactions.length === 0 ? (
         <p className="transaction-list-empty">No transactions yet.</p>
