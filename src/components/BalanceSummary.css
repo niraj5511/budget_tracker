@@ -1,9 +1,9 @@
 .balance-summary {
   margin: 0 0 20px;
   display: grid;
-  /* auto-fit drops to one column when two 200px tiles no longer fit,
-     so the layout follows the container instead of a magic breakpoint. */
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  /* Capped at 320px so a wide screen adds more tiles per row instead of
+     stretching two tiles to fill it - the same idea as the breakdown grid. */
+  grid-template-columns: repeat(auto-fit, minmax(200px, 320px));
   gap: 12px;
 }
 

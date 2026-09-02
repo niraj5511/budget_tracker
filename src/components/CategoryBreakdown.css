@@ -20,11 +20,11 @@
   margin-top: 2px;
 }
 
-/* Two cards side by side on wide screens, stacked on narrow ones - same
-   auto-fit trick the balance tiles use, so it never needs a manual
-   breakpoint. */
+/* Two cards side by side up to a sane max width - uncapped 1fr would stretch
+   the 220px chart across a much wider card on a full-width page, leaving it
+   looking lost in empty space. */
 .breakdown-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(300px, 460px));
   gap: 12px;
 }
