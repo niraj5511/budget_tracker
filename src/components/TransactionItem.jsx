@@ -13,15 +13,21 @@ function TransactionItem({ transaction, isEditing, onEdit, onDelete }) {
         isEditing ? ' is-being-edited' : ''
       }`}
     >
-      <div className="transaction-info">
-        <span className="transaction-description">{description}</span>
-        <span className="transaction-meta">
-          <span className="transaction-category">{category}</span>
-          {/* A date outside the BS table has no Nepali form, and there is no
-              Gregorian fallback to drop back to any more, so such a row
-              carries no date rather than an empty one. */}
-          {bsDate && <span className="transaction-date">{bsDate}</span>}
+      <div className="transaction-main">
+        <span className="transaction-type-icon" aria-hidden="true">
+          {isIncome ? '\u2191' : '\u2193'}
         </span>
+
+        <div className="transaction-info">
+          <span className="transaction-description">{description}</span>
+          <span className="transaction-meta">
+            <span className="transaction-category">{category}</span>
+            {/* A date outside the BS table has no Nepali form, and there is no
+                Gregorian fallback to drop back to any more, so such a row
+                carries no date rather than an empty one. */}
+            {bsDate && <span className="transaction-date">{bsDate}</span>}
+          </span>
+        </div>
       </div>
 
       <div className="transaction-actions">

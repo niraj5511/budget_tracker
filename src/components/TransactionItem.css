@@ -1,236 +1,167 @@
-.transaction-form {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  padding: 20px;
-  margin-bottom: 20px;
-
-  display: grid;
-  /* max(45%, 180px) as the min track caps this at two columns at any width
-     (a third would need >90% of the row) and collapses to one below ~375px. */
-  grid-template-columns: repeat(auto-fit, minmax(max(45%, 180px), 1fr));
-  gap: 14px;
-  align-items: start;
-}
-
-.transaction-form-header,
-.form-field--wide,
-.form-actions {
-  grid-column: 1 / -1;
-}
-
-/* Marks the form while it holds an existing row, so a filled-in form is
-   never mistaken for a half-typed new one. */
-.transaction-form.is-editing {
-  border-color: var(--accent);
-}
-
-.transaction-form-header {
+.transaction-item {
   display: flex;
   align-items: center;
-  gap: 10px;
-}
-
-.transaction-form-title {
-  font-size: 15px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.6px;
-  color: var(--text-muted);
-}
-
-.editing-badge {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--accent);
-  background: color-mix(in srgb, var(--accent) 12%, transparent);
-  border-radius: 999px;
-  padding: 3px 10px;
-}
-
-/* Also resets the two <fieldset>s - the type toggle and the date. */
-.form-field {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  min-width: 0;
-  margin: 0;
-  padding: 0;
-  border: 0;
-}
-
-.form-label {
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text-muted);
-  padding: 0;
-}
-
-.transaction-form input[type='text'],
-.transaction-form input[type='number'],
-.transaction-form select {
-  font: inherit;
-  font-size: 15px;
-  color: var(--text);
-  background: var(--surface);
-  border: 1px solid var(--border);
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 16px;
+  border-left: 3px solid transparent;
   border-radius: 8px;
-  padding: 10px 12px;
-  width: 100%;
-  min-width: 0;
-  transition: border-color 0.15s;
-}
-
-.transaction-form input:hover,
-.transaction-form select:hover {
-  border-color: var(--text-muted);
-}
-
-/* The Rs. prefix sits inside the input's own border, like a currency field
-   in a banking app, rather than as a separate label beside it. */
-.amount-input-wrap {
-  position: relative;
-}
-
-.amount-prefix {
-  position: absolute;
-  left: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 15px;
-  color: var(--text-muted);
-  pointer-events: none;
-}
-
-.amount-input-wrap input {
-  padding-left: 34px;
-}
-
-/* Native selects ignore border-radius on Windows, so the arrow is drawn by
-   hand to keep the control matching the inputs beside it. Must come after
-   the shared rule, whose `background` shorthand would clear the image. */
-.transaction-form select {
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2.5 4.5L6 8l3.5-3.5' fill='none' stroke='%236b7280' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 12px center;
-  background-size: 12px;
-  padding-right: 34px;
-  cursor: pointer;
-}
-
-.transaction-form input:focus-visible,
-.transaction-form select:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 1px;
-  border-color: var(--accent);
-}
-
-.transaction-form input[aria-invalid='true'] {
-  border-color: var(--expense);
-}
-
-.form-error {
-  font-size: 13px;
-  color: var(--expense);
-}
-
-/* Segmented control: real radios, visually replaced by their labels. */
-.type-toggle {
-  display: flex;
-  gap: 6px;
-  padding: 4px;
   background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 8px;
+  transition: background-color 0.15s;
 }
 
-.type-option {
-  position: relative;
-  flex: 1;
-  text-align: center;
-  padding: 8px 12px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--text-muted);
+.transaction-item:hover {
+  background: color-mix(in srgb, var(--bg) 60%, var(--border));
 }
 
-.type-option input {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  opacity: 0;
+.transaction-item.is-income {
+  border-left-color: var(--income);
 }
 
-.type-option:has(input:checked) {
-  background: var(--surface);
-  box-shadow: var(--shadow);
+.transaction-item.is-expense {
+  border-left-color: var(--expense);
 }
 
-.type-option--expense:has(input:checked) {
-  color: var(--expense);
+.transaction-type-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  font-size: 13px;
+  font-weight: 700;
 }
 
-.type-option--income:has(input:checked) {
+.is-income .transaction-type-icon {
+  background: color-mix(in srgb, var(--income) 14%, transparent);
   color: var(--income);
 }
 
-.type-option:has(input:focus-visible) {
-  outline: 2px solid var(--accent);
-  outline-offset: 1px;
+.is-expense .transaction-type-icon {
+  background: color-mix(in srgb, var(--expense) 14%, transparent);
+  color: var(--expense);
 }
 
-.form-actions {
+/* The form is one card away from the list, so the row it holds has to be
+   identifiable - otherwise a long list leaves you guessing. Outline only: the
+   row background stays put, or the category chip and the icon hover states
+   (both surface-coloured) would disappear into it. */
+.transaction-item.is-being-edited {
+  outline: 2px solid var(--accent);
+  outline-offset: -1px;
+}
+
+.transaction-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.transaction-main {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.transaction-description {
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
+/* Wraps rather than squeezing the amount when the category name is long. */
+.transaction-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+}
+
+.transaction-category {
+  font-size: 12px;
+  color: var(--text-muted);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 1px 8px;
+  white-space: nowrap;
+}
+
+.transaction-date {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.transaction-amount {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.transaction-actions {
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
-.form-submit {
-  font: inherit;
-  font-size: 15px;
-  font-weight: 600;
-  color: #fff;
-  background: var(--accent);
+/* Always visible rather than hover-only, so they work on touch and by
+   keyboard; recessive by default so they don't compete with the amount. */
+.transaction-edit,
+.transaction-delete {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  padding: 0;
   border: 0;
-  border-radius: 8px;
-  padding: 11px 20px;
-  cursor: pointer;
-  transition: background-color 0.15s, transform 0.15s;
-}
-
-.form-submit:hover {
-  background: #2560d4;
-  transform: translateY(-1px);
-}
-
-.form-submit:focus-visible {
-  outline: 2px solid var(--text);
-  outline-offset: 2px;
-}
-
-/* Quieter than the submit: leaving an edit is the lesser action. */
-.form-cancel {
-  font: inherit;
-  font-size: 15px;
-  font-weight: 500;
-  color: var(--text-muted);
+  border-radius: 6px;
   background: transparent;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 10px 18px;
+  color: var(--text-muted);
   cursor: pointer;
 }
 
-.form-cancel:hover {
-  color: var(--text);
-  border-color: var(--text-muted);
+.transaction-edit svg,
+.transaction-delete svg {
+  width: 16px;
+  height: 16px;
 }
 
-.form-cancel:focus-visible {
+.transaction-edit:hover {
+  background: var(--surface);
+  color: var(--accent);
+}
+
+.transaction-edit:focus-visible {
   outline: 2px solid var(--accent);
-  outline-offset: 2px;
+  outline-offset: 1px;
+  color: var(--accent);
+}
+
+/* Holds the accent while this row is loaded in the form, pairing with the
+   row's own highlight. */
+.transaction-edit[aria-pressed='true'] {
+  color: var(--accent);
+}
+
+.transaction-delete:hover {
+  background: var(--surface);
+  color: var(--expense);
+}
+
+.transaction-delete:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+  color: var(--expense);
+}
+
+.is-income .transaction-amount {
+  color: var(--income);
+}
+
+.is-expense .transaction-amount {
+  color: var(--expense);
 }
