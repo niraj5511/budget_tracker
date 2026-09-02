@@ -134,3 +134,22 @@ export function formatBsMonth(monthKey) {
   const month = Number(match[2])
   return `${BS_MONTHS[month - 1]} ${match[1]}`
 }
+
+/**
+ * The BS month key immediately before the given one, e.g. '2083-05' ->
+ * '2083-04', and '2083-01' -> '2082-12' across the year boundary. Null when
+ * the previous year falls off the table, same as the rest of this module.
+ */
+export function previousBsMonthKey(monthKey) {
+  const match = BS_MONTH_KEY.exec(monthKey)
+  if (!match) return null
+
+  const year = Number(match[1])
+  const month = Number(match[2])
+
+  if (month > 1) return `${year}-${String(month - 1).padStart(2, '0')}`
+
+  const previousYear = year - 1
+  if (previousYear < BS_EPOCH_YEAR) return null
+  return `${previousYear}-12`
+}

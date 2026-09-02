@@ -1,5 +1,6 @@
 import BalanceSummary from '../components/BalanceSummary'
 import CategoryBreakdown from '../components/CategoryBreakdown'
+import MonthComparisonCard from '../components/MonthComparisonCard'
 import MonthFilter from '../components/MonthFilter'
 import MonthlyTrendChart from '../components/MonthlyTrendChart'
 
@@ -22,6 +23,7 @@ function Dashboard({
           onChange={onMonthChange}
         />
       )}
+      <MonthComparisonCard transactions={transactions} activeMonth={activeMonth} />
       <MonthlyTrendChart transactions={transactions} activeMonth={activeMonth} />
       <BalanceSummary transactions={visibleTransactions} />
       <CategoryBreakdown

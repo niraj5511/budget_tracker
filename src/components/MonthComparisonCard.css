@@ -1,0 +1,53 @@
+.comparison-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 16px 20px;
+  margin: 0 0 20px;
+}
+
+.comparison-title {
+  margin: 0 0 10px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.comparison-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.comparison-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 14px;
+}
+
+.comparison-label {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.comparison-change {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.comparison-change.is-good {
+  color: var(--income);
+}
+
+.comparison-change.is-bad {
+  color: var(--expense);
+}
+
+.comparison-change.is-flat {
+  color: var(--text-muted);
+}
