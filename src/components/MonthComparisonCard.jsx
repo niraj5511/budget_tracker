@@ -41,11 +41,6 @@ function ComparisonRow({ label, change, goodDirection }) {
   )
 }
 
-/**
- * Only meaningful against a single selected month - "All time" has no
- * single previous period to compare against, so the card stays hidden then,
- * same as when the selected month is the first one on record.
- */
 function MonthComparisonCard({ transactions, activeMonth }) {
   if (activeMonth === ALL_MONTHS) return null
 
