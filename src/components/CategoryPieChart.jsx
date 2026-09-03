@@ -15,11 +15,7 @@ function ChartTooltip({ active, payload }) {
   )
 }
 
-/**
- * A donut chart for one side of the ledger (expense or income), plus a
- * legend list with amounts - the chart shows proportion at a glance, the
- * list gives the exact figure the chart can't label without crowding.
- */
+
 function CategoryPieChart({ title, rows, emptyLabel, valueLabel }) {
   const total = rows.reduce((sum, row) => sum + row.amount, 0)
 
