@@ -33,12 +33,7 @@ function ChartTooltip({ active, payload }) {
   )
 }
 
-/**
- * Built from the full transaction history so a single selected month still
- * has neighbouring months to compare against - but which slice of that
- * history is shown follows the same month filter as the rest of the page:
- * one bar-pair for a specific month, or the trailing months for "All time".
- */
+
 function MonthlyTrendChart({ transactions, activeMonth }) {
   const allData = monthlyTrend(transactions)
 
