@@ -2,11 +2,7 @@ import CategoryPieChart from './CategoryPieChart'
 import { expensesByCategory, incomeByCategory } from '../utils/breakdown'
 import './CategoryBreakdown.css'
 
-/**
- * Two donut charts side by side, mirroring how the old spreadsheet kept
- * expense and income in separate blocks - one chart mixing both directions
- * would need its slices to mean two different things.
- */
+
 function CategoryBreakdown({ transactions, periodLabel }) {
   const expenseRows = expensesByCategory(transactions)
   const incomeRows = incomeByCategory(transactions)
