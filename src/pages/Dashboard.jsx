@@ -3,6 +3,7 @@ import CategoryBreakdown from '../components/CategoryBreakdown'
 import MonthComparisonCard from '../components/MonthComparisonCard'
 import MonthFilter from '../components/MonthFilter'
 import MonthlyTrendChart from '../components/MonthlyTrendChart'
+import TopCategoryCard from '../components/TopCategoryCard'
 
 function Dashboard({
   months,
@@ -26,6 +27,7 @@ function Dashboard({
       <MonthComparisonCard transactions={transactions} activeMonth={activeMonth} />
       <MonthlyTrendChart transactions={transactions} activeMonth={activeMonth} />
       <BalanceSummary transactions={visibleTransactions} />
+      <TopCategoryCard transactions={visibleTransactions} />
       <CategoryBreakdown
         transactions={visibleTransactions}
         periodLabel={periodLabel}
