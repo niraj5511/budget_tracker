@@ -76,3 +76,51 @@ export function saveTransactions(transactions) {
     // session; only persistence is lost, so there is nothing to recover.
   }
 }
+
+const BUDGETS_STORAGE_KEY = 'budget-tracker:budgets'
+
+/**
+ * Budgets are a plain { category: limit } map, not a list - a category only
+ * ever has one active limit, so there is nothing an id would identify that
+ * the key itself doesn't already.
+ */
+function isValidBudgetMap(value) {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    !Array.isArray(value) &&
+    Object.entries(value).every(
+      ([category, limit]) =>
+        category.trim() && typeof limit === 'number' && Number.isFinite(limit) && limit > 0,
+    )
+  )
+}
+
+/** Reads saved budget limits, returning {} when there is nothing usable. */
+export function loadBudgets() {
+  let raw
+  try {
+    raw = localStorage.getItem(BUDGETS_STORAGE_KEY)
+  } catch {
+    return {}
+  }
+
+  if (raw === null) return {}
+
+  let parsed
+  try {
+    parsed = JSON.parse(raw)
+  } catch {
+    return {}
+  }
+
+  return isValidBudgetMap(parsed) ? parsed : {}
+}
+
+export function saveBudgets(budgets) {
+  try {
+    localStorage.setItem(BUDGETS_STORAGE_KEY, JSON.stringify(budgets))
+  } catch {
+    // Same as saveTransactions: nothing to recover from a storage failure.
+  }
+}
