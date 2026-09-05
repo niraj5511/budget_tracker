@@ -1,0 +1,105 @@
+.budget-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 20px;
+}
+
+.budget-header {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.budget-title {
+  font-size: 15px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--text-muted);
+}
+
+.budget-summary {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.budget-hint {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin: 0 0 18px;
+  max-width: 480px;
+}
+
+.budget-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.budget-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.budget-row:last-child {
+  border-bottom: 0;
+}
+
+.budget-row-label {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.budget-row-input {
+  position: relative;
+  width: 160px;
+  flex-shrink: 0;
+}
+
+.budget-row-prefix {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 14px;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.budget-row-input input {
+  width: 100%;
+  font: inherit;
+  font-size: 14px;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 12px 8px 34px;
+  transition: border-color 0.15s;
+}
+
+.budget-row-input input:hover {
+  border-color: var(--text-muted);
+}
+
+.budget-row-input input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+  border-color: var(--accent);
+}
+
+.budget-row-saved {
+  flex-shrink: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--income);
+}
