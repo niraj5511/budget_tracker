@@ -4,6 +4,7 @@ import './Navbar.css'
 const NAV_LINKS = [
   { to: '/', label: 'Dashboard', end: true },
   { to: '/transactions', label: 'Transactions' },
+  { to: '/budget', label: 'Budget' },
 ]
 
 function Navbar() {
