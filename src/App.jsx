@@ -1,12 +1,18 @@
 import { useEffect, useState } from 'react'
 import { Route, Routes } from 'react-router-dom'
 import Navbar from './components/Navbar'
+import Budget from './pages/Budget'
 import Dashboard from './pages/Dashboard'
 import Transactions from './pages/Transactions'
 import sampleTransactions from './data/sampleTransactions'
 import { ALL_MONTHS, availableMonths, filterByMonth } from './utils/months'
 import { formatBsMonth } from './utils/nepaliDate'
-import { loadTransactions, saveTransactions } from './utils/storage'
+import {
+  loadBudgets,
+  loadTransactions,
+  saveBudgets,
+  saveTransactions,
+} from './utils/storage'
 import './App.css'
 
 function App() {
@@ -15,12 +21,17 @@ function App() {
   const [transactions, setTransactions] = useState(() =>
     loadTransactions(sampleTransactions),
   )
+  const [budgets, setBudgets] = useState(() => loadBudgets())
   const [selectedMonth, setSelectedMonth] = useState(ALL_MONTHS)
   const [editingId, setEditingId] = useState(null)
 
   useEffect(() => {
     saveTransactions(transactions)
   }, [transactions])
+
+  useEffect(() => {
+    saveBudgets(budgets)
+  }, [budgets])
 
   // Derived rather than trusted: the row being edited can be deleted from
   // under the form, and looking it up each render means a missing row simply
@@ -49,6 +60,19 @@ function App() {
 
   function handleDeleteTransaction(id) {
     setTransactions((prev) => prev.filter((transaction) => transaction.id !== id))
+  }
+
+  // null clears a limit rather than storing it - a category with no limit
+  // shouldn't linger in the map at 0, which would read as "budget: Rs. 0"
+  // instead of "no budget set".
+  function handleSaveLimit(category, limit) {
+    setBudgets((prev) => {
+      if (limit === null) {
+        const { [category]: _removed, ...rest } = prev
+        return rest
+      }
+      return { ...prev, [category]: limit }
+    })
   }
 
   const months = availableMonths(transactions)
@@ -85,6 +109,7 @@ function App() {
                 transactions={transactions}
                 visibleTransactions={visibleTransactions}
                 periodLabel={periodLabel}
+                budgets={budgets}
               />
             }
           />
@@ -106,6 +131,10 @@ function App() {
                 onDeleteTransaction={handleDeleteTransaction}
               />
             }
+          />
+          <Route
+            path="/budget"
+            element={<Budget budgets={budgets} onSaveLimit={handleSaveLimit} />}
           />
         </Routes>
       </main>
