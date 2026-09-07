@@ -6,6 +6,7 @@ function TransactionList({
   editingId,
   onEditTransaction,
   onDeleteTransaction,
+  emptyMessage = 'No transactions yet.',
 }) {
   return (
     <section className="transaction-list-section">
@@ -17,7 +18,7 @@ function TransactionList({
       </div>
 
       {transactions.length === 0 ? (
-        <p className="transaction-list-empty">No transactions yet.</p>
+        <p className="transaction-list-empty">{emptyMessage}</p>
       ) : (
         <ul className="transaction-list">
           {transactions.map((transaction) => (
