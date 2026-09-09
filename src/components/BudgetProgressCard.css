@@ -75,3 +75,14 @@
 .progress-fill.is-over {
   background: var(--expense);
 }
+
+.progress-remaining {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.progress-remaining.is-over {
+  color: var(--expense);
+  font-weight: 500;
+}

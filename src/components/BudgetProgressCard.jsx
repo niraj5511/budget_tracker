@@ -6,6 +6,7 @@ import './BudgetProgressCard.css'
 
 function ProgressRow({ row }) {
   const width = Math.min(row.percent, 100)
+  const remaining = row.limit - row.spent
 
   return (
     <div className="progress-row">
@@ -21,6 +22,11 @@ function ProgressRow({ row }) {
           style={{ width: `${width}%` }}
         />
       </div>
+      <p className={`progress-remaining${row.isOver ? ' is-over' : ''}`}>
+        {row.isOver
+          ? `${formatCurrency(Math.abs(remaining))} over`
+          : `${formatCurrency(remaining)} left`}
+      </p>
     </div>
   )
 }
