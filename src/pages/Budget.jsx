@@ -34,6 +34,12 @@ function BudgetRow({ category, limit, onSave }) {
     setTimeout(() => setSaved(false), 1200)
   }
 
+    // Enter commits the same way tabbing away does - routes through the
+  // existing onBlur handler instead of duplicating the save logic here.
+  function handleKeyDown(event) {
+    if (event.key === 'Enter') event.currentTarget.blur()
+  }
+
   return (
     <div className="budget-row">
       <label className="budget-row-label" htmlFor={`budget-${category}`}>
@@ -53,13 +59,13 @@ function BudgetRow({ category, limit, onSave }) {
           value={value}
           onChange={(event) => setValue(event.target.value)}
           onBlur={handleBlur}
+          onKeyDown={handleKeyDown}
         />
       </div>
       {saved && <span className="budget-row-saved">Saved</span>}
     </div>
   )
 }
-
 /**
  * Sets a recurring monthly limit per expense category. A limit applies to
  * every month until changed here - there is no per-month override, which
