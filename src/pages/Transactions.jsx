@@ -59,18 +59,26 @@ function Transactions({
         onCancel={onCancelEdit}
       />
 
-      {sortedTransactions.length > 0 && (
-        <TransactionFilters
-          search={search}
-          onSearchChange={setSearch}
-          type={type}
-          onTypeChange={setType}
-          category={category}
-          onCategoryChange={setCategory}
-          categoryOptions={categoryOptions}
-          onClear={handleClear}
-          isFiltered={isFiltered}
-        />
+            {sortedTransactions.length > 0 && (
+        <>
+          <TransactionFilters
+            search={search}
+            onSearchChange={setSearch}
+            type={type}
+            onTypeChange={setType}
+            category={category}
+            onCategoryChange={setCategory}
+            categoryOptions={categoryOptions}
+            onClear={handleClear}
+            isFiltered={isFiltered}
+          />
+          {isFiltered && (
+            <p className="filter-result-count">
+              Showing {filteredTransactions.length} of{' '}
+              {sortedTransactions.length} transactions
+            </p>
+          )}
+        </>
       )}
 
       <TransactionList
