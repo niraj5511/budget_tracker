@@ -57,7 +57,13 @@ function TransactionItem({ transaction, isEditing, onEdit, onDelete }) {
         <button
           className="transaction-delete"
           type="button"
-          onClick={() => onDelete(id)}
+          onClick={() => {
+            // There is no undo yet, so a misclick would otherwise lose the
+            // row with no way back.
+            if (window.confirm(`Delete "${description}"? This can't be undone.`)) {
+              onDelete(id)
+            }
+          }}
           aria-label={`Delete ${description}`}
         >
           <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
