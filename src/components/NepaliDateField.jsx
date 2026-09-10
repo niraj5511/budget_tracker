@@ -56,6 +56,7 @@ function NepaliDateField({ value, invalid, describedBy, onChange }) {
         className="nepali-date-part"
         aria-label="Month"
         aria-invalid={invalid}
+        aria-describedby={describedBy}
         value={bs?.month ?? ''}
         onChange={(event) => change('month', event.target.value)}
       >
@@ -70,6 +71,7 @@ function NepaliDateField({ value, invalid, describedBy, onChange }) {
         className="nepali-date-part"
         aria-label="Year"
         aria-invalid={invalid}
+        aria-describedby={describedBy}
         value={bs?.year ?? ''}
         onChange={(event) => change('year', event.target.value)}
       >
