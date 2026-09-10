@@ -30,6 +30,12 @@ function TransactionFilters({
         placeholder="Search description or category..."
         value={search}
         onChange={(event) => onSearchChange(event.target.value)}
+        // Escape clears the text only - the type/category dropdowns are
+        // separate controls with their own state, not part of what this
+        // field owns.
+        onKeyDown={(event) => {
+          if (event.key === 'Escape' && search) onSearchChange('')
+        }}
         aria-label="Search transactions"
       />
 
