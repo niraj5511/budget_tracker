@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { EXPENSE_CATEGORIES } from '../data/categories'
 import { formatCurrency } from '../utils/format'
 import './Budget.css'
@@ -12,8 +12,17 @@ function BudgetRow({ category, limit, onSave }) {
   // mid-edit without that half-typed value overwriting the real budget.
   const [value, setValue] = useState(limit ? String(limit) : '')
   const [saved, setSaved] = useState(false)
+  // blur() fires synchronously, before the setValue() from an Escape revert
+  // has committed - so handleBlur would otherwise still see the old typed
+  // text. This flag tells it to skip the save-on-blur logic entirely.
+  const revertingRef = useRef(false)
 
   function handleBlur() {
+    if (revertingRef.current) {
+      revertingRef.current = false
+      return
+    }
+
     const trimmed = value.trim()
 
     if (!trimmed) {
@@ -34,10 +43,18 @@ function BudgetRow({ category, limit, onSave }) {
     setTimeout(() => setSaved(false), 1200)
   }
 
-    // Enter commits the same way tabbing away does - routes through the
+  // Enter commits the same way tabbing away does - routes through the
   // existing onBlur handler instead of duplicating the save logic here.
+  // Escape discards the in-progress edit instead, reverting the field
+  // without calling onSave.
   function handleKeyDown(event) {
-    if (event.key === 'Enter') event.currentTarget.blur()
+    if (event.key === 'Enter') {
+      event.currentTarget.blur()
+    } else if (event.key === 'Escape') {
+      revertingRef.current = true
+      setValue(limit ? String(limit) : '')
+      event.currentTarget.blur()
+    }
   }
 
   return (
@@ -66,6 +83,7 @@ function BudgetRow({ category, limit, onSave }) {
     </div>
   )
 }
+
 /**
  * Sets a recurring monthly limit per expense category. A limit applies to
  * every month until changed here - there is no per-month override, which
