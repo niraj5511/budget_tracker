@@ -54,7 +54,7 @@ function TransactionItem({ transaction, isEditing, onEdit, onDelete }) {
             />
           </svg>
         </button>
-        <button
+                <button
           className="transaction-delete"
           type="button"
           onClick={() => {
@@ -65,6 +65,7 @@ function TransactionItem({ transaction, isEditing, onEdit, onDelete }) {
             }
           }}
           aria-label={`Delete ${description}`}
+          title="Delete transaction"
         >
           <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
             <path
