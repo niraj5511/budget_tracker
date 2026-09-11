@@ -35,7 +35,7 @@ function ComparisonRow({ label, change, goodDirection }) {
           ? 'New this month'
           : percent === null
             ? 'No change'
-            : `${Math.abs(Math.round(percent))}%`}
+            : `${Math.round(Math.abs(percent))}%`}
       </span>
     </div>
   )
