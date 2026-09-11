@@ -16,7 +16,7 @@ function ChartTooltip({ active, payload }) {
 }
 
 
-function CategoryPieChart({ title, rows, emptyLabel, valueLabel }) {
+function CategoryPieChart({ title, rows = [], emptyLabel, valueLabel }) {
   const total = rows.reduce((sum, row) => sum + row.amount, 0)
 
   return (
