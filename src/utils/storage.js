@@ -71,9 +71,10 @@ export function loadTransactions(fallback) {
 export function saveTransactions(transactions) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(transactions))
-  } catch {
+  } catch (error) {
     // Out of quota, or storage disabled. The app still works for this
     // session; only persistence is lost, so there is nothing to recover.
+    console.error('Failed to save transactions:', error)
   }
 }
 
@@ -120,7 +121,8 @@ export function loadBudgets() {
 export function saveBudgets(budgets) {
   try {
     localStorage.setItem(BUDGETS_STORAGE_KEY, JSON.stringify(budgets))
-  } catch {
+  } catch (error) {
     // Same as saveTransactions: nothing to recover from a storage failure.
+    console.error('Failed to save budgets:', error)
   }
 }
