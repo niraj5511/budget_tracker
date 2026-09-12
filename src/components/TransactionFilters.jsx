@@ -28,6 +28,7 @@ function TransactionFilters({
         type="search"
         className="filter-search"
         placeholder="Search description or category..."
+        autoComplete="off"
         value={search}
         onChange={(event) => onSearchChange(event.target.value)}
         // Escape clears the text only - the type/category dropdowns are
