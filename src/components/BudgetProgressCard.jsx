@@ -1,34 +1,41 @@
-import { Link } from 'react-router-dom'
-import { formatCurrency } from '../utils/format'
-import { budgetProgress } from '../utils/budgetProgress'
-import { ALL_MONTHS } from '../utils/months'
-import './BudgetProgressCard.css'
+import { Link } from "react-router-dom";
+import { formatCurrency } from "../utils/format";
+import { budgetProgress } from "../utils/budgetProgress";
+import { ALL_MONTHS } from "../utils/months";
+import "./BudgetProgressCard.css";
 
 function ProgressRow({ row }) {
-  const width = Math.min(row.percent, 100)
-  const remaining = row.limit - row.spent
+  const width = Math.min(row.percent, 100);
+  const remaining = row.limit - row.spent;
 
   return (
     <div className="progress-row">
       <div className="progress-row-top">
         <span className="progress-category">{row.category}</span>
-        <span className={`progress-figures${row.isOver ? ' is-over' : ''}`}>
+        <span className={`progress-figures${row.isOver ? " is-over" : ""}`}>
           {formatCurrency(row.spent)} / {formatCurrency(row.limit)}
         </span>
       </div>
-      <div className="progress-track">
+      <div
+        className="progress-track"
+        role="progressbar"
+        aria-valuenow={Math.round(width)}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-label={`${row.category} budget used`}
+      >
         <div
-          className={`progress-fill${row.isOver ? ' is-over' : ''}`}
+          className={`progress-fill${row.isOver ? " is-over" : ""}`}
           style={{ width: `${width}%` }}
         />
       </div>
-      <p className={`progress-remaining${row.isOver ? ' is-over' : ''}`}>
+      <p className={`progress-remaining${row.isOver ? " is-over" : ""}`}>
         {row.isOver
           ? `${formatCurrency(Math.abs(remaining))} over`
           : `${formatCurrency(remaining)} left`}
       </p>
     </div>
-  )
+  );
 }
 
 /**
@@ -37,7 +44,7 @@ function ProgressRow({ row }) {
  * blown by month three. Hidden there, same as the comparison card.
  */
 function BudgetProgressCard({ transactions, activeMonth, budgets }) {
-  if (activeMonth === ALL_MONTHS) return null
+  if (activeMonth === ALL_MONTHS) return null;
   if (Object.keys(budgets).length === 0) {
     return (
       <section className="budget-progress-card">
@@ -47,10 +54,10 @@ function BudgetProgressCard({ transactions, activeMonth, budgets }) {
           spending against a budget.
         </p>
       </section>
-    )
+    );
   }
 
-  const rows = budgetProgress(transactions, budgets)
+  const rows = budgetProgress(transactions, budgets);
 
   return (
     <section className="budget-progress-card">
@@ -61,7 +68,7 @@ function BudgetProgressCard({ transactions, activeMonth, budgets }) {
         ))}
       </div>
     </section>
-  )
+  );
 }
 
-export default BudgetProgressCard
+export default BudgetProgressCard;
