@@ -1,23 +1,22 @@
-import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts'
-import { colorFor } from '../utils/chartColors'
-import { formatCurrency } from '../utils/format'
-import './CategoryPieChart.css'
+import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
+import { colorFor } from "../utils/chartColors";
+import { formatCurrency } from "../utils/format";
+import "./CategoryPieChart.css";
 
 function ChartTooltip({ active, payload }) {
-  if (!active || !payload?.length) return null
-  const { category, amount } = payload[0].payload
+  if (!active || !payload?.length) return null;
+  const { category, amount } = payload[0].payload;
 
   return (
     <div className="pie-tooltip">
       <strong>{category}</strong>
       <span>{formatCurrency(amount)}</span>
     </div>
-  )
+  );
 }
 
-
 function CategoryPieChart({ title, rows = [], emptyLabel, valueLabel }) {
-  const total = rows.reduce((sum, row) => sum + row.amount, 0)
+  const total = rows.reduce((sum, row) => sum + row.amount, 0);
 
   return (
     <section className="pie-card">
@@ -57,7 +56,8 @@ function CategoryPieChart({ title, rows = [], emptyLabel, valueLabel }) {
                 />
                 <span className="pie-legend-label">{row.category}</span>
                 <span className="pie-legend-amount">
-                  {formatCurrency(row.amount)}
+                  {formatCurrency(row.amount)} &middot;{" "}
+                  {Math.round((row.amount / total) * 100)}%
                 </span>
               </li>
             ))}
@@ -70,7 +70,7 @@ function CategoryPieChart({ title, rows = [], emptyLabel, valueLabel }) {
         </>
       )}
     </section>
-  )
+  );
 }
 
-export default CategoryPieChart
+export default CategoryPieChart;
