@@ -33,7 +33,6 @@ function ChartTooltip({ active, payload }) {
   )
 }
 
-
 function MonthlyTrendChart({ transactions, activeMonth }) {
   const allData = monthlyTrend(transactions)
 
