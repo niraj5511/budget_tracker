@@ -86,7 +86,8 @@
   border-color: var(--accent);
 }
 
-.transaction-form input[aria-invalid='true'] {
+.transaction-form input[aria-invalid='true'],
+.transaction-form select[aria-invalid='true'] {
   border-color: var(--expense);
 }
 
