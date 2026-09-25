@@ -18,7 +18,9 @@ function categoryTotals(transactions, type) {
 
   return [...totals]
     .map(([category, amount]) => ({ category, amount }))
-    .sort((a, b) => b.amount - a.amount)
+    // Ties (equal amounts) fall back to category name, so the order is
+    // deterministic instead of depending on transaction insertion order.
+    .sort((a, b) => b.amount - a.amount || a.category.localeCompare(b.category))
 }
 
 /** Totals expenses per category, largest first. */
