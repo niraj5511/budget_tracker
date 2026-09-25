@@ -5,6 +5,9 @@ import { expensesByCategory, incomeByCategory } from './breakdown'
  * that side's total. Both breakdown functions already sort largest-first,
  * so the top row is just rows[0] - this only adds the percentage and the
  * empty-period guard.
+ *
+ * @param {{ category: string, amount: number }[]} rows
+ * @returns {{ category: string, amount: number, percent: number } | null}
  */
 function topOf(rows) {
   if (rows.length === 0) return null
@@ -26,6 +29,12 @@ function topOf(rows) {
  * passed in - callers filter to the active period first, so this follows
  * the same month filter as the rest of the dashboard rather than having an
  * opinion of its own.
+ *
+ * @param {object[]} transactions
+ * @returns {{
+ *   expense: { category: string, amount: number, percent: number } | null,
+ *   income: { category: string, amount: number, percent: number } | null
+ * }}
  */
 export function topCategories(transactions) {
   return {
