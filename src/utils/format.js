@@ -4,10 +4,15 @@ const numberFormatter = new Intl.NumberFormat('en-IN', {
   maximumFractionDigits: 2,
 })
 
-/** 4250.5 -> 'Rs. 4,250.50'; -2400.75 -> '-Rs. 2,400.75' */
+/**
+ * 4250.5 -> 'Rs. 4,250.50'; -2400.75 -> '-Rs. 2,400.75'
+ * Non-finite input (NaN, Infinity, undefined, ...) falls back to 'Rs. 0.00'
+ * rather than leaking a broken string into the UI.
+ */
 export function formatCurrency(amount) {
-  const sign = amount < 0 ? '-' : ''
-  return `${sign}Rs. ${numberFormatter.format(Math.abs(amount))}`
+  const safeAmount = Number.isFinite(amount) ? amount : 0
+  const sign = safeAmount < 0 ? '-' : ''
+  return `${sign}Rs. ${numberFormatter.format(Math.abs(safeAmount))}`
 }
 
 /**
