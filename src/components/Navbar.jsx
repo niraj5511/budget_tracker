@@ -11,7 +11,7 @@ function Navbar() {
   return (
     <header className="navbar">
       <div className="navbar-inner">
-        <div className="navbar-brand">
+        <NavLink to="/" className="navbar-brand" aria-label="Go to dashboard">
           <span className="navbar-mark" aria-hidden="true">
             Rs
           </span>
@@ -21,7 +21,7 @@ function Navbar() {
               Keep an eye on where your money goes.
             </span>
           </div>
-        </div>
+        </NavLink>
 
         <nav className="navbar-links" aria-label="Main">
           {NAV_LINKS.map((link) => (
