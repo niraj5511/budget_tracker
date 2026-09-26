@@ -15,11 +15,14 @@ export function budgetProgress(transactions, budgets) {
   return Object.entries(budgets)
     .map(([category, limit]) => {
       const spent = spentByCategory.get(category) ?? 0
+      // A zero limit would divide to Infinity; treat it as "fully used"
+      // once anything is spent, and 0% while spend is still zero too.
+      const percent = limit > 0 ? (spent / limit) * 100 : spent > 0 ? 100 : 0
       return {
         category,
         limit,
         spent,
-        percent: (spent / limit) * 100,
+        percent,
         isOver: spent > limit,
       }
     })
