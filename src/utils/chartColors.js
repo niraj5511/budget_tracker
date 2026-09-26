@@ -17,5 +17,8 @@ export const CHART_COLORS = [
 ]
 
 export function colorFor(index) {
-  return CHART_COLORS[index % CHART_COLORS.length]
+  // Double modulo so a negative index still wraps into range instead of
+  // producing a negative array index (and `undefined`).
+  const safeIndex = ((index % CHART_COLORS.length) + CHART_COLORS.length) % CHART_COLORS.length
+  return CHART_COLORS[safeIndex]
 }
