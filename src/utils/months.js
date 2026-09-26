@@ -30,6 +30,13 @@ export function availableMonths(transactions) {
   return [...keys].sort((a, b) => b.localeCompare(a))
 }
 
+/**
+ * Transactions whose BS month key matches `month`.
+ *
+ * @param {object[]} transactions
+ * @param {string} month a 'YYYY-MM' BS key, or ALL_MONTHS to skip filtering
+ * @returns {object[]}
+ */
 export function filterByMonth(transactions, month) {
   if (month === ALL_MONTHS) return transactions
 
