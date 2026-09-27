@@ -32,8 +32,12 @@ function Transactions({
       if (category !== "all" && transaction.category !== category) return false;
       if (!query) return true;
 
+      // Description is optional on some rows, so fall back to an empty
+      // string rather than calling toLowerCase() on undefined.
+      const description = transaction.description ?? "";
+
       return (
-        transaction.description.toLowerCase().includes(query) ||
+        description.toLowerCase().includes(query) ||
         transaction.category.toLowerCase().includes(query)
       );
     });
