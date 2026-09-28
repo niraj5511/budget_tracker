@@ -30,9 +30,9 @@ function ComparisonRow({ label, change, goodDirection }) {
         aria-label={`${label} ${
           isNew
             ? "is new this month"
-            : percent === null
+            : direction === "flat"
               ? "unchanged"
-              : `${direction === "up" ? "up" : "down"} ${Math.abs(Math.round(percent))}%`
+              : `${direction} ${Math.abs(Math.round(percent))}%`
         }`}
       >
         <span aria-hidden="true">
