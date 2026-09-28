@@ -9,9 +9,14 @@ function TransactionList({
   emptyMessage = 'No transactions yet.',
 }) {
   return (
-    <section className="transaction-list-section">
+    <section
+      className="transaction-list-section"
+      aria-labelledby="transaction-list-title"
+    >
       <div className="transaction-list-header">
-        <h2 className="transaction-list-title">Transactions</h2>
+        <h2 id="transaction-list-title" className="transaction-list-title">
+          Transactions
+        </h2>
         {transactions.length > 0 && (
           <span className="transaction-count">{transactions.length}</span>
         )}
