@@ -57,7 +57,7 @@ function CategoryPieChart({ title, rows = [], emptyLabel, valueLabel }) {
                 <span className="pie-legend-label">{row.category}</span>
                 <span className="pie-legend-amount">
                   {formatCurrency(row.amount)} &middot;{" "}
-                  {Math.round((row.amount / total) * 100)}%
+                  {total > 0 ? Math.round((row.amount / total) * 100) : 0}%
                 </span>
               </li>
             ))}
