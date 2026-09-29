@@ -53,6 +53,9 @@ function NepaliDateField({ value, invalid, describedBy, onChange }) {
         value={bs?.day ?? ""}
         onChange={(event) => change("day", event.target.value)}
       >
+        {/* Shown only while nothing is selected, so the browser doesn't
+            fall back to displaying the first real option as if chosen. */}
+        {!bs && <option value="" hidden></option>}
         {/* Rebuilt per month, since the last day moves between 29 and 32. */}
         {Array.from({ length: dayCount }, (_, index) => index + 1).map(
           (day) => (
@@ -71,6 +74,7 @@ function NepaliDateField({ value, invalid, describedBy, onChange }) {
         value={bs?.month ?? ""}
         onChange={(event) => change("month", event.target.value)}
       >
+        {!bs && <option value="" hidden></option>}
         {BS_MONTHS.map((month, index) => (
           <option key={month} value={index + 1}>
             {month}
@@ -86,6 +90,7 @@ function NepaliDateField({ value, invalid, describedBy, onChange }) {
         value={bs?.year ?? ""}
         onChange={(event) => change("year", event.target.value)}
       >
+        {!bs && <option value="" hidden></option>}
         {YEARS.map((year) => (
           <option key={year} value={year}>
             {year}
