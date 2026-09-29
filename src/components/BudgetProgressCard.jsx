@@ -22,6 +22,7 @@ function ProgressRow({ row }) {
         aria-valuenow={Math.round(width)}
         aria-valuemin={0}
         aria-valuemax={100}
+        aria-valuetext={`${Math.round(row.percent)}% used${row.isOver ? ", over budget" : ""}`}
         aria-label={`${row.category} budget used`}
       >
         <div
