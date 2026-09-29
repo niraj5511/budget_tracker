@@ -31,6 +31,22 @@ const EPOCH_UTC = (() => {
 })()
 
 /**
+ * True when year/month/day form a real calendar date. `Date.UTC` normalizes
+ * out-of-range components instead of rejecting them (month 13 rolls into
+ * next year, day 32 rolls into next month), so this checks the constructed
+ * date's fields match what was asked for rather than trusting the regex
+ * shape alone.
+ */
+function isRealAdDate(year, month, day) {
+  const date = new Date(Date.UTC(year, month - 1, day))
+  return (
+    date.getUTCFullYear() === year &&
+    date.getUTCMonth() === month - 1 &&
+    date.getUTCDate() === day
+  )
+}
+
+/**
  * `Date.UTC` and `toISOString` are safe in this module even though the rest of
  * the app avoids Date arithmetic: every instant here is a UTC midnight, so
  * differences are exact whole days and the ISO string is the intended date.
@@ -54,6 +70,11 @@ export function toBs(isoDate) {
   // Inputs arrive half-typed and empty from form state, so the shape is
   // checked rather than assumed.
   if (typeof isoDate !== 'string' || !ISO_DATE.test(isoDate)) return null
+
+  // The regex only checks digit shape - '2026-13-45' would still match it,
+  // so a real-calendar-date check catches what the shape check can't.
+  const [adYear, adMonth, adDay] = isoDate.split('-').map(Number)
+  if (!isRealAdDate(adYear, adMonth, adDay)) return null
 
   const offset = daysFromEpoch(isoDate)
   if (!Number.isInteger(offset) || offset < 0 || offset >= TOTAL_DAYS) return null
