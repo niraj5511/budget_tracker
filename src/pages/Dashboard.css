@@ -1,0 +1,19 @@
+/* One place owns the vertical rhythm between dashboard blocks, so the cards
+   themselves don't need outer margins. */
+.dashboard {
+  gap: var(--space-6);
+}
+
+.dashboard .page-header {
+  margin-bottom: 0;
+}
+
+/* TEMPORARY: these undo margins the not-yet-refreshed components still carry.
+   Delete each line when that component is updated in a later step. */
+.dashboard-filter .month-filter {
+  margin-bottom: 0; /* remove after MonthFilter step */
+}
+
+.dashboard > .breakdown {
+  margin-bottom: 0; /* remove after CategoryBreakdown step */
+}

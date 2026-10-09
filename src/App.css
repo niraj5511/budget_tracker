@@ -1,8 +1,38 @@
+/* Same max-width and gutter as the navbar's inner row, so the page content
+   lines up with the logo on wide screens. */
 .app-main {
-  padding: 32px clamp(20px, 4vw, 48px) 40px;
+  width: 100%;
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: var(--space-8) var(--gutter) var(--space-10);
+}
+
+/* Programmatic focus target for the skip link; no ring needed on a container. */
+.app-main:focus {
+  outline: none;
 }
 
 .page {
   display: flex;
   flex-direction: column;
+  animation: page-in var(--t-base) var(--ease);
+}
+
+@keyframes page-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* The navbar becomes a fixed bottom tab bar on phones, so leave room for it. */
+@media (max-width: 640px) {
+  .app-main {
+    padding-top: var(--space-5);
+    padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px));
+  }
 }

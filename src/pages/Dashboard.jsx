@@ -4,6 +4,7 @@ import MonthComparisonCard from '../components/MonthComparisonCard'
 import MonthFilter from '../components/MonthFilter'
 import MonthlyTrendChart from '../components/MonthlyTrendChart'
 import TopCategoryCard from '../components/TopCategoryCard'
+import './Dashboard.css'
 
 function Dashboard({
   months,
@@ -14,19 +15,30 @@ function Dashboard({
   periodLabel,
 }) {
   return (
-    <div className="page">
-      {/* With nothing saved there is nothing to filter, and the select
-          would offer "All time" as its only option. */}
-      {months.length > 0 && (
-        <MonthFilter
-          months={months}
-          value={activeMonth}
-          onChange={onMonthChange}
-        />
-      )}
+    <div className="page dashboard">
+      <header className="page-header">
+        <div>
+          <h1 className="page-title">Dashboard</h1>
+          <p className="page-subtitle">Overview &middot; {periodLabel}</p>
+        </div>
+
+        {/* With nothing saved there is nothing to filter, and the select
+            would offer "All time" as its only option. */}
+        {months.length > 0 && (
+          <div className="dashboard-filter">
+            <MonthFilter
+              months={months}
+              value={activeMonth}
+              onChange={onMonthChange}
+            />
+          </div>
+        )}
+      </header>
+
+      {/* The headline numbers come first; everything below explains them. */}
+      <BalanceSummary transactions={visibleTransactions} />
       <MonthComparisonCard transactions={transactions} activeMonth={activeMonth} />
       <MonthlyTrendChart transactions={transactions} activeMonth={activeMonth} />
-      <BalanceSummary transactions={visibleTransactions} />
       <TopCategoryCard transactions={visibleTransactions} />
       <CategoryBreakdown
         transactions={visibleTransactions}
