@@ -1,88 +1,119 @@
 .budget-progress-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  padding: 16px 20px;
-  margin: 0 0 20px;
-}
-
-.budget-progress-title {
-  margin: 0 0 12px;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text-muted);
-}
-
-.budget-progress-empty {
-  font-size: 14px;
-  color: var(--text-muted);
-  margin: 0;
-}
-
-.budget-progress-empty a {
-  color: var(--accent);
-  font-weight: 500;
-}
-
-.progress-rows {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.03);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 1.125rem;
 }
 
-.progress-row-top {
+.budget-progress-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px -4px rgba(15, 23, 42, 0.06);
+}
+
+.budget-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.category-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #0f172a;
+  letter-spacing: -0.01em;
+}
+
+.percentage-pill {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.25rem 0.625rem;
+  border-radius: 9999px;
+  border: 1px solid transparent;
+}
+
+.percentage-pill.normal {
+  background: #f0fdf4;
+  color: #16a34a;
+  border-color: #dcfce7;
+}
+
+.percentage-pill.warning {
+  background: #fffbeb;
+  color: #d97706;
+  border-color: #fef3c7;
+}
+
+.percentage-pill.danger {
+  background: #fef2f2;
+  color: #dc2626;
+  border-color: #fee2e2;
+}
+
+.budget-metrics {
   display: flex;
   align-items: baseline;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 6px;
-  font-size: 13px;
+  gap: 0.5rem;
 }
 
-.progress-category {
+.metric-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.metric-label {
+  font-size: 0.75rem;
   font-weight: 500;
-  color: var(--text);
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
 }
 
-.progress-figures {
-  color: var(--text-muted);
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
+.metric-value {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #0f172a;
 }
 
-.progress-figures.is-over {
-  color: var(--expense);
-  font-weight: 600;
+.limit-val {
+  color: #64748b;
+}
+
+.metric-divider {
+  font-size: 1.125rem;
+  color: #cbd5e1;
+  font-weight: 400;
+  margin: 0 0.25rem;
 }
 
 .progress-track {
+  width: 100%;
   height: 8px;
-  border-radius: 999px;
-  background: var(--bg);
+  background: #f1f5f9;
+  border-radius: 9999px;
   overflow: hidden;
+  position: relative;
 }
 
 .progress-fill {
   height: 100%;
-  border-radius: 999px;
-  background: var(--accent);
-  transition: width 0.2s;
+  border-radius: 9999px;
+  transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Past 100% the bar is already full width, so colour is the only signal
-   left to show a limit was actually exceeded rather than just reached. */
-.progress-fill.is-over {
-  background: var(--expense);
+.progress-fill.normal {
+  background: #2563eb;
 }
 
-.progress-remaining {
-  margin: 4px 0 0;
-  font-size: 12px;
-  color: var(--text-muted);
+.progress-fill.warning {
+  background: #f59e0b;
 }
 
-.progress-remaining.is-over {
-  color: var(--expense);
-  font-weight: 500;
+.progress-fill.danger {
+  background: #dc2626;
 }

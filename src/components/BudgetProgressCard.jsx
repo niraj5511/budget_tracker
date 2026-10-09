@@ -1,75 +1,42 @@
-import { Link } from "react-router-dom";
-import { formatCurrency } from "../utils/format";
-import { budgetProgress } from "../utils/budgetProgress";
-import { ALL_MONTHS } from "../utils/months";
-import "./BudgetProgressCard.css";
+import React from 'react';
+import { formatCurrency } from '../utils/format';
+import './BudgetProgressCard.css';
 
-function ProgressRow({ row }) {
-  const width = Math.min(row.percent, 100);
-  const remaining = row.limit - row.spent;
+export default function BudgetProgressCard({ categoryName, spent = 0, limit = 0 }) {
+  const percentage = limit > 0 ? Math.min(Math.round((spent / limit) * 100), 100) : 0;
+  
+  let statusClass = 'normal';
+  if (percentage >= 90) {
+    statusClass = 'danger';
+  } else if (percentage >= 75) {
+    statusClass = 'warning';
+  }
 
   return (
-    <div className="progress-row">
-      <div className="progress-row-top">
-        <span className="progress-category">{row.category}</span>
-        <span className={`progress-figures${row.isOver ? " is-over" : ""}`}>
-          {formatCurrency(row.spent)} / {formatCurrency(row.limit)}
-        </span>
+    <div className={`budget-progress-card ${statusClass}`}>
+      <div className="budget-card-header">
+        <span className="category-title">{categoryName}</span>
+        <span className={`percentage-pill ${statusClass}`}>{percentage}%</span>
       </div>
-      <div
-        className="progress-track"
-        role="progressbar"
-        aria-valuenow={Math.round(width)}
-        aria-valuemin={0}
-        aria-valuemax={100}
-        aria-valuetext={`${Math.round(row.percent)}% used${row.isOver ? ", over budget" : ""}`}
-        aria-label={`${row.category} budget used`}
-      >
-        <div
-          className={`progress-fill${row.isOver ? " is-over" : ""}`}
-          style={{ width: `${width}%` }}
-        />
+
+      <div className="budget-metrics">
+        <div className="metric-item">
+          <span className="metric-label">Spent</span>
+          <span className="metric-value">{formatCurrency(spent)}</span>
+        </div>
+        <div className="metric-divider">/</div>
+        <div className="metric-item">
+          <span className="metric-label">Limit</span>
+          <span className="metric-value limit-val">{formatCurrency(limit)}</span>
+        </div>
       </div>
-      <p className={`progress-remaining${row.isOver ? " is-over" : ""}`}>
-        {row.isOver
-          ? `${formatCurrency(Math.abs(remaining))} over`
-          : `${formatCurrency(remaining)} left`}
-      </p>
+
+      <div className="progress-track">
+        <div 
+          className={`progress-fill ${statusClass}`} 
+          style={{ width: `${percentage}%` }}
+        ></div>
+      </div>
     </div>
   );
 }
-
-/**
- * Only meaningful for a single month - limits are monthly, so summing spend
- * across "All time" against one month's limit would flag every budget as
- * blown by month three. Hidden there, same as the comparison card.
- */
-function BudgetProgressCard({ transactions, activeMonth, budgets }) {
-  if (activeMonth === ALL_MONTHS) return null;
-  if (Object.keys(budgets).length === 0) {
-    return (
-      <section className="budget-progress-card">
-        <h3 className="budget-progress-title">Budget</h3>
-        <p className="budget-progress-empty">
-          No limits set yet. <Link to="/budget">Set one up</Link> to track
-          spending against a budget.
-        </p>
-      </section>
-    );
-  }
-
-  const rows = budgetProgress(transactions, budgets);
-
-  return (
-    <section className="budget-progress-card">
-      <h3 className="budget-progress-title">Budget</h3>
-      <div className="progress-rows">
-        {rows.map((row) => (
-          <ProgressRow key={row.category} row={row} />
-        ))}
-      </div>
-    </section>
-  );
-}
-
-export default BudgetProgressCard;
