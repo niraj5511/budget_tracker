@@ -1,49 +1,141 @@
 .trend-card {
+  padding: var(--space-5) var(--space-6);
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border-radius: var(--radius-lg);
   box-shadow: var(--shadow);
-  padding: 18px 20px;
-  margin: 0 0 20px;
-  transition: box-shadow 0.15s;
 }
 
-.trend-card:hover {
-  box-shadow: 0 2px 4px rgba(16, 24, 40, 0.08), 0 4px 8px rgba(16, 24, 40, 0.1);
+.trend-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
 }
 
 .trend-title {
-  margin: 0 0 8px;
-  font-size: 15px;
-  font-weight: 600;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.trend-scope {
+  margin-top: 2px;
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+}
+
+/* ---- Legend (custom, so it matches the rest of the UI) ---------------- */
+.trend-legend {
+  display: flex;
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.trend-legend li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.trend-dot {
+  display: inline-block;
+  flex-shrink: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+}
+
+.trend-dot.is-income {
+  background: var(--income);
+}
+
+.trend-dot.is-expense {
+  background: var(--expense);
+}
+
+/* ---- Chart ------------------------------------------------------------ */
+/* Fixed height here (not on ResponsiveContainer) so phones can shrink it. */
+.trend-chart-wrap {
+  height: 280px;
+  margin-right: -8px;
 }
 
 .trend-empty {
+  padding: var(--space-6) var(--space-4);
+  font-size: 0.9375rem;
+  text-align: center;
   color: var(--text-muted);
-  font-size: 14px;
-  margin: 4px 0 0;
+  background: var(--surface-2);
+  border-radius: var(--radius);
 }
 
-.trend-chart-wrap {
-  margin: 4px -8px 0;
-}
-
+/* ---- Tooltip ---------------------------------------------------------- */
 .trend-tooltip {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  box-shadow: var(--shadow);
-  padding: 8px 12px;
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  font-size: 13px;
+  gap: 6px;
+  min-width: 190px;
+  padding: var(--space-3) var(--space-4);
+  font-size: 0.8125rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
 }
 
-.trend-tooltip-income {
+.trend-tooltip-title {
+  margin-bottom: 2px;
+  font-size: 0.875rem;
+}
+
+.trend-tooltip-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.trend-tooltip-name {
+  color: var(--text-muted);
+}
+
+.trend-tooltip-value {
+  margin-left: auto;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.trend-tooltip-row.is-net {
+  margin-top: 2px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+
+.trend-tooltip-value.is-positive {
   color: var(--income);
 }
 
-.trend-tooltip-expense {
+.trend-tooltip-value.is-negative {
   color: var(--expense);
+}
+
+@media (max-width: 560px) {
+  .trend-card {
+    padding: var(--space-4);
+  }
+
+  .trend-header {
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .trend-chart-wrap {
+    height: 220px;
+  }
 }
