@@ -1,39 +1,65 @@
-/* Sits above the summary, not in the transaction list header, because it
-   changes the totals too - putting it beside "Transactions" would imply it
-   only filtered the rows. */
+/* Sits at the top of the dashboard, not in the transaction list header,
+   because it changes the totals too - putting it beside "Transactions"
+   would imply it only filtered the rows. */
 .month-filter {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 16px;
+  gap: var(--space-3);
 }
 
 .month-filter-label {
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 500;
   color: var(--text-muted);
 }
 
-.month-filter-select {
-  font: inherit;
-  font-size: 14px;
-  color: var(--text);
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 7px 32px 7px 12px;
-  cursor: pointer;
+.month-filter-control {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
 
-  /* Hand-drawn arrow, matching the form's category select. */
+/* Sits over the select's left padding; clicks pass through to the select. */
+.month-filter-icon {
+  position: absolute;
+  left: 12px;
+  width: 16px;
+  height: 16px;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.month-filter-select {
+  width: 100%;
+  min-height: 40px;
+  padding: 0 36px 0 36px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text);
+  background-color: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition:
+    border-color var(--t-fast) var(--ease),
+    box-shadow var(--t-fast) var(--ease);
+
+  /* Hand-drawn chevron, matching the form's category select. */
   appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2.5 4.5L6 8l3.5-3.5' fill='none' stroke='%236b7280' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2.5 4.5L6 8l3.5-3.5' fill='none' stroke='%235b6678' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
-  background-position: right 11px center;
+  background-position: right 12px center;
   background-size: 12px;
 }
 
+.month-filter-select:hover {
+  border-color: var(--text-subtle);
+}
+
 .month-filter-select:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 1px;
+  outline: none;
   border-color: var(--accent);
+  box-shadow: var(--ring);
 }

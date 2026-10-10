@@ -8,12 +8,15 @@
   margin-bottom: 0;
 }
 
-/* TEMPORARY: these undo margins the not-yet-refreshed components still carry.
-   Delete each line when that component is updated in a later step. */
-.dashboard-filter .month-filter {
-  margin-bottom: 0; /* remove after MonthFilter step */
+/* Phones: the filter drops below the title and uses the full width. */
+@media (max-width: 560px) {
+  .dashboard-filter {
+    width: 100%;
+  }
 }
 
+/* TEMPORARY: undoes a margin the not-yet-refreshed component still carries.
+   Delete this rule when CategoryBreakdown is updated in a later step. */
 .dashboard > .breakdown {
   margin-bottom: 0; /* remove after CategoryBreakdown step */
 }
