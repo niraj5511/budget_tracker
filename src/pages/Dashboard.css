@@ -14,9 +14,3 @@
     width: 100%;
   }
 }
-
-/* TEMPORARY: undoes a margin the not-yet-refreshed component still carries.
-   Delete this rule when CategoryBreakdown is updated in a later step. */
-.dashboard > .breakdown {
-  margin-bottom: 0; /* remove after CategoryBreakdown step */
-}

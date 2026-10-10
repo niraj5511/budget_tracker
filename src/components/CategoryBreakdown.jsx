@@ -2,15 +2,16 @@ import CategoryPieChart from './CategoryPieChart'
 import { expensesByCategory, incomeByCategory } from '../utils/breakdown'
 import './CategoryBreakdown.css'
 
-
 function CategoryBreakdown({ transactions, periodLabel }) {
   const expenseRows = expensesByCategory(transactions)
   const incomeRows = incomeByCategory(transactions)
 
   return (
-    <section className="breakdown">
+    <section className="breakdown" aria-labelledby="breakdown-title">
       <div className="breakdown-header">
-        <h2 className="breakdown-title">Breakdown by category</h2>
+        <h2 id="breakdown-title" className="breakdown-title">
+          Breakdown by category
+        </h2>
         <p className="breakdown-period">{periodLabel}</p>
       </div>
 

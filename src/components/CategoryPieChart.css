@@ -1,73 +1,101 @@
 .pie-card {
+  /* Lets the layout below react to the card's own width, not the window's. */
+  container-type: inline-size;
+  min-width: 0;
+  padding: var(--space-5) var(--space-6);
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border-radius: var(--radius-lg);
   box-shadow: var(--shadow);
-  padding: 18px 20px;
-  min-width: 0;
-  transition: box-shadow 0.15s;
-}
-
-.pie-card:hover {
-  box-shadow: 0 2px 4px rgba(16, 24, 40, 0.08), 0 4px 8px rgba(16, 24, 40, 0.1);
 }
 
 .pie-title {
-  margin: 0 0 4px;
-  font-size: 15px;
-  font-weight: 600;
+  margin-bottom: var(--space-4);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
 }
 
 .pie-empty {
+  padding: var(--space-6) var(--space-4);
+  font-size: 0.9375rem;
+  text-align: center;
   color: var(--text-muted);
-  font-size: 14px;
-  margin: 12px 0 0;
+  background: var(--surface-2);
+  border-radius: var(--radius);
+}
+
+/* Donut on the left, total + legend on the right. */
+.pie-body {
+  display: grid;
+  grid-template-columns: 200px minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-6);
 }
 
 .pie-chart-wrap {
-  margin: 4px -8px 0;
+  width: 200px;
+  height: 200px;
 }
 
-.pie-tooltip {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  box-shadow: var(--shadow);
-  padding: 6px 10px;
+.pie-details {
   display: flex;
   flex-direction: column;
-  font-size: 13px;
+  gap: var(--space-4);
+  min-width: 0;
 }
 
+.pie-total {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.pie-total-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+/* ---- Legend ----------------------------------------------------------- */
 .pie-legend {
-  list-style: none;
-  margin: 8px 0 0;
-  padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  max-height: 160px;
+  gap: var(--space-3);
+  max-height: 260px;
+  margin: 0;
+  padding: 0 var(--space-1) 0 0;
   overflow-y: auto;
+  list-style: none;
 }
 
 .pie-legend-row {
   display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pie-legend-top {
+  display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 13px;
+  gap: var(--space-2);
+  font-size: 0.8125rem;
 }
 
 .pie-legend-swatch {
+  flex-shrink: 0;
   width: 10px;
   height: 10px;
-  border-radius: 50%;
-  flex-shrink: 0;
+  border-radius: 3px;
 }
 
 .pie-legend-label {
   flex: 1;
   min-width: 0;
   overflow: hidden;
+  font-weight: 500;
   text-overflow: ellipsis;
   white-space: nowrap;
   color: var(--text);
@@ -75,22 +103,52 @@
 
 .pie-legend-amount {
   color: var(--text-muted);
-  font-variant-numeric: tabular-nums;
 }
 
-.pie-total {
-  margin: 12px 0 0;
-  padding-top: 10px;
-  border-top: 1px solid var(--border);
+.pie-legend-share {
+  min-width: 34px;
+  font-weight: 600;
+  text-align: right;
+  color: var(--text);
+}
+
+.pie-legend-bar {
+  height: 4px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  overflow: hidden;
+}
+
+.pie-legend-bar-fill {
+  height: 100%;
+  border-radius: inherit;
+}
+
+/* ---- Tooltip ---------------------------------------------------------- */
+.pie-tooltip {
   display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  font-size: 13px;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--space-2) var(--space-3);
+  font-size: 0.8125rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-lg);
+}
+
+.pie-tooltip .num {
   color: var(--text-muted);
 }
 
-.pie-total strong {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--text);
+/* ---- Narrow cards: donut on top, details underneath ------------------- */
+@container (max-width: 500px) {
+  .pie-body {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-5);
+  }
+
+  .pie-chart-wrap {
+    margin: 0 auto;
+  }
 }

@@ -1,30 +1,32 @@
 .breakdown {
-  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
 }
 
-.breakdown-header {
-  margin-bottom: 12px;
-}
-
+/* Same section-heading style as "Budget progress". */
 .breakdown-title {
-  font-size: 15px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.6px;
-  color: var(--text-muted);
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
 .breakdown-period {
-  font-size: 13px;
-  color: var(--text-muted);
   margin-top: 2px;
+  font-size: 0.8125rem;
+  color: var(--text-muted);
 }
 
-/* Two cards side by side up to a sane max width - uncapped 1fr would stretch
-   the 220px chart across a much wider card on a full-width page, leaving it
-   looking lost in empty space. */
+/* Expenses and income side by side; one column once the page gets narrow.
+   minmax(0, 1fr) lets the cards shrink instead of overflowing. */
 .breakdown-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 460px));
-  gap: 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+@media (max-width: 900px) {
+  .breakdown-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
