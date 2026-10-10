@@ -1,42 +1,54 @@
-import React from 'react';
-import { formatCurrency } from '../utils/format';
-import './BudgetProgressCard.css';
+import { formatCurrency } from '../utils/format'
+import './BudgetProgressCard.css'
 
-export default function BudgetProgressCard({ categoryName, spent = 0, limit = 0 }) {
-  const percentage = limit > 0 ? Math.min(Math.round((spent / limit) * 100), 100) : 0;
-  
-  let statusClass = 'normal';
-  if (percentage >= 90) {
-    statusClass = 'danger';
-  } else if (percentage >= 75) {
-    statusClass = 'warning';
-  }
+/**
+ * One category's spend against its monthly limit. Takes a row as returned by
+ * budgetProgress() - `<BudgetProgressCard {...row} />` - so the maths lives in
+ * one place (utils/budgetProgress.js) and this component only presents it.
+ */
+export default function BudgetProgressCard({
+  category,
+  spent = 0,
+  limit = 0,
+  percent = 0,
+  isOver = false,
+}) {
+  const shownPercent = Math.round(percent)
+  // The bar stops at full; the pill still says 112% so overspend isn't hidden.
+  const barWidth = Math.min(Math.max(percent, 0), 100)
+
+  let status = 'normal'
+  if (isOver || percent >= 90) status = 'danger'
+  else if (percent >= 75) status = 'warning'
 
   return (
-    <div className={`budget-progress-card ${statusClass}`}>
-      <div className="budget-card-header">
-        <span className="category-title">{categoryName}</span>
-        <span className={`percentage-pill ${statusClass}`}>{percentage}%</span>
+    <article className={`budget-progress-card ${status}`}>
+      <header className="bpc-header">
+        <h3 className="bpc-category">{category}</h3>
+        <span className={`bpc-pill ${status}`}>{shownPercent}%</span>
+      </header>
+
+      <p className="bpc-amount num">
+        <span className="bpc-spent">{formatCurrency(spent)}</span>
+        <span className="bpc-limit"> of {formatCurrency(limit)}</span>
+      </p>
+
+      <div
+        className="bpc-track"
+        role="progressbar"
+        aria-label={`${category} budget used`}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={Math.min(shownPercent, 100)}
+      >
+        <div className={`bpc-fill ${status}`} style={{ width: `${barWidth}%` }} />
       </div>
 
-      <div className="budget-metrics">
-        <div className="metric-item">
-          <span className="metric-label">Spent</span>
-          <span className="metric-value">{formatCurrency(spent)}</span>
-        </div>
-        <div className="metric-divider">/</div>
-        <div className="metric-item">
-          <span className="metric-label">Limit</span>
-          <span className="metric-value limit-val">{formatCurrency(limit)}</span>
-        </div>
-      </div>
-
-      <div className="progress-track">
-        <div 
-          className={`progress-fill ${statusClass}`} 
-          style={{ width: `${percentage}%` }}
-        ></div>
-      </div>
-    </div>
-  );
+      <p className={`bpc-footer num${isOver ? ' is-over' : ''}`}>
+        {isOver
+          ? `${formatCurrency(spent - limit)} over budget`
+          : `${formatCurrency(limit - spent)} left`}
+      </p>
+    </article>
+  )
 }

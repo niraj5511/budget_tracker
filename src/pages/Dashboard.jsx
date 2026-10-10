@@ -1,9 +1,11 @@
 import BalanceSummary from '../components/BalanceSummary'
+import BudgetOverview from '../components/BudgetOverview'
 import CategoryBreakdown from '../components/CategoryBreakdown'
 import MonthComparisonCard from '../components/MonthComparisonCard'
 import MonthFilter from '../components/MonthFilter'
 import MonthlyTrendChart from '../components/MonthlyTrendChart'
 import TopCategoryCard from '../components/TopCategoryCard'
+import { ALL_MONTHS } from '../utils/months'
 import './Dashboard.css'
 
 function Dashboard({
@@ -13,6 +15,7 @@ function Dashboard({
   transactions,
   visibleTransactions,
   periodLabel,
+  budgets,
 }) {
   return (
     <div className="page dashboard">
@@ -37,6 +40,11 @@ function Dashboard({
 
       {/* The headline numbers come first; everything below explains them. */}
       <BalanceSummary transactions={visibleTransactions} />
+      <BudgetOverview
+        transactions={visibleTransactions}
+        budgets={budgets}
+        isAllTime={activeMonth === ALL_MONTHS}
+      />
       <MonthComparisonCard transactions={transactions} activeMonth={activeMonth} />
       <MonthlyTrendChart transactions={transactions} activeMonth={activeMonth} />
       <TopCategoryCard transactions={visibleTransactions} />
