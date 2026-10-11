@@ -1,80 +1,90 @@
-import { formatBsMonth } from "../utils/nepaliDate";
-import { monthComparison } from "../utils/monthComparison";
-import { ALL_MONTHS } from "../utils/months";
-import "./MonthComparisonCard.css";
+import { formatCurrency } from '../utils/format'
+import { monthComparison } from '../utils/monthComparison'
+import { ALL_MONTHS } from '../utils/months'
+import { formatBsMonth } from '../utils/nepaliDate'
+import './MonthComparisonCard.css'
 
-function ComparisonRow({ label, change, goodDirection }) {
-  const { percent, isNew } = change;
+function ComparisonRow({ label, change, goodDirection, previousName }) {
+  const { percent, isNew, current, previous } = change
 
-  let direction = "flat";
-  if (percent !== null) {
-    if (percent > 0) direction = "up";
-    else if (percent < 0) direction = "down";
-  } else if (isNew) {
-    direction = "up";
-  }
+  // A change that rounds to 0% reads as "no change" rather than "up 0%".
+  const rounded = percent === null ? null : Math.round(Math.abs(percent))
+
+  let direction = 'flat'
+  if (isNew) direction = 'up'
+  else if (rounded) direction = percent > 0 ? 'up' : 'down'
 
   // Whether a change is favourable depends on which row it's in - more
   // income is good, more expense isn't, so the same "up" arrow can carry
   // either colour depending on context.
-  const isGood = direction === "flat" ? null : direction === goodDirection;
+  const tone =
+    direction === 'flat' ? 'is-flat' : direction === goodDirection ? 'is-good' : 'is-bad'
 
-  const changeClass =
-    isGood === null ? "is-flat" : isGood ? "is-good" : "is-bad";
+  let pillText = 'No change'
+  let spoken = `${label} unchanged`
+  if (isNew) {
+    pillText = 'New'
+    spoken = `${label} is new this month`
+  } else if (direction !== 'flat') {
+    pillText = `${rounded}%`
+    spoken = `${label} ${direction} ${rounded}%`
+  }
 
   return (
     <div className="comparison-row">
-      <span className="comparison-label">{label}</span>
-      <span
-        className={`comparison-change ${changeClass}`}
-        aria-label={`${label} ${
-          isNew
-            ? "is new this month"
-            : direction === "flat"
-              ? "unchanged"
-              : `${direction} ${Math.abs(Math.round(percent))}%`
-        }`}
-      >
-        <span aria-hidden="true">
-          {direction === "up" && "\u2191"}
-          {direction === "down" && "\u2193"}
-          {direction === "flat" && "\u2192"}
+      <div className="comparison-main">
+        <span className="eyebrow">{label}</span>
+        <span className="comparison-amount num">{formatCurrency(current)}</span>
+        <span className="comparison-previous num">
+          {previous === 0
+            ? `Nothing recorded in ${previousName}`
+            : `${formatCurrency(previous)} in ${previousName}`}
         </span>
-        {isNew
-          ? "New this month"
-          : percent === null
-            ? "No change"
-            : `${Math.round(Math.abs(percent))}%`}
+      </div>
+
+      <span className={`comparison-pill ${tone}`} aria-label={spoken}>
+        <span aria-hidden="true">
+          {direction === 'up' && '\u2191'}
+          {direction === 'down' && '\u2193'}
+          {direction === 'flat' && '\u2192'}
+        </span>
+        <span aria-hidden="true">{pillText}</span>
       </span>
     </div>
-  );
+  )
 }
 
 function MonthComparisonCard({ transactions, activeMonth }) {
-  if (activeMonth === ALL_MONTHS) return null;
+  if (activeMonth === ALL_MONTHS) return null
 
-  const comparison = monthComparison(transactions, activeMonth);
-  if (!comparison) return null;
+  const comparison = monthComparison(transactions, activeMonth)
+  if (!comparison) return null
+
+  const previousLabel = formatBsMonth(comparison.previousMonth)
+  const [previousName] = previousLabel.split(' ')
 
   return (
-    <section className="comparison-card">
-      <h3 className="comparison-title">
-        Vs. {formatBsMonth(comparison.previousMonth)}
-      </h3>
+    <section className="comparison-card" aria-labelledby="comparison-title">
+      <h2 id="comparison-title" className="comparison-title">
+        Compared with {previousLabel}
+      </h2>
+
       <div className="comparison-rows">
         <ComparisonRow
           label="Income"
           change={comparison.income}
           goodDirection="up"
+          previousName={previousName}
         />
         <ComparisonRow
           label="Expense"
           change={comparison.expense}
           goodDirection="down"
+          previousName={previousName}
         />
       </div>
     </section>
-  );
+  )
 }
 
-export default MonthComparisonCard;
+export default MonthComparisonCard

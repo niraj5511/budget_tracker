@@ -45,9 +45,15 @@ function Dashboard({
         budgets={budgets}
         isAllTime={activeMonth === ALL_MONTHS}
       />
-      <MonthComparisonCard transactions={transactions} activeMonth={activeMonth} />
+
+      {/* Two small cards share a row. Either may render nothing (no previous
+          month, no transactions); the survivor then fills the whole row. */}
+      <div className="dashboard-insights">
+        <MonthComparisonCard transactions={transactions} activeMonth={activeMonth} />
+        <TopCategoryCard transactions={visibleTransactions} />
+      </div>
+
       <MonthlyTrendChart transactions={transactions} activeMonth={activeMonth} />
-      <TopCategoryCard transactions={visibleTransactions} />
       <CategoryBreakdown
         transactions={visibleTransactions}
         periodLabel={periodLabel}

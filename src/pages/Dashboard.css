@@ -8,6 +8,19 @@
   margin-bottom: 0;
 }
 
+/* Comparison + top-category cards side by side. auto-fit collapses unused
+   tracks, so a lone card stretches across the full row. */
+.dashboard-insights {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+  gap: var(--space-4);
+}
+
+/* If both cards render nothing, drop the empty row so it adds no gap. */
+.dashboard-insights:empty {
+  display: none;
+}
+
 /* Phones: the filter drops below the title and uses the full width. */
 @media (max-width: 560px) {
   .dashboard-filter {
