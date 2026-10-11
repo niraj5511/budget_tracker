@@ -1,0 +1,79 @@
+.confirm-dialog {
+  width: min(420px, calc(100vw - 32px));
+  padding: 0;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+}
+
+.confirm-dialog::backdrop {
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(2px);
+}
+
+.confirm-dialog[open] {
+  animation: confirm-dialog-in var(--t-base) var(--ease);
+}
+
+@keyframes confirm-dialog-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.confirm-dialog-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-6);
+}
+
+.confirm-dialog-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.confirm-dialog-body {
+  font-size: 0.9375rem;
+  color: var(--text-muted);
+}
+
+.confirm-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+
+/* Destructive action: red, so it never reads as the routine "confirm". */
+.confirm-dialog .btn-danger {
+  color: #fff;
+  background: var(--expense);
+  box-shadow: 0 1px 2px rgba(207, 50, 50, 0.35);
+}
+
+.confirm-dialog .btn-danger:hover {
+  background: #b32727;
+}
+
+.confirm-dialog .btn-danger:focus-visible {
+  box-shadow: 0 0 0 3px rgba(207, 50, 50, 0.3);
+}
+
+@media (max-width: 480px) {
+  .confirm-dialog-actions {
+    flex-direction: column-reverse;
+  }
+
+  .confirm-dialog-actions .btn {
+    width: 100%;
+  }
+}

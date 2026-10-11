@@ -1,74 +1,60 @@
+/* icon | description + meta | amount | actions */
 .transaction-item {
-  display: flex;
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr) auto auto;
   align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 14px 16px;
-  border-left: 3px solid transparent;
-  border-radius: 8px;
-  background: var(--bg);
-  transition: background-color 0.15s;
+  gap: var(--space-3) var(--space-4);
+  padding: var(--space-3) var(--space-2);
+  border-radius: var(--radius);
+  transition: background-color var(--t-fast) var(--ease);
 }
 
 .transaction-item:hover {
-  background: color-mix(in srgb, var(--bg) 60%, var(--border));
+  background: var(--surface-2);
 }
 
-.transaction-item.is-income {
-  border-left-color: var(--income);
+/* The form can be a card away, so the row it holds has to be identifiable.
+   Tint plus a bar down the left edge, so it isn't colour alone. */
+.transaction-item.is-being-edited {
+  background: var(--accent-soft);
+  box-shadow: inset 3px 0 0 var(--accent);
 }
 
-.transaction-item.is-expense {
-  border-left-color: var(--expense);
-}
-
+/* ---- Type icon -------------------------------------------------------- */
 .transaction-type-icon {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  font-size: 13px;
-  font-weight: 700;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+}
+
+.transaction-type-icon svg {
+  width: 18px;
+  height: 18px;
 }
 
 .is-income .transaction-type-icon {
-  background: color-mix(in srgb, var(--income) 14%, transparent);
   color: var(--income);
+  background: var(--income-soft);
 }
 
 .is-expense .transaction-type-icon {
-  background: color-mix(in srgb, var(--expense) 14%, transparent);
   color: var(--expense);
+  background: var(--expense-soft);
 }
 
-/* The form is one card away from the list, so the row it holds has to be
-   identifiable - otherwise a long list leaves you guessing. Outline only: the
-   row background stays put, or the category chip and the icon hover states
-   (both surface-coloured) would disappear into it. */
-.transaction-item.is-being-edited {
-  outline: 2px solid var(--accent);
-  outline-offset: -1px;
-}
-
+/* ---- Text ------------------------------------------------------------- */
 .transaction-info {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-}
-
-.transaction-main {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+  gap: 3px;
   min-width: 0;
 }
 
 .transaction-description {
-  font-weight: 500;
+  font-size: 0.9375rem;
+  font-weight: 600;
   overflow-wrap: anywhere;
 }
 
@@ -81,81 +67,31 @@
 }
 
 .transaction-category {
-  font-size: 12px;
-  color: var(--text-muted);
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 999px;
   padding: 1px 8px;
+  font-size: 0.75rem;
+  font-weight: 500;
   white-space: nowrap;
+  color: var(--text-muted);
+  background: var(--surface-2);
+  border-radius: 999px;
+}
+
+/* On a hovered or highlighted row the chip's own grey would vanish. */
+.transaction-item:hover .transaction-category,
+.transaction-item.is-being-edited .transaction-category {
+  background: var(--surface);
+  box-shadow: 0 0 0 1px var(--border);
 }
 
 .transaction-date {
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--text-muted);
 }
 
 .transaction-amount {
-  font-variant-numeric: tabular-nums;
-  font-weight: 600;
+  font-size: 0.9375rem;
+  font-weight: 700;
   white-space: nowrap;
-}
-
-.transaction-actions {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-/* Always visible rather than hover-only, so they work on touch and by
-   keyboard; recessive by default so they don't compete with the amount. */
-.transaction-edit,
-.transaction-delete {
-  display: grid;
-  place-items: center;
-  flex-shrink: 0;
-  width: 28px;
-  height: 28px;
-  padding: 0;
-  border: 0;
-  border-radius: 6px;
-  background: transparent;
-  color: var(--text-muted);
-  cursor: pointer;
-}
-
-.transaction-edit svg,
-.transaction-delete svg {
-  width: 16px;
-  height: 16px;
-}
-
-.transaction-edit:hover {
-  background: var(--surface);
-  color: var(--accent);
-}
-
-.transaction-edit:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 1px;
-  color: var(--accent);
-}
-
-/* Holds the accent while this row is loaded in the form, pairing with the
-   row's own highlight. */
-.transaction-edit[aria-pressed='true'] {
-  color: var(--accent);
-}
-
-.transaction-delete:hover {
-  background: var(--surface);
-  color: var(--expense);
-}
-
-.transaction-delete:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 1px;
-  color: var(--expense);
 }
 
 .is-income .transaction-amount {
@@ -164,4 +100,79 @@
 
 .is-expense .transaction-amount {
   color: var(--expense);
+}
+
+/* ---- Actions ---------------------------------------------------------- */
+/* Always visible rather than hover-only, so they work on touch and by
+   keyboard; recessive by default so they don't compete with the amount. */
+.transaction-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.transaction-edit,
+.transaction-delete {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  color: var(--text-muted);
+  background: transparent;
+  border: 0;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition:
+    background-color var(--t-fast) var(--ease),
+    color var(--t-fast) var(--ease);
+}
+
+.transaction-edit svg,
+.transaction-delete svg {
+  width: 17px;
+  height: 17px;
+}
+
+.transaction-edit:hover {
+  color: var(--accent);
+  background: var(--surface);
+  box-shadow: 0 0 0 1px var(--border);
+}
+
+.transaction-delete:hover {
+  color: var(--expense);
+  background: var(--surface);
+  box-shadow: 0 0 0 1px var(--border);
+}
+
+.transaction-edit:focus-visible,
+.transaction-delete:focus-visible {
+  outline: none;
+  box-shadow: var(--ring);
+}
+
+/* Holds the accent while this row is loaded in the form. */
+.transaction-edit[aria-pressed='true'] {
+  color: var(--accent);
+}
+
+/* ---- Phones: actions drop to their own line under the text ------------- */
+@media (max-width: 560px) {
+  .transaction-item {
+    grid-template-columns: 36px minmax(0, 1fr) auto;
+    gap: var(--space-2) var(--space-3);
+  }
+
+  .transaction-actions {
+    grid-column: 2 / -1;
+    justify-self: end;
+  }
+
+  .transaction-edit,
+  .transaction-delete {
+    width: 40px;
+    height: 40px;
+  }
 }

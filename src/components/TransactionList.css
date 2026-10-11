@@ -1,48 +1,87 @@
-/* Each block owns its own card surface, so App just stacks them. */
+/* Each block owns its own card surface, so the page just stacks them. */
 .transaction-list-section {
+  padding: var(--space-5) var(--space-5) var(--space-4);
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border-radius: var(--radius-lg);
   box-shadow: var(--shadow);
-  padding: 20px;
 }
 
 .transaction-list-header {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 14px;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+  padding: 0 var(--space-2);
 }
 
 .transaction-list-title {
-  font-size: 15px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.6px;
-  color: var(--text-muted);
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+/* Focus lands here after a delete; a ring on a heading would just be noise. */
+.transaction-list-title:focus {
+  outline: none;
 }
 
 .transaction-count {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-muted);
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 999px;
   padding: 1px 9px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted);
+  background: var(--surface-2);
+  border-radius: 999px;
 }
 
 .transaction-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
+/* ---- Empty state ------------------------------------------------------ */
 .transaction-list-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-10) var(--space-4);
   color: var(--text-muted);
   text-align: center;
-  padding: 20px 0;
+}
+
+.transaction-list-empty-icon {
+  width: 36px;
+  height: 36px;
+  color: var(--text-subtle);
+}
+
+/* ---- Delete confirmation content (rendered inside ConfirmDialog) ------- */
+.delete-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  font-size: 0.875rem;
+  background: var(--surface-2);
+  border-radius: var(--radius);
+  overflow-wrap: anywhere;
+}
+
+.delete-summary strong {
+  font-size: 0.9375rem;
+  color: var(--text);
+}
+
+@media (max-width: 560px) {
+  .transaction-list-section {
+    padding: var(--space-4) var(--space-3) var(--space-3);
+  }
 }
