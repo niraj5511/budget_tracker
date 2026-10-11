@@ -1,105 +1,191 @@
+/* Capped: a limit field a full 1280px away from its category name is
+   hard to follow across the row. */
 .budget-card {
+  max-width: 640px;
+  padding: var(--space-6);
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border-radius: var(--radius-lg);
   box-shadow: var(--shadow);
-  padding: 20px;
 }
 
 .budget-header {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 6px;
+  gap: var(--space-2) var(--space-4);
+  margin-bottom: var(--space-2);
 }
 
 .budget-title {
-  font-size: 15px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.6px;
-  color: var(--text-muted);
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
 .budget-summary {
-  font-size: 13px;
+  padding: 3px 12px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
   color: var(--text-muted);
+  background: var(--surface-2);
+  border-radius: 999px;
 }
 
 .budget-hint {
-  font-size: 13px;
+  margin-bottom: var(--space-4);
+  font-size: 0.8125rem;
   color: var(--text-muted);
-  margin: 0 0 18px;
-  max-width: 480px;
 }
 
+/* ---- Rows ------------------------------------------------------------- */
 .budget-rows {
   display: flex;
   flex-direction: column;
-  gap: 4px;
 }
 
 .budget-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 0;
-  border-bottom: 1px solid var(--border);
+  padding: var(--space-3) 0;
+  border-top: 1px solid var(--border);
 }
 
-.budget-row:last-child {
-  border-bottom: 0;
+.budget-row-main {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
 }
 
 .budget-row-label {
   flex: 1;
-  font-size: 14px;
+  min-width: 0;
+  font-size: 0.9375rem;
   font-weight: 500;
   color: var(--text);
+  overflow-wrap: anywhere;
 }
 
 .budget-row-input {
   position: relative;
-  width: 160px;
   flex-shrink: 0;
+  width: 170px;
 }
 
 .budget-row-prefix {
   position: absolute;
-  left: 12px;
   top: 50%;
-  transform: translateY(-50%);
-  font-size: 14px;
+  left: var(--space-3);
+  font-size: 0.875rem;
+  font-weight: 600;
   color: var(--text-muted);
+  transform: translateY(-50%);
   pointer-events: none;
 }
 
 .budget-row-input input {
   width: 100%;
+  min-height: 44px;
+  padding: 0 36px 0 40px;
   font: inherit;
-  font-size: 14px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
   color: var(--text);
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 8px 12px 8px 34px;
-  transition: border-color 0.15s;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  transition:
+    border-color var(--t-fast) var(--ease),
+    box-shadow var(--t-fast) var(--ease);
+
+  /* Spinner arrows are easy to hit by accident and nudge the limit. */
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+.budget-row-input input::-webkit-outer-spin-button,
+.budget-row-input input::-webkit-inner-spin-button {
+  margin: 0;
+  -webkit-appearance: none;
+}
+
+.budget-row-input input::placeholder {
+  font-weight: 400;
+  color: var(--text-subtle);
 }
 
 .budget-row-input input:hover {
-  border-color: var(--text-muted);
+  border-color: var(--text-subtle);
 }
 
 .budget-row-input input:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 1px;
+  outline: none;
   border-color: var(--accent);
+  box-shadow: var(--ring);
 }
 
-.budget-row-saved {
-  flex-shrink: 0;
-  font-size: 12px;
-  font-weight: 600;
+.budget-row-input input[aria-invalid='true'] {
+  border-color: var(--expense);
+}
+
+/* "Saved" tick inside the right edge of the field. */
+.budget-row-check {
+  position: absolute;
+  top: 50%;
+  right: var(--space-3);
+  width: 16px;
+  height: 16px;
   color: var(--income);
+  opacity: 0;
+  transform: translateY(-50%) scale(0.8);
+  transition:
+    opacity var(--t-base) var(--ease),
+    transform var(--t-base) var(--ease);
+  pointer-events: none;
+}
+
+.budget-row-check.is-visible {
+  opacity: 1;
+  transform: translateY(-50%) scale(1);
+}
+
+.budget-row-error {
+  margin-top: var(--space-2);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  text-align: right;
+  color: var(--expense);
+}
+
+/* ---- Footer link ------------------------------------------------------ */
+.budget-dashboard-link {
+  display: inline-block;
+  margin-top: var(--space-4);
+  padding-top: var(--space-4);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--accent);
+  text-decoration: none;
+  border-radius: var(--radius-sm);
+}
+
+.budget-dashboard-link:hover {
+  color: var(--accent-strong);
+  text-decoration: underline;
+}
+
+.budget-dashboard-link:focus-visible {
+  outline: none;
+  box-shadow: var(--ring);
+}
+
+@media (max-width: 480px) {
+  .budget-card {
+    padding: var(--space-4);
+  }
+
+  .budget-row-input {
+    width: 150px;
+  }
 }

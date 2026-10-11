@@ -1,4 +1,5 @@
-import { useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import { EXPENSE_CATEGORIES } from "../data/categories";
 import { formatCurrency } from "../utils/format";
 import "./Budget.css";
@@ -11,11 +12,28 @@ function BudgetRow({ category, limit, onSave }) {
   // Local text, not the committed number - lets the field hold '' or '12.'
   // mid-edit without that half-typed value overwriting the real budget.
   const [value, setValue] = useState(limit ? String(limit) : "");
-  const [saved, setSaved] = useState(false);
+  // '' | 'saved' | 'cleared' - drives the check mark and the spoken message.
+  const [status, setStatus] = useState("");
+  const [error, setError] = useState("");
   // blur() fires synchronously, before the setValue() from an Escape revert
   // has committed - so handleBlur would otherwise still see the old typed
   // text. This flag tells it to skip the save-on-blur logic entirely.
   const revertingRef = useRef(false);
+  const timerRef = useRef(null);
+
+  // Category names can contain spaces and '&', which are not safe inside an
+  // aria-describedby id list, so ids come from useId instead.
+  const inputId = useId();
+  const errorId = `${inputId}-error`;
+
+  // Don't leave a timer running after the page is left.
+  useEffect(() => () => clearTimeout(timerRef.current), []);
+
+  function flash(nextStatus) {
+    setStatus(nextStatus);
+    clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => setStatus(""), 1500);
+  }
 
   function handleBlur() {
     if (revertingRef.current) {
@@ -26,21 +44,25 @@ function BudgetRow({ category, limit, onSave }) {
     const trimmed = value.trim();
 
     if (!trimmed) {
-      if (limit !== undefined) onSave(category, null);
+      if (limit !== undefined) {
+        onSave(category, null);
+        flash("cleared");
+      }
       return;
     }
 
     const parsed = Number(trimmed);
     if (!Number.isFinite(parsed) || parsed <= 0) {
       // Invalid entry reverts to the last saved value instead of silently
-      // keeping bad text in the field.
+      // keeping bad text in the field - and says why, so the field snapping
+      // back isn't a mystery.
       setValue(limit ? String(limit) : "");
+      setError("Enter an amount greater than 0.");
       return;
     }
 
     onSave(category, Math.round(parsed * 100) / 100);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 1200);
+    flash("saved");
   }
 
   // Enter commits the same way tabbing away does - routes through the
@@ -53,37 +75,69 @@ function BudgetRow({ category, limit, onSave }) {
     } else if (event.key === "Escape") {
       revertingRef.current = true;
       setValue(limit ? String(limit) : "");
+      setError("");
       event.currentTarget.blur();
     }
   }
 
   return (
     <div className="budget-row">
-      <label className="budget-row-label" htmlFor={`budget-${category}`}>
-        {category}
-      </label>
-      <div className="budget-row-input">
-        <span className="budget-row-prefix" aria-hidden="true">
-          Rs.
-        </span>
-        <input
-          id={`budget-${category}`}
-          type="number"
-          min="0"
-          step="0.01"
-          inputMode="decimal"
-          placeholder="No limit"
-          value={value}
-          onChange={(event) => setValue(event.target.value)}
-          onBlur={handleBlur}
-          onKeyDown={handleKeyDown}
-        />
+      <div className="budget-row-main">
+        <label className="budget-row-label" htmlFor={inputId}>
+          {category}
+        </label>
+
+        <div className="budget-row-input">
+          <span className="budget-row-prefix" aria-hidden="true">
+            Rs.
+          </span>
+          <input
+            id={inputId}
+            type="number"
+            min="0"
+            step="0.01"
+            inputMode="decimal"
+            placeholder="No limit"
+            value={value}
+            onChange={(event) => {
+              setValue(event.target.value);
+              setError("");
+            }}
+            onFocus={() => setError("")}
+            onBlur={handleBlur}
+            onKeyDown={handleKeyDown}
+            aria-invalid={Boolean(error)}
+            aria-describedby={error ? errorId : undefined}
+          />
+          {/* Sits inside the input's right edge, so the row never changes
+              size when it appears. */}
+          <svg
+            className={`budget-row-check${status === "saved" ? " is-visible" : ""}`}
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.6"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <path d="M5 12.5l4.5 4.5L19 7.5" />
+          </svg>
+        </div>
       </div>
-      {saved && (
-        <span className="budget-row-saved" aria-live="polite">
-          Saved
-        </span>
+
+      {error && (
+        <p className="budget-row-error" id={errorId} role="alert">
+          {error}
+        </p>
       )}
+
+      {/* Always in the DOM, so the text is announced when it changes. */}
+      <span className="sr-only" role="status">
+        {status === "saved" && `${category} limit saved`}
+        {status === "cleared" && `${category} limit cleared`}
+      </span>
     </div>
   );
 }
@@ -102,19 +156,31 @@ function Budget({ budgets, onSaveLimit }) {
 
   return (
     <div className="page">
-      <section className="budget-card">
-        <div className="budget-header">
-          <h2 className="budget-title">Monthly budget limits</h2>
-          {limitCount > 0 && (
-            <span className="budget-summary">
-              {limitCount} categor{limitCount === 1 ? "y" : "ies"} &middot;{" "}
-              {formatCurrency(totalLimit)} total
-            </span>
-          )}
+      <header className="page-header">
+        <div>
+          <h1 className="page-title">Budget</h1>
+          <p className="page-subtitle">
+            Set a monthly spending limit for the categories you want to track.
+          </p>
         </div>
+      </header>
+
+      <section className="budget-card" aria-labelledby="budget-title">
+        <div className="budget-header">
+          <h2 id="budget-title" className="budget-title">
+            Monthly limits
+          </h2>
+          <span className="budget-summary">
+            {limitCount > 0
+              ? `${limitCount} limit${limitCount === 1 ? "" : "s"} \u00b7 ${formatCurrency(totalLimit)} total`
+              : "No limits set yet"}
+          </span>
+        </div>
+
         <p className="budget-hint">
-          Set a limit for any category you want to track. Leave it blank for no
-          limit. These apply every month until you change them here.
+          Leave a field blank for no limit. Limits repeat every month until you
+          change them, and save as soon as you leave the field. Press Enter to
+          save or Esc to undo.
         </p>
 
         <div className="budget-rows">
@@ -127,6 +193,12 @@ function Budget({ budgets, onSaveLimit }) {
             />
           ))}
         </div>
+
+        {limitCount > 0 && (
+          <Link to="/" className="budget-dashboard-link">
+            See your progress on the dashboard
+          </Link>
+        )}
       </section>
     </div>
   );
