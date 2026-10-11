@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import TransactionFilters from "../components/TransactionFilters";
 import TransactionForm from "../components/TransactionForm";
 import TransactionList from "../components/TransactionList";
+import "./Transactions.css";
 
 function Transactions({
   editingTransaction,
@@ -52,51 +53,70 @@ function Transactions({
     setCategory("all");
   }
 
+  const total = sortedTransactions.length;
+
   return (
     <div className="page">
-      {/* The key is the mechanism, not decoration: changing it remounts the
-          form so its fields reload from the new row, instead of the form
-          having to copy props into state and keep them in sync. */}
-      <TransactionForm
-        key={editingTransaction?.id ?? "new"}
-        transaction={editingTransaction}
-        onSubmit={onSubmit}
-        onCancel={onCancelEdit}
-      />
+      <header className="page-header">
+        <div>
+          <h1 className="page-title">Transactions</h1>
+          <p className="page-subtitle">
+            {total === 0
+              ? "Record your first income or expense to get started."
+              : `${total} transaction${total === 1 ? "" : "s"} recorded`}
+          </p>
+        </div>
+      </header>
 
-      {sortedTransactions.length > 0 && (
-        <>
-          <TransactionFilters
-            search={search}
-            onSearchChange={setSearch}
-            type={type}
-            onTypeChange={setType}
-            category={category}
-            onCategoryChange={setCategory}
-            categoryOptions={categoryOptions}
-            onClear={handleClear}
-            isFiltered={isFiltered}
+      <div className="transactions-layout">
+        <div className="transactions-form-col">
+          {/* The key is the mechanism, not decoration: changing it remounts
+              the form so its fields reload from the new row, instead of the
+              form having to copy props into state and keep them in sync. */}
+          <TransactionForm
+            key={editingTransaction?.id ?? "new"}
+            transaction={editingTransaction}
+            onSubmit={onSubmit}
+            onCancel={onCancelEdit}
           />
-          {isFiltered && (
-            <p className="filter-result-count">
-              Showing {filteredTransactions.length} of{" "}
-              {sortedTransactions.length} transactions
-            </p>
-          )}
-        </>
-      )}
+        </div>
 
-      <TransactionList
-        transactions={filteredTransactions}
-        editingId={editingId}
-        onEditTransaction={onEditTransaction}
-        onDeleteTransaction={onDeleteTransaction}
-        emptyMessage={
-          isFiltered
-            ? "No transactions match your filters."
-            : "No transactions yet."
-        }
-      />
+        <div className="transactions-main">
+          {sortedTransactions.length > 0 && (
+            <>
+              <TransactionFilters
+                search={search}
+                onSearchChange={setSearch}
+                type={type}
+                onTypeChange={setType}
+                category={category}
+                onCategoryChange={setCategory}
+                categoryOptions={categoryOptions}
+                onClear={handleClear}
+                isFiltered={isFiltered}
+              />
+              {isFiltered && (
+                <p className="filter-result-count">
+                  Showing {filteredTransactions.length} of{" "}
+                  {sortedTransactions.length} transactions
+                </p>
+              )}
+            </>
+          )}
+
+          <TransactionList
+            transactions={filteredTransactions}
+            editingId={editingId}
+            onEditTransaction={onEditTransaction}
+            onDeleteTransaction={onDeleteTransaction}
+            emptyMessage={
+              isFiltered
+                ? "No transactions match your filters."
+                : "No transactions yet."
+            }
+          />
+        </div>
+      </div>
     </div>
   );
 }

@@ -1,0 +1,25 @@
+/* Phones and tablets: form on top, list below. */
+.transactions-layout {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.transactions-main {
+  min-width: 0;
+}
+
+/* Desktop: the form becomes a sidebar that stays in view while the list
+   scrolls, so adding or editing never means scrolling back up. */
+@media (min-width: 1024px) {
+  .transactions-layout {
+    display: grid;
+    grid-template-columns: minmax(340px, 400px) minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .transactions-form-col {
+    position: sticky;
+    top: 88px; /* header height plus a little air */
+  }
+}

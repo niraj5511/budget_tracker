@@ -55,6 +55,21 @@ function validate({ description, amount, date }) {
   return errors
 }
 
+// Same top-to-bottom order as the fields on screen.
+const ERROR_ORDER = ['amount', 'description', 'date']
+
+/** Moves focus to the first field with an error, so a failed submit isn't silent. */
+function focusFirstError(formElement, errors) {
+  const key = ERROR_ORDER.find((name) => errors[name])
+  if (!key) return
+
+  const target =
+    key === 'date'
+      ? formElement.querySelector('.nepali-date-part')
+      : formElement.querySelector(`#${key}`)
+  target?.focus()
+}
+
 /**
  * Adds a transaction, or edits one when `transaction` is supplied. App gives
  * this component a `key` that changes per edited row, so React remounts it
@@ -64,21 +79,34 @@ function TransactionForm({ transaction, onSubmit, onCancel }) {
   const isEditing = Boolean(transaction)
   const [form, setForm] = useState(() => createFormState(transaction))
   const [errors, setErrors] = useState({})
+  const [notice, setNotice] = useState('')
   const formRef = useRef(null)
   const descriptionRef = useRef(null)
 
-  
   useEffect(() => {
     if (!isEditing) return
 
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    formRef.current?.scrollIntoView({
-      behavior: reduceMotion ? 'auto' : 'smooth',
-      block: 'center',
-    })
+    // On wide screens the form is a sticky sidebar and already in view;
+    // only scroll when it isn't.
+    const rect = formRef.current?.getBoundingClientRect()
+    const fullyVisible = rect && rect.top >= 0 && rect.bottom <= window.innerHeight
+    if (!fullyVisible) {
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      formRef.current?.scrollIntoView({
+        behavior: reduceMotion ? 'auto' : 'smooth',
+        block: 'center',
+      })
+    }
     // preventScroll, or focus would fight the smooth scroll above.
     descriptionRef.current?.focus({ preventScroll: true })
   }, [isEditing])
+
+  // The "added" confirmation clears itself.
+  useEffect(() => {
+    if (!notice) return
+    const timer = setTimeout(() => setNotice(''), 2500)
+    return () => clearTimeout(timer)
+  }, [notice])
 
   function handleChange(event) {
     const { name, value } = event.target
@@ -112,7 +140,10 @@ function TransactionForm({ transaction, onSubmit, onCancel }) {
 
     const nextErrors = validate(form)
     setErrors(nextErrors)
-    if (Object.keys(nextErrors).length > 0) return
+    if (Object.keys(nextErrors).length > 0) {
+      focusFirstError(formRef.current, nextErrors)
+      return
+    }
 
     // Values only - App owns ids and decides whether this replaces a row or
     // becomes a new one.
@@ -130,6 +161,7 @@ function TransactionForm({ transaction, onSubmit, onCancel }) {
     if (!isEditing) {
       setForm(createEmptyForm())
       setErrors({})
+      setNotice('Transaction added.')
     }
   }
 
@@ -142,136 +174,150 @@ function TransactionForm({ transaction, onSubmit, onCancel }) {
       noValidate
     >
       <div className="transaction-form-header">
-        <h2 className="transaction-form-title">
-          {isEditing ? 'Edit transaction' : 'Add transaction'}
-        </h2>
+        <div>
+          <h2 className="transaction-form-title">
+            {isEditing ? 'Edit transaction' : 'Add transaction'}
+          </h2>
+          <p className="transaction-form-hint">
+            {isEditing
+              ? 'Update the details, then save. Press Esc to cancel.'
+              : 'Record an income or an expense.'}
+          </p>
+        </div>
         {/* Backs up the border-colour cue on .is-editing with text, so the
             state isn't carried by colour alone. */}
         {isEditing && <span className="editing-badge">Editing</span>}
       </div>
 
-      <fieldset className="form-field">
-        <legend className="form-label">Type</legend>
-        <div className="type-toggle">
-          <label className="type-option type-option--expense">
-            <input
-              type="radio"
-              name="type"
-              value="expense"
-              checked={form.type === 'expense'}
-              onChange={handleChange}
-            />
-            <span>Expense</span>
+      <div className="form-grid">
+        <fieldset className="form-field form-field--wide">
+          <legend className="form-label">Type</legend>
+          <div className="type-toggle">
+            <label className="type-option type-option--expense">
+              <input
+                type="radio"
+                name="type"
+                value="expense"
+                checked={form.type === 'expense'}
+                onChange={handleChange}
+              />
+              <span>Expense</span>
+            </label>
+            <label className="type-option type-option--income">
+              <input
+                type="radio"
+                name="type"
+                value="income"
+                checked={form.type === 'income'}
+                onChange={handleChange}
+              />
+              <span>Income</span>
+            </label>
+          </div>
+        </fieldset>
+
+        <div className="form-field">
+          <label className="form-label" htmlFor="amount">
+            Amount
           </label>
-          <label className="type-option type-option--income">
+          <div className="amount-input-wrap">
+            <span className="amount-prefix" aria-hidden="true">
+              Rs.
+            </span>
             <input
-              type="radio"
-              name="type"
-              value="income"
-              checked={form.type === 'income'}
+              id="amount"
+              name="amount"
+              type="number"
+              min="0"
+              step="0.01"
+              inputMode="decimal"
+              placeholder="0.00"
+              value={form.amount}
               onChange={handleChange}
+              aria-invalid={Boolean(errors.amount)}
+              aria-describedby={errors.amount ? 'amount-error' : undefined}
             />
-            <span>Income</span>
-          </label>
+          </div>
+          {errors.amount && (
+            <p className="form-error" id="amount-error" role="alert">
+              {errors.amount}
+            </p>
+          )}
         </div>
-      </fieldset>
 
-      <div className="form-field">
-        <label className="form-label" htmlFor="category">
-          Category
-        </label>
-        <select
-          id="category"
-          name="category"
-          value={form.category}
-          onChange={handleChange}
-        >
-          {categoriesFor(form.type).map((category) => (
-            <option key={category} value={category}>
-              {category}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <div className="form-field form-field--wide">
-        <label className="form-label" htmlFor="description">
-          Description
-        </label>
-        <input
-          id="description"
-          name="description"
-          type="text"
-          ref={descriptionRef}
-          placeholder="e.g. Groceries"
-          value={form.description}
-          onChange={handleChange}
-          aria-invalid={Boolean(errors.description)}
-          aria-describedby={errors.description ? 'description-error' : undefined}
-        />
-        {errors.description && (
-          <p className="form-error" id="description-error">
-            {errors.description}
-          </p>
-        )}
-      </div>
-
-      <div className="form-field">
-        <label className="form-label" htmlFor="amount">
-          Amount
-        </label>
-        <div className="amount-input-wrap">
-          <span className="amount-prefix" aria-hidden="true">
-            Rs.
-          </span>
-          <input
-            id="amount"
-            name="amount"
-            type="number"
-            min="0"
-            step="0.01"
-            inputMode="decimal"
-            placeholder="0.00"
-            value={form.amount}
+        <div className="form-field">
+          <label className="form-label" htmlFor="category">
+            Category
+          </label>
+          <select
+            id="category"
+            name="category"
+            value={form.category}
             onChange={handleChange}
-            aria-invalid={Boolean(errors.amount)}
-            aria-describedby={errors.amount ? 'amount-error' : undefined}
-          />
+          >
+            {categoriesFor(form.type).map((category) => (
+              <option key={category} value={category}>
+                {category}
+              </option>
+            ))}
+          </select>
         </div>
-        {errors.amount && (
-          <p className="form-error" id="amount-error">
-            {errors.amount}
-          </p>
-        )}
-      </div>
 
-      {/* A fieldset, like the type toggle: one label has to cover three
-          controls, and a <label for> can only point at one of them. */}
-      <fieldset className="form-field">
-        <legend className="form-label">Date</legend>
-        <NepaliDateField
-          value={form.date}
-          invalid={Boolean(errors.date)}
-          describedBy={errors.date ? 'date-error' : undefined}
-          onChange={handleDateChange}
-        />
-        {errors.date && (
-          <p className="form-error" id="date-error">
-            {errors.date}
-          </p>
-        )}
-      </fieldset>
+        <div className="form-field form-field--wide">
+          <label className="form-label" htmlFor="description">
+            Description
+          </label>
+          <input
+            id="description"
+            name="description"
+            type="text"
+            ref={descriptionRef}
+            placeholder="e.g. Groceries"
+            value={form.description}
+            onChange={handleChange}
+            aria-invalid={Boolean(errors.description)}
+            aria-describedby={errors.description ? 'description-error' : undefined}
+          />
+          {errors.description && (
+            <p className="form-error" id="description-error" role="alert">
+              {errors.description}
+            </p>
+          )}
+        </div>
+
+        {/* A fieldset, like the type toggle: one label has to cover three
+            controls, and a <label for> can only point at one of them. */}
+        <fieldset className="form-field form-field--wide">
+          <legend className="form-label">Date (Bikram Sambat)</legend>
+          <NepaliDateField
+            value={form.date}
+            invalid={Boolean(errors.date)}
+            describedBy={errors.date ? 'date-error' : undefined}
+            onChange={handleDateChange}
+          />
+          {errors.date && (
+            <p className="form-error" id="date-error" role="alert">
+              {errors.date}
+            </p>
+          )}
+        </fieldset>
+      </div>
 
       <div className="form-actions">
-        <button className="form-submit" type="submit">
+        <button className="btn btn-primary form-submit" type="submit">
           {isEditing ? 'Save changes' : 'Add transaction'}
         </button>
         {isEditing && (
-          <button className="form-cancel" type="button" onClick={onCancel}>
+          <button className="btn btn-secondary" type="button" onClick={onCancel}>
             Cancel
           </button>
         )}
       </div>
+
+      {/* Always in the DOM so screen readers announce the text when it appears. */}
+      <p className="form-notice" role="status">
+        {notice}
+      </p>
     </form>
   )
 }
