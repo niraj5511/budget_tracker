@@ -1,77 +1,223 @@
 .transaction-filters {
   display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+
+.filter-controls {
+  display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 12px;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* ---- Search ----------------------------------------------------------- */
+.filter-search-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1 1 240px;
+  min-width: 0;
+}
+
+.filter-search-icon {
+  position: absolute;
+  left: 12px;
+  width: 16px;
+  height: 16px;
+  color: var(--text-muted);
+  pointer-events: none;
 }
 
 .filter-search {
-  flex: 1 1 220px;
+  width: 100%;
   min-width: 0;
+  min-height: 40px;
+  padding: 0 40px 0 36px;
   font: inherit;
-  font-size: 14px;
+  font-size: 0.875rem;
   color: var(--text);
   background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 9px 12px;
-  transition: border-color 0.15s;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm);
+  transition:
+    border-color var(--t-fast) var(--ease),
+    box-shadow var(--t-fast) var(--ease);
+
+  /* The browser's own clear "x" differs per browser; we draw our own. */
+  appearance: none;
+}
+
+.filter-search::-webkit-search-cancel-button,
+.filter-search::-webkit-search-decoration {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.filter-search::placeholder {
+  color: var(--text-subtle);
 }
 
 .filter-search:hover {
-  border-color: var(--text-muted);
+  border-color: var(--text-subtle);
 }
 
 .filter-search:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 1px;
+  outline: none;
   border-color: var(--accent);
+  box-shadow: var(--ring);
 }
 
-.filter-select {
-  flex: 0 1 160px;
+.filter-search-clear {
+  position: absolute;
+  right: 6px;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  color: var(--text-muted);
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.filter-search-clear svg {
+  width: 14px;
+  height: 14px;
+}
+
+.filter-search-clear:hover {
+  color: var(--text);
+  background: var(--surface-2);
+}
+
+.filter-search-clear:focus-visible {
+  outline: none;
+  box-shadow: var(--ring);
+}
+
+/* ---- Type: segmented control ------------------------------------------ */
+.filter-type {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 2px;
+  margin: 0;
+  padding: 3px;
   min-width: 0;
-  font: inherit;
-  font-size: 14px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+.filter-type-option {
+  position: relative;
+  padding: 6px 12px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  border-radius: 6px;
+  cursor: pointer;
+  transition:
+    background-color var(--t-fast) var(--ease),
+    color var(--t-fast) var(--ease);
+}
+
+.filter-type-option:hover {
+  color: var(--text);
+}
+
+.filter-type-option input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.filter-type-option:has(input:checked) {
   color: var(--text);
   background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 9px 12px;
+  box-shadow: var(--shadow-sm), 0 0 0 1px var(--border);
+}
+
+.filter-type-option--income:has(input:checked) {
+  color: var(--income);
+  background: var(--income-soft);
+  box-shadow: none;
+}
+
+.filter-type-option--expense:has(input:checked) {
+  color: var(--expense);
+  background: var(--expense-soft);
+  box-shadow: none;
+}
+
+.filter-type-option:has(input:focus-visible) {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+/* ---- Category select -------------------------------------------------- */
+.filter-select {
+  flex: 0 1 180px;
+  min-width: 0;
+  min-height: 40px;
+  padding: 0 34px 0 var(--space-3);
+  font: inherit;
+  font-size: 0.875rem;
+  color: var(--text);
+  background-color: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm);
   cursor: pointer;
-  transition: border-color 0.15s;
+  transition:
+    border-color var(--t-fast) var(--ease),
+    box-shadow var(--t-fast) var(--ease);
+
+  /* Same hand-drawn chevron as the other selects, so they all match. */
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2.5 4.5L6 8l3.5-3.5' fill='none' stroke='%235b6678' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 12px;
 }
 
 .filter-select:hover {
-  border-color: var(--text-muted);
+  border-color: var(--text-subtle);
 }
 
 .filter-select:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 1px;
+  outline: none;
   border-color: var(--accent);
+  box-shadow: var(--ring);
 }
 
 .filter-clear {
   flex-shrink: 0;
-  font: inherit;
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--text-muted);
-  background: transparent;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 9px 14px;
-  cursor: pointer;
+  min-height: 40px;
 }
 
-.filter-clear:hover {
-  color: var(--text);
-  border-color: var(--text-muted);
-}
-
+/* ---- Result count ----------------------------------------------------- */
 .filter-result-count {
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--text-muted);
-  margin: -4px 0 12px;
+}
+
+.filter-result-count:empty {
+  display: none;
+}
+
+/* Phones: search takes its own full row, the other controls share the next. */
+@media (max-width: 560px) {
+  .filter-search-wrap {
+    flex-basis: 100%;
+  }
+
+  .filter-select {
+    flex: 1 1 140px;
+  }
 }
