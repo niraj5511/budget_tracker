@@ -13,6 +13,8 @@ import {
   saveBudgets,
   saveTransactions,
 } from "./utils/storage";
+import RouteEffects from "./components/RouteEffects";
+import NotFound from "./pages/NotFound";
 import "./App.css";
 
 function App() {
@@ -101,7 +103,7 @@ function App() {
   return (
     <div className="app">
       <Navbar />
-
+      <RouteEffects />
       <main id="main" className="app-main" tabIndex={-1}>
         <Routes>
           <Route
@@ -141,6 +143,7 @@ function App() {
             path="/budget"
             element={<Budget budgets={budgets} onSaveLimit={handleSaveLimit} />}
           />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
     </div>
