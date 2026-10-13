@@ -1,6 +1,7 @@
 import BalanceSummary from '../components/BalanceSummary'
 import BudgetOverview from '../components/BudgetOverview'
 import CategoryBreakdown from '../components/CategoryBreakdown'
+import DashboardEmpty from '../components/DashboardEmpty'
 import MonthComparisonCard from '../components/MonthComparisonCard'
 import MonthFilter from '../components/MonthFilter'
 import MonthlyTrendChart from '../components/MonthlyTrendChart'
@@ -17,6 +18,24 @@ function Dashboard({
   periodLabel,
   budgets,
 }) {
+  // No data at all (first run, or everything deleted): one welcome card, not
+  // a wall of empty ones. Checks `transactions`, not `visibleTransactions` -
+  // a month with no activity is still a dashboard, just a quiet one.
+  if (transactions.length === 0) {
+    return (
+      <div className="page dashboard">
+        <header className="page-header">
+          <div>
+            <h1 className="page-title">Dashboard</h1>
+            <p className="page-subtitle">Your money at a glance</p>
+          </div>
+        </header>
+
+        <DashboardEmpty />
+      </div>
+    )
+  }
+
   return (
     <div className="page dashboard">
       <header className="page-header">

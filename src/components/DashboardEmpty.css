@@ -1,0 +1,52 @@
+.dashboard-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-10) var(--space-6);
+  text-align: center;
+  background: var(--surface);
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-xl);
+}
+
+.dashboard-empty-icon {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  margin-bottom: var(--space-2);
+  color: var(--accent);
+  background: var(--accent-soft);
+  border-radius: var(--radius-lg);
+}
+
+.dashboard-empty-icon svg {
+  width: 26px;
+  height: 26px;
+}
+
+.dashboard-empty-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.dashboard-empty-text {
+  max-width: 420px;
+  font-size: 0.9375rem;
+  color: var(--text-muted);
+}
+
+.dashboard-empty-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+}
+
+/* .btn is built for <button>; links need their underline removed. */
+.dashboard-empty .btn {
+  text-decoration: none;
+}
