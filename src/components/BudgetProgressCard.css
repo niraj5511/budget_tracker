@@ -12,7 +12,7 @@
 
 /* A card that is over budget gets a red edge so it stands out in the grid. */
 .budget-progress-card.danger {
-  border-color: rgba(207, 50, 50, 0.35);
+  border-color: color-mix(in srgb, var(--expense) 35%, transparent);
 }
 
 .bpc-header {
@@ -89,7 +89,7 @@
 }
 
 .bpc-fill.warning {
-  background: #f59e0b;
+  background: var(--warning-bar);
 }
 
 .bpc-fill.danger {

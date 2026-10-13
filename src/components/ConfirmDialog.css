@@ -9,7 +9,7 @@
 }
 
 .confirm-dialog::backdrop {
-  background: rgba(15, 23, 42, 0.45);
+  background: var(--scrim);
   backdrop-filter: blur(2px);
 }
 
@@ -51,21 +51,6 @@
   justify-content: flex-end;
   gap: var(--space-3);
   margin-top: var(--space-2);
-}
-
-/* Destructive action: red, so it never reads as the routine "confirm". */
-.confirm-dialog .btn-danger {
-  color: #fff;
-  background: var(--expense);
-  box-shadow: 0 1px 2px rgba(207, 50, 50, 0.35);
-}
-
-.confirm-dialog .btn-danger:hover {
-  background: #b32727;
-}
-
-.confirm-dialog .btn-danger:focus-visible {
-  box-shadow: 0 0 0 3px rgba(207, 50, 50, 0.3);
 }
 
 @media (max-width: 480px) {

@@ -2,7 +2,7 @@
   position: sticky;
   top: 0;
   z-index: 100;
-  background: rgba(255, 255, 255, 0.82);
+  background: var(--glass);
   backdrop-filter: saturate(180%) blur(14px);
   -webkit-backdrop-filter: saturate(180%) blur(14px);
   border-bottom: 1px solid var(--border);
@@ -33,16 +33,16 @@
   width: 36px;
   height: 36px;
   border-radius: 10px;
-  background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
+  background: var(--brand-gradient);
   display: grid;
   place-items: center;
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.28);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--accent) 28%, transparent);
 }
 
 .brand-svg {
   width: 20px;
   height: 20px;
-  color: #fff;
+  color: var(--on-accent);
 }
 
 .brand-name {
@@ -87,16 +87,14 @@
 
 .nav-item:hover {
   color: var(--text);
-  background: rgba(255, 255, 255, 0.7);
+  background: color-mix(in srgb, var(--surface) 70%, transparent);
 }
 
 .nav-item.active {
   color: var(--text);
   font-weight: 600;
   background: var(--surface);
-  box-shadow:
-    var(--shadow-sm),
-    0 0 0 1px var(--border);
+  box-shadow: var(--shadow-sm), 0 0 0 1px var(--border);
 }
 
 .nav-item.active .nav-icon {
@@ -133,7 +131,7 @@
     grid-template-columns: repeat(3, 1fr);
     gap: 0;
     padding: 6px 8px calc(6px + env(safe-area-inset-bottom, 0px));
-    background: rgba(255, 255, 255, 0.92);
+    background: var(--glass-strong);
     backdrop-filter: saturate(180%) blur(14px);
     -webkit-backdrop-filter: saturate(180%) blur(14px);
     border: 0;

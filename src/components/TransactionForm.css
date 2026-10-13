@@ -19,7 +19,7 @@
    never mistaken for a half-typed new one. */
 .transaction-form.is-editing {
   border-color: var(--accent);
-  box-shadow: var(--shadow), 0 0 0 3px rgba(37, 99, 235, 0.12);
+  box-shadow: var(--shadow), 0 0 0 3px color-mix(in srgb, var(--accent) 12%, transparent);
 }
 
 /* ---- Header ----------------------------------------------------------- */
@@ -141,7 +141,7 @@
 
 .transaction-form input[aria-invalid='true']:focus-visible,
 .transaction-form select[aria-invalid='true']:focus-visible {
-  box-shadow: 0 0 0 3px rgba(207, 50, 50, 0.22);
+  box-shadow: var(--ring-danger);
 }
 
 .form-error {

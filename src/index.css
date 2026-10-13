@@ -1,3 +1,10 @@
+/* ==========================================================================
+   Design tokens
+   Every component should read from these instead of hard-coding colours,
+   radii or shadows. The original variable names (--bg, --surface, --border,
+   --text, --text-muted, --accent, --income, --expense, --radius, --shadow)
+   are kept so files not yet refreshed keep working.
+   ========================================================================== */
 :root {
   /* Surfaces */
   --bg: #f6f7fb;
@@ -23,6 +30,20 @@
   --expense-soft: #fdecec;
   --warning: #b45309;
   --warning-soft: #fef3e2;
+  --warning-bar: #f59e0b;
+
+  /* Text/icons sitting on a solid accent or danger fill */
+  --on-accent: #ffffff;
+
+  /* Brand mark, hover shade for destructive buttons */
+  --brand-gradient: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
+  --expense-strong: #b32727;
+
+  /* Translucent surfaces (sticky header, bottom tab bar) and the dim layer
+     behind dialogs */
+  --glass: rgba(255, 255, 255, 0.82);
+  --glass-strong: rgba(255, 255, 255, 0.92);
+  --scrim: rgba(15, 23, 42, 0.45);
 
   /* Shape */
   --radius-sm: 8px;
@@ -32,8 +53,7 @@
 
   /* Elevation */
   --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.05);
-  --shadow:
-    0 1px 2px rgba(15, 23, 42, 0.05), 0 4px 12px -2px rgba(15, 23, 42, 0.06);
+  --shadow: 0 1px 2px rgba(15, 23, 42, 0.05), 0 4px 12px -2px rgba(15, 23, 42, 0.06);
   --shadow-lg: 0 12px 32px -8px rgba(15, 23, 42, 0.14);
 
   /* Spacing scale (4px base) */
@@ -56,10 +76,10 @@
   --t-base: 0.25s;
 
   /* Focus ring */
-  --ring: 0 0 0 3px rgba(37, 99, 235, 0.28);
+  --ring: 0 0 0 3px color-mix(in srgb, var(--accent) 28%, transparent);
+  --ring-danger: 0 0 0 3px color-mix(in srgb, var(--expense) 28%, transparent);
 
-  font-family:
-    "Inter", system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family: 'Inter', system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   color: var(--text);
   background-color: var(--bg);
@@ -85,7 +105,7 @@ body {
   background:
     radial-gradient(
       900px 320px at 50% -160px,
-      rgba(37, 99, 235, 0.09),
+      color-mix(in srgb, var(--accent) 9%, transparent),
       transparent
     ),
     var(--bg);
@@ -106,13 +126,17 @@ textarea {
 }
 
 ::selection {
-  background: rgba(37, 99, 235, 0.18);
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
 }
 
 :focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
+
+/* ==========================================================================
+   Shared primitives (used by the pages/components refreshed in later parts)
+   ========================================================================== */
 
 /* Page heading block: title on the left, optional actions on the right. */
 .page-header {
@@ -191,9 +215,9 @@ textarea {
 }
 
 .btn-primary {
-  color: #fff;
+  color: var(--on-accent);
   background: var(--accent);
-  box-shadow: 0 1px 2px rgba(37, 99, 235, 0.35);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--accent) 35%, transparent);
 }
 
 .btn-primary:hover {
@@ -208,6 +232,21 @@ textarea {
 
 .btn-secondary:hover {
   background: var(--surface-2);
+}
+
+/* Destructive actions (delete). Red so it never reads as a routine confirm. */
+.btn-danger {
+  color: var(--on-accent);
+  background: var(--expense);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--expense) 35%, transparent);
+}
+
+.btn-danger:hover {
+  background: var(--expense-strong);
+}
+
+.btn-danger:focus-visible {
+  box-shadow: var(--ring-danger);
 }
 
 .btn-ghost {
@@ -242,7 +281,7 @@ textarea {
   padding: var(--space-2) var(--space-4);
   font-size: 0.875rem;
   font-weight: 600;
-  color: #fff;
+  color: var(--on-accent);
   background: var(--text);
   border-radius: var(--radius-sm);
   transform: translateY(-200%);
