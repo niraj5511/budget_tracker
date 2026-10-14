@@ -42,7 +42,7 @@
 .brand-svg {
   width: 20px;
   height: 20px;
-  color: var(--on-accent);
+  color: var(--on-brand);
 }
 
 .brand-name {
@@ -53,6 +53,14 @@
 }
 
 /* ---- Navigation (desktop: segmented pill in the header) -------------- */
+/* Holds the page tabs and the theme button; on phones the tabs leave the
+   flow (fixed to the bottom) and only the button remains up here. */
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
 .app-nav {
   display: flex;
   align-items: center;
