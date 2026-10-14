@@ -5,6 +5,7 @@ const TITLES = {
   '/': 'Dashboard',
   '/transactions': 'Transactions',
   '/budget': 'Budget',
+  '/backup': 'Backup',
 }
 
 /**

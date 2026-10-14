@@ -1,0 +1,100 @@
+.backup-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-width: 640px;
+}
+
+.backup-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-6);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+}
+
+.backup-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.backup-text {
+  font-size: 0.9375rem;
+  color: var(--text-muted);
+}
+
+.backup-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3) var(--space-4);
+  margin-top: var(--space-1);
+}
+
+.backup-btn-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.backup-meta {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+}
+
+/* Greyed out when there is nothing to download. */
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.backup-error {
+  padding: var(--space-3) var(--space-4);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--expense);
+  background: var(--expense-soft);
+  border-radius: var(--radius-sm);
+}
+
+.backup-success {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--income);
+}
+
+.backup-success:empty {
+  display: none;
+}
+
+/* ---- Restore confirmation (rendered inside ConfirmDialog) ---------------- */
+.restore-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  font-size: 0.875rem;
+  background: var(--surface-2);
+  border-radius: var(--radius);
+}
+
+.restore-summary strong {
+  font-size: 0.9375rem;
+  color: var(--text);
+}
+
+.restore-warning {
+  margin-top: var(--space-3);
+  font-weight: 500;
+  color: var(--warning);
+}
+
+@media (max-width: 480px) {
+  .backup-card {
+    padding: var(--space-4);
+  }
+}

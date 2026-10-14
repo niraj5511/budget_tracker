@@ -10,7 +10,7 @@ const STORAGE_KEY = 'budget-tracker:transactions'
  * `category` is deliberately not required: records saved before categories
  * existed are still perfectly good data, and `withCategory` fills them in.
  */
-function isValidTransaction(value) {
+export function isValidTransaction(value) {
   return (
     typeof value === 'object' &&
     value !== null &&
@@ -30,7 +30,7 @@ function isValidTransaction(value) {
  * non-empty category is kept as-is, even one no longer on the list - dropping
  * a user's label would be worse than showing an unfamiliar one.
  */
-function withCategory(transaction) {
+export function withCategory(transaction) {
   return typeof transaction.category === 'string' && transaction.category.trim()
     ? transaction
     : { ...transaction, category: DEFAULT_CATEGORY }
@@ -85,7 +85,7 @@ const BUDGETS_STORAGE_KEY = 'budget-tracker:budgets'
  * ever has one active limit, so there is nothing an id would identify that
  * the key itself doesn't already.
  */
-function isValidBudgetMap(value) {
+export function isValidBudgetMap(value) {
   return (
     typeof value === 'object' &&
     value !== null &&

@@ -1,45 +1,46 @@
-import { useEffect, useState } from "react";
-import { Route, Routes } from "react-router-dom";
-import Navbar from "./components/Navbar";
-import Budget from "./pages/Budget";
-import Dashboard from "./pages/Dashboard";
-import Transactions from "./pages/Transactions";
-import sampleTransactions from "./data/sampleTransactions";
-import { ALL_MONTHS, availableMonths, filterByMonth } from "./utils/months";
-import { formatBsMonth } from "./utils/nepaliDate";
+import { useEffect, useState } from 'react'
+import { Route, Routes } from 'react-router-dom'
+import Navbar from './components/Navbar'
+import RouteEffects from './components/RouteEffects'
+import Backup from './pages/Backup'
+import Budget from './pages/Budget'
+import Dashboard from './pages/Dashboard'
+import NotFound from './pages/NotFound'
+import Transactions from './pages/Transactions'
+import sampleTransactions from './data/sampleTransactions'
+import { ALL_MONTHS, availableMonths, filterByMonth } from './utils/months'
+import { formatBsMonth } from './utils/nepaliDate'
 import {
   loadBudgets,
   loadTransactions,
   saveBudgets,
   saveTransactions,
-} from "./utils/storage";
-import RouteEffects from "./components/RouteEffects";
-import NotFound from "./pages/NotFound";
-import "./App.css";
+} from './utils/storage'
+import './App.css'
 
 function App() {
   // Passed as a function so storage is read once on mount rather than on
   // every render. The samples are only a first-run seed.
   const [transactions, setTransactions] = useState(() =>
     loadTransactions(sampleTransactions),
-  );
-  const [budgets, setBudgets] = useState(() => loadBudgets());
-  const [selectedMonth, setSelectedMonth] = useState(ALL_MONTHS);
-  const [editingId, setEditingId] = useState(null);
+  )
+  const [budgets, setBudgets] = useState(() => loadBudgets())
+  const [selectedMonth, setSelectedMonth] = useState(ALL_MONTHS)
+  const [editingId, setEditingId] = useState(null)
 
   useEffect(() => {
-    saveTransactions(transactions);
-  }, [transactions]);
+    saveTransactions(transactions)
+  }, [transactions])
 
   useEffect(() => {
-    saveBudgets(budgets);
-  }, [budgets]);
+    saveBudgets(budgets)
+  }, [budgets])
 
   // Derived rather than trusted: the row being edited can be deleted from
   // under the form, and looking it up each render means a missing row simply
   // drops the form back to adding instead of leaving a stale id in charge.
   const editingTransaction =
-    transactions.find((transaction) => transaction.id === editingId) ?? null;
+    transactions.find((transaction) => transaction.id === editingId) ?? null
 
   // The form only reports field values; identity belongs here.
   function handleSubmitTransaction(values) {
@@ -50,23 +51,18 @@ function App() {
             ? { ...transaction, ...values }
             : transaction,
         ),
-      );
-      setEditingId(null);
-      return;
+      )
+      setEditingId(null)
+      return
     }
 
     // Prepend, so that among transactions sharing a date the newest addition
     // sorts first - Array.prototype.sort is stable, so it keeps this order.
-    setTransactions((prev) => [
-      { id: crypto.randomUUID(), ...values },
-      ...prev,
-    ]);
+    setTransactions((prev) => [{ id: crypto.randomUUID(), ...values }, ...prev])
   }
 
   function handleDeleteTransaction(id) {
-    setTransactions((prev) =>
-      prev.filter((transaction) => transaction.id !== id),
-    );
+    setTransactions((prev) => prev.filter((transaction) => transaction.id !== id))
   }
 
   // null clears a limit rather than storing it - a category with no limit
@@ -75,35 +71,45 @@ function App() {
   function handleSaveLimit(category, limit) {
     setBudgets((prev) => {
       if (limit === null) {
-        const { [category]: _removed, ...rest } = prev;
-        return rest;
+        const { [category]: _removed, ...rest } = prev
+        return rest
       }
-      return { ...prev, [category]: limit };
-    });
+      return { ...prev, [category]: limit }
+    })
   }
 
-  const months = availableMonths(transactions);
+  // Replaces everything with a backup's contents. Resets the view state too:
+  // an old editing id or selected month may not exist in the restored data.
+  function handleRestore({ transactions: nextTransactions, budgets: nextBudgets }) {
+    setTransactions(nextTransactions)
+    setBudgets(nextBudgets)
+    setEditingId(null)
+    setSelectedMonth(ALL_MONTHS)
+  }
+
+  const months = availableMonths(transactions)
 
   const activeMonth =
     selectedMonth !== ALL_MONTHS && !months.includes(selectedMonth)
       ? ALL_MONTHS
-      : selectedMonth;
+      : selectedMonth
 
-  const visibleTransactions = filterByMonth(transactions, activeMonth);
+  const visibleTransactions = filterByMonth(transactions, activeMonth)
 
   // ISO date strings compare lexicographically, so this is a plain string
   // sort. Copy first: sort() mutates, and state must not be touched.
   const sortedTransactions = [...visibleTransactions].sort((a, b) =>
     b.date.localeCompare(a.date),
-  );
+  )
 
   const periodLabel =
-    activeMonth === ALL_MONTHS ? "All time" : formatBsMonth(activeMonth);
+    activeMonth === ALL_MONTHS ? 'All time' : formatBsMonth(activeMonth)
 
   return (
     <div className="app">
       <Navbar />
       <RouteEffects />
+
       <main id="main" className="app-main" tabIndex={-1}>
         <Routes>
           <Route
@@ -143,11 +149,21 @@ function App() {
             path="/budget"
             element={<Budget budgets={budgets} onSaveLimit={handleSaveLimit} />}
           />
+          <Route
+            path="/backup"
+            element={
+              <Backup
+                transactions={transactions}
+                budgets={budgets}
+                onRestore={handleRestore}
+              />
+            }
+          />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
     </div>
-  );
+  )
 }
 
-export default App;
+export default App
