@@ -2,15 +2,38 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
-    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta
       name="description"
       content="Artha: personal income and expense tracker with Nepali (Bikram Sambat) dates."
     />
+    <meta name="color-scheme" content="light dark" />
     <meta name="theme-color" content="#f6f7fb" />
+    <!-- Runs before first paint so a saved dark theme never flashes white. -->
+    <script>
+      (function () {
+        // Blocked storage (private mode) must not also block the system
+        // preference, so reading it gets its own try.
+        var saved = null;
+        try {
+          saved = localStorage.getItem("artha-theme");
+        } catch (e) {}
+
+        var theme =
+          saved === "light" || saved === "dark"
+            ? saved
+            : window.matchMedia &&
+                window.matchMedia("(prefers-color-scheme: dark)").matches
+              ? "dark"
+              : "light";
+
+        document.documentElement.dataset.theme = theme;
+        if (theme === "dark") {
+          var bar = document.querySelector('meta[name="theme-color"]');
+          if (bar) bar.setAttribute("content", "#0b1020");
+        }
+      })();
+    </script>
     <link
       rel="icon"
       href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232563eb'/%3E%3Cpath d='M10 21V11h6a3 3 0 010 6h-6m4 0l5 4' fill='none' stroke='white' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"
