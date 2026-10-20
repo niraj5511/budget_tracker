@@ -1,12 +1,13 @@
 package com.niraj.backend;
 
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.atomic.AtomicLong;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -18,25 +19,31 @@ import jakarta.validation.Valid;
 @RequestMapping("/api/transactions")
 public class TransactionController {
 
-    private final List<Transaction> transactions = new CopyOnWriteArrayList<>();
-    private final AtomicLong nextId = new AtomicLong(1);
+    private final TransactionService service;
+
+    public TransactionController(TransactionService service) {
+        this.service = service;
+    }
 
     @GetMapping
     public List<Transaction> getAll() {
-        return transactions;
+        return service.findAll();
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Transaction create(@Valid @RequestBody TransactionRequest request) {
-        Transaction transaction = new Transaction(
-                nextId.getAndIncrement(),
-                request.description(),
-                request.amount(),
-                request.type(),
-                request.category(),
-                request.date());
-        transactions.add(transaction);
-        return transaction;
+        return service.create(request);
+    }
+
+    @PutMapping("/{id}")
+    public Transaction update(@PathVariable long id, @Valid @RequestBody TransactionRequest request) {
+        return service.update(id, request);
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable long id) {
+        service.delete(id);
     }
 }
