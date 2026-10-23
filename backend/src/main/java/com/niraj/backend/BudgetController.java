@@ -9,6 +9,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+
 import jakarta.validation.Valid;
 
 @RestController
@@ -29,5 +33,11 @@ public class BudgetController {
     @PutMapping("/{category}")
     public Budget set(@PathVariable String category, @Valid @RequestBody BudgetRequest request) {
         return service.set(category, request.limit());
+    }
+
+    @DeleteMapping("/{category}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable String category) {
+        service.delete(category);
     }
 }
