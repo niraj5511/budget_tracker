@@ -45,26 +45,30 @@ function App() {
     transactions.find((transaction) => transaction.id === editingId) ?? null
 
   // The form only reports field values; identity belongs here.
-  function handleSubmitTransaction(values) {
-    if (editingTransaction) {
-      setTransactions((prev) =>
-        prev.map((transaction) =>
-          transaction.id === editingTransaction.id
-            ? { ...transaction, ...values }
-            : transaction,
-        ),
-      )
-      setEditingId(null)
-      return
+  async function handleSubmitTransaction(values) {
+    try {
+      if (editingTransaction) {
+        const saved = await updateTransaction(editingTransaction.id, values)
+        setTransactions((prev) =>
+          prev.map((transaction) => (transaction.id === saved.id ? saved : transaction)),
+        )
+        setEditingId(null)
+        return
+      }
+      const saved = await createTransaction(values)
+      setTransactions((prev) => [saved, ...prev])
+    } catch (error) {
+      console.error('Failed to save transaction:', error)
     }
-
-    // Prepend, so that among transactions sharing a date the newest addition
-    // sorts first - Array.prototype.sort is stable, so it keeps this order.
-    setTransactions((prev) => [{ id: crypto.randomUUID(), ...values }, ...prev])
   }
 
-  function handleDeleteTransaction(id) {
-    setTransactions((prev) => prev.filter((transaction) => transaction.id !== id))
+  async function handleDeleteTransaction(id) {
+    try {
+      await deleteTransaction(id)
+      setTransactions((prev) => prev.filter((transaction) => transaction.id !== id))
+    } catch (error) {
+      console.error('Failed to delete transaction:', error)
+    }
   }
 
   // null clears a limit rather than storing it - a category with no limit
