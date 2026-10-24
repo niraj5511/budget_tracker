@@ -7,30 +7,32 @@ import Budget from './pages/Budget'
 import Dashboard from './pages/Dashboard'
 import NotFound from './pages/NotFound'
 import Transactions from './pages/Transactions'
-import sampleTransactions from './data/sampleTransactions'
+
 import { ALL_MONTHS, availableMonths, filterByMonth } from './utils/months'
 import { formatBsMonth } from './utils/nepaliDate'
+import { loadBudgets, saveBudgets } from './utils/storage'
 import {
-  loadBudgets,
-  loadTransactions,
-  saveBudgets,
-  saveTransactions,
-} from './utils/storage'
+  createTransaction,
+  deleteTransaction,
+  fetchTransactions,
+  updateTransaction,
+} from './utils/api'
 import './App.css'
 
 function App() {
   // Passed as a function so storage is read once on mount rather than on
   // every render. The samples are only a first-run seed.
-  const [transactions, setTransactions] = useState(() =>
-    loadTransactions(sampleTransactions),
-  )
+  const [transactions, setTransactions] = useState([])
   const [budgets, setBudgets] = useState(() => loadBudgets())
   const [selectedMonth, setSelectedMonth] = useState(ALL_MONTHS)
   const [editingId, setEditingId] = useState(null)
 
+  // Runs once after the first render, because of the empty [] at the end.
   useEffect(() => {
-    saveTransactions(transactions)
-  }, [transactions])
+    fetchTransactions()
+      .then(setTransactions)
+      .catch((error) => console.error('Failed to load transactions:', error))
+  }, [])
 
   useEffect(() => {
     saveBudgets(budgets)
