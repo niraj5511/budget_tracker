@@ -10,11 +10,13 @@ import Transactions from './pages/Transactions'
 
 import { ALL_MONTHS, availableMonths, filterByMonth } from './utils/months'
 import { formatBsMonth } from './utils/nepaliDate'
-import { loadBudgets, saveBudgets } from './utils/storage'
 import {
   createTransaction,
+  deleteBudgetLimit,
   deleteTransaction,
+  fetchBudgets,
   fetchTransactions,
+  saveBudgetLimit,
   updateTransaction,
 } from './utils/api'
 import './App.css'
@@ -23,7 +25,7 @@ function App() {
   // Passed as a function so storage is read once on mount rather than on
   // every render. The samples are only a first-run seed.
   const [transactions, setTransactions] = useState([])
-  const [budgets, setBudgets] = useState(() => loadBudgets())
+  const [budgets, setBudgets] = useState({})
   const [selectedMonth, setSelectedMonth] = useState(ALL_MONTHS)
   const [editingId, setEditingId] = useState(null)
 
@@ -35,8 +37,10 @@ function App() {
   }, [])
 
   useEffect(() => {
-    saveBudgets(budgets)
-  }, [budgets])
+    fetchBudgets()
+      .then(setBudgets)
+      .catch((error) => console.error('Failed to load budgets:', error))
+  }, [])
 
   // Derived rather than trusted: the row being edited can be deleted from
   // under the form, and looking it up each render means a missing row simply
