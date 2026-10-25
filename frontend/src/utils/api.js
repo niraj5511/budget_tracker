@@ -32,3 +32,18 @@ export async function updateTransaction(id, values) {
 export async function deleteTransaction(id) {
   await request(`/transactions/${id}`, { method: 'DELETE' })
 }
+export async function fetchBudgets() {
+  const list = await request('/budgets')
+  return Object.fromEntries(list.map((budget) => [budget.category, budget.limit]))
+}
+
+export async function saveBudgetLimit(category, limit) {
+  await request(`/budgets/${encodeURIComponent(category)}`, {
+    method: 'PUT',
+    body: JSON.stringify({ limit }),
+  })
+}
+
+export async function deleteBudgetLimit(category) {
+  await request(`/budgets/${encodeURIComponent(category)}`, { method: 'DELETE' })
+}
