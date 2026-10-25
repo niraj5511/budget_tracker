@@ -78,14 +78,22 @@ function App() {
   // null clears a limit rather than storing it - a category with no limit
   // shouldn't linger in the map at 0, which would read as "budget: Rs. 0"
   // instead of "no budget set".
-  function handleSaveLimit(category, limit) {
-    setBudgets((prev) => {
+  async function handleSaveLimit(category, limit) {
+    try {
       if (limit === null) {
-        const { [category]: _removed, ...rest } = prev
-        return rest
+        // Only call the backend if a limit exists, otherwise it returns 404.
+        if (category in budgets) await deleteBudgetLimit(category)
+        setBudgets((prev) => {
+          const { [category]: _removed, ...rest } = prev
+          return rest
+        })
+        return
       }
-      return { ...prev, [category]: limit }
-    })
+      await saveBudgetLimit(category, limit)
+      setBudgets((prev) => ({ ...prev, [category]: limit }))
+    } catch (error) {
+      console.error('Failed to save budget:', error)
+    }
   }
 
   // Replaces everything with a backup's contents. Resets the view state too:
