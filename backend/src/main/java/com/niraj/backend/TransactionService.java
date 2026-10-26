@@ -1,10 +1,8 @@
 package com.niraj.backend;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ConcurrentSkipListMap;
-import java.util.concurrent.atomic.AtomicLong;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -12,42 +10,51 @@ import org.springframework.web.server.ResponseStatusException;
 @Service
 public class TransactionService {
 
-    private final ConcurrentSkipListMap<Long, Transaction> store = new ConcurrentSkipListMap<>();
-    private final AtomicLong nextId = new AtomicLong(1);
+    private final TransactionRepository repository;
+
+    public TransactionService(TransactionRepository repository) {
+        this.repository = repository;
+    }
 
     public List<Transaction> findAll() {
-        return new ArrayList<>(store.values());
+        return repository.findAll(Sort.by("id")).stream().map(this::toTransaction).toList();
     }
 
     public Transaction create(TransactionRequest request) {
-        long id = nextId.getAndIncrement();
-        Transaction transaction = toTransaction(id, request);
-        store.put(id, transaction);
-        return transaction;
+        TransactionEntity entity = new TransactionEntity();
+        apply(entity, request);
+        return toTransaction(repository.save(entity));
     }
 
     public Transaction update(long id, TransactionRequest request) {
-        Transaction transaction = toTransaction(id, request);
-        if (store.replace(id, transaction) == null) {
-            throw notFound(id);
-        }
-        return transaction;
+        TransactionEntity entity = repository.findById(id).orElseThrow(() -> notFound(id));
+        apply(entity, request);
+        return toTransaction(repository.save(entity));
     }
 
     public void delete(long id) {
-        if (store.remove(id) == null) {
+        if (!repository.existsById(id)) {
             throw notFound(id);
         }
+        repository.deleteById(id);
     }
 
-    private Transaction toTransaction(long id, TransactionRequest request) {
+    private void apply(TransactionEntity entity, TransactionRequest request) {
+        entity.setDescription(request.description());
+        entity.setAmount(request.amount());
+        entity.setType(request.type());
+        entity.setCategory(request.category());
+        entity.setDate(request.date());
+    }
+
+    private Transaction toTransaction(TransactionEntity entity) {
         return new Transaction(
-                id,
-                request.description(),
-                request.amount(),
-                request.type(),
-                request.category(),
-                request.date());
+                entity.getId(),
+                entity.getDescription(),
+                entity.getAmount(),
+                entity.getType(),
+                entity.getCategory(),
+                entity.getDate());
     }
 
     private ResponseStatusException notFound(long id) {
