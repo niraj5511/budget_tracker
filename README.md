@@ -23,15 +23,24 @@ budget_tracker/
 | Part | Tools |
 |---|---|
 | Frontend | React 19, Vite, React Router, Recharts |
-| Backend | Java 21, Spring Boot 4.1, Maven, Spring Web, Validation |
+| Backend | Java 21, Spring Boot 4.1, Maven, Spring Web, Validation, Spring Data JPA |
+| Database | PostgreSQL on Supabase |
 
 ## Requirements
 
 - Node.js and npm
 - JDK 21
+- A Supabase project (free plan) for the database
 
 ## Running locally
 
+Create `backend/secrets.properties` with your database details. It is listed in `.gitignore` and must not be committed.
+```
+spring.datasource.url=jdbc:postgresql://<host>:5432/postgres
+spring.datasource.username=<user>
+spring.datasource.password=<password>
+```
+Use the Session pooler connection details from the Supabase Connect panel. Always start the backend from the `backend` folder, because the file is read from the current directory.
 Start the backend first.
 
 ```
@@ -110,13 +119,14 @@ Source is in `backend/src/main/java/com/niraj/backend/`.
 | File | Role |
 |---|---|
 | `TransactionController`, `BudgetController` | Handle HTTP requests |
-| `TransactionService`, `BudgetService` | Hold the data and the rules for changing it |
+| `TransactionService`, `BudgetService` | Business rules and database access through the repositories |
 | `Transaction`, `Budget` | Data returned by the API |
 | `TransactionRequest`, `BudgetRequest` | Input accepted by the API, with validation |
 | `HealthController` | Health check |
 | `WebConfig` | CORS settings for the frontend |
+| `TransactionEntity`, `BudgetEntity` | Database tables, created automatically on startup |
+| `TransactionRepository`, `BudgetRepository` | Database access |
 
 ## Current limitations
 
-- The backend keeps transactions and budgets in memory, so they are cleared when the server restarts.
 - Backup restore updates only the data on screen and does not send it to the backend.
