@@ -15,6 +15,9 @@ public class TransactionEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
+
     @Column(nullable = false)
     private String description;
 
@@ -31,6 +34,9 @@ public class TransactionEntity {
     private String date;
 
     public Long getId() { return id; }
+
+    public Long getUserId() { return userId; }
+    public void setUserId(Long userId) { this.userId = userId; }
 
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
