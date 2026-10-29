@@ -1,15 +1,17 @@
-import { useEffect, useState } from 'react'
-import { Route, Routes } from 'react-router-dom'
-import Navbar from './components/Navbar'
-import RouteEffects from './components/RouteEffects'
-import Backup from './pages/Backup'
-import Budget from './pages/Budget'
-import Dashboard from './pages/Dashboard'
-import NotFound from './pages/NotFound'
-import Transactions from './pages/Transactions'
+import { useEffect, useState } from "react";
+import { Route, Routes } from "react-router-dom";
+import Navbar from "./components/Navbar";
+import RouteEffects from "./components/RouteEffects";
+import Backup from "./pages/Backup";
+import Budget from "./pages/Budget";
+import Dashboard from "./pages/Dashboard";
+import NotFound from "./pages/NotFound";
+import Transactions from "./pages/Transactions";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
 
-import { ALL_MONTHS, availableMonths, filterByMonth } from './utils/months'
-import { formatBsMonth } from './utils/nepaliDate'
+import { ALL_MONTHS, availableMonths, filterByMonth } from "./utils/months";
+import { formatBsMonth } from "./utils/nepaliDate";
 import {
   createTransaction,
   deleteBudgetLimit,
@@ -18,60 +20,64 @@ import {
   fetchTransactions,
   saveBudgetLimit,
   updateTransaction,
-} from './utils/api'
-import './App.css'
+} from "./utils/api";
+import "./App.css";
 
 function App() {
   // Passed as a function so storage is read once on mount rather than on
   // every render. The samples are only a first-run seed.
-  const [transactions, setTransactions] = useState([])
-  const [budgets, setBudgets] = useState({})
-  const [selectedMonth, setSelectedMonth] = useState(ALL_MONTHS)
-  const [editingId, setEditingId] = useState(null)
+  const [transactions, setTransactions] = useState([]);
+  const [budgets, setBudgets] = useState({});
+  const [selectedMonth, setSelectedMonth] = useState(ALL_MONTHS);
+  const [editingId, setEditingId] = useState(null);
 
   // Runs once after the first render, because of the empty [] at the end.
   useEffect(() => {
     fetchTransactions()
       .then(setTransactions)
-      .catch((error) => console.error('Failed to load transactions:', error))
-  }, [])
+      .catch((error) => console.error("Failed to load transactions:", error));
+  }, []);
 
   useEffect(() => {
     fetchBudgets()
       .then(setBudgets)
-      .catch((error) => console.error('Failed to load budgets:', error))
-  }, [])
+      .catch((error) => console.error("Failed to load budgets:", error));
+  }, []);
 
   // Derived rather than trusted: the row being edited can be deleted from
   // under the form, and looking it up each render means a missing row simply
   // drops the form back to adding instead of leaving a stale id in charge.
   const editingTransaction =
-    transactions.find((transaction) => transaction.id === editingId) ?? null
+    transactions.find((transaction) => transaction.id === editingId) ?? null;
 
   // The form only reports field values; identity belongs here.
   async function handleSubmitTransaction(values) {
     try {
       if (editingTransaction) {
-        const saved = await updateTransaction(editingTransaction.id, values)
+        const saved = await updateTransaction(editingTransaction.id, values);
         setTransactions((prev) =>
-          prev.map((transaction) => (transaction.id === saved.id ? saved : transaction)),
-        )
-        setEditingId(null)
-        return
+          prev.map((transaction) =>
+            transaction.id === saved.id ? saved : transaction,
+          ),
+        );
+        setEditingId(null);
+        return;
       }
-      const saved = await createTransaction(values)
-      setTransactions((prev) => [saved, ...prev])
+      const saved = await createTransaction(values);
+      setTransactions((prev) => [saved, ...prev]);
     } catch (error) {
-      console.error('Failed to save transaction:', error)
+      console.error("Failed to save transaction:", error);
     }
   }
 
   async function handleDeleteTransaction(id) {
     try {
-      await deleteTransaction(id)
-      setTransactions((prev) => prev.filter((transaction) => transaction.id !== id))
+      await deleteTransaction(id);
+      setTransactions((prev) =>
+        prev.filter((transaction) => transaction.id !== id),
+      );
     } catch (error) {
-      console.error('Failed to delete transaction:', error)
+      console.error("Failed to delete transaction:", error);
     }
   }
 
@@ -82,46 +88,49 @@ function App() {
     try {
       if (limit === null) {
         // Only call the backend if a limit exists, otherwise it returns 404.
-        if (category in budgets) await deleteBudgetLimit(category)
+        if (category in budgets) await deleteBudgetLimit(category);
         setBudgets((prev) => {
-          const { [category]: _removed, ...rest } = prev
-          return rest
-        })
-        return
+          const { [category]: _removed, ...rest } = prev;
+          return rest;
+        });
+        return;
       }
-      await saveBudgetLimit(category, limit)
-      setBudgets((prev) => ({ ...prev, [category]: limit }))
+      await saveBudgetLimit(category, limit);
+      setBudgets((prev) => ({ ...prev, [category]: limit }));
     } catch (error) {
-      console.error('Failed to save budget:', error)
+      console.error("Failed to save budget:", error);
     }
   }
 
   // Replaces everything with a backup's contents. Resets the view state too:
   // an old editing id or selected month may not exist in the restored data.
-  function handleRestore({ transactions: nextTransactions, budgets: nextBudgets }) {
-    setTransactions(nextTransactions)
-    setBudgets(nextBudgets)
-    setEditingId(null)
-    setSelectedMonth(ALL_MONTHS)
+  function handleRestore({
+    transactions: nextTransactions,
+    budgets: nextBudgets,
+  }) {
+    setTransactions(nextTransactions);
+    setBudgets(nextBudgets);
+    setEditingId(null);
+    setSelectedMonth(ALL_MONTHS);
   }
 
-  const months = availableMonths(transactions)
+  const months = availableMonths(transactions);
 
   const activeMonth =
     selectedMonth !== ALL_MONTHS && !months.includes(selectedMonth)
       ? ALL_MONTHS
-      : selectedMonth
+      : selectedMonth;
 
-  const visibleTransactions = filterByMonth(transactions, activeMonth)
+  const visibleTransactions = filterByMonth(transactions, activeMonth);
 
   // ISO date strings compare lexicographically, so this is a plain string
   // sort. Copy first: sort() mutates, and state must not be touched.
   const sortedTransactions = [...visibleTransactions].sort((a, b) =>
     b.date.localeCompare(a.date),
-  )
+  );
 
   const periodLabel =
-    activeMonth === ALL_MONTHS ? 'All time' : formatBsMonth(activeMonth)
+    activeMonth === ALL_MONTHS ? "All time" : formatBsMonth(activeMonth);
 
   return (
     <div className="app">
@@ -177,11 +186,13 @@ function App() {
               />
             }
           />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
