@@ -1,13 +1,14 @@
-import { NavLink } from 'react-router-dom'
-import ThemeToggle from './ThemeToggle'
-import './Navbar.css'
+import { NavLink } from "react-router-dom";
+import ThemeToggle from "./ThemeToggle";
+import { useAuth } from "../context/AuthContext";
+import "./Navbar.css";
 
 // Icons are 24x24 stroke paths; NavLink adds the `active` class and
 // aria-current="page" on its own, so no className function is needed.
 const NAV_ITEMS = [
   {
-    to: '/',
-    label: 'Dashboard',
+    to: "/",
+    label: "Dashboard",
     end: true,
     icon: (
       <>
@@ -19,8 +20,8 @@ const NAV_ITEMS = [
     ),
   },
   {
-    to: '/budget',
-    label: 'Budget',
+    to: "/budget",
+    label: "Budget",
     icon: (
       <>
         <path d="M21 12a9 9 0 1 1-9-9" />
@@ -29,8 +30,8 @@ const NAV_ITEMS = [
     ),
   },
   {
-    to: '/transactions',
-    label: 'Transactions',
+    to: "/transactions",
+    label: "Transactions",
     icon: (
       <>
         <path d="M8 6h13M8 12h13M8 18h13" />
@@ -39,8 +40,8 @@ const NAV_ITEMS = [
     ),
   },
   {
-    to: '/backup',
-    label: 'Backup',
+    to: "/backup",
+    label: "Backup",
     icon: (
       <>
         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
@@ -49,9 +50,10 @@ const NAV_ITEMS = [
       </>
     ),
   },
-]
+];
 
 export default function Navbar() {
+  const { logout } = useAuth();
   return (
     <header className="app-header">
       <a className="skip-link" href="#main">
@@ -59,9 +61,20 @@ export default function Navbar() {
       </a>
 
       <div className="header-inner">
-        <NavLink to="/" end className="brand-lockup" aria-label="Artha, go to dashboard">
+        <NavLink
+          to="/"
+          end
+          className="brand-lockup"
+          aria-label="Artha, go to dashboard"
+        >
           <span className="brand-icon-wrapper" aria-hidden="true">
-            <svg className="brand-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+            <svg
+              className="brand-svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.2"
+            >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -95,8 +108,12 @@ export default function Navbar() {
           </nav>
 
           <ThemeToggle />
+
+          <button type="button" className="logout-button" onClick={logout}>
+            Log out
+          </button>
         </div>
       </div>
     </header>
-  )
+  );
 }

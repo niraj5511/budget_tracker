@@ -9,6 +9,8 @@ import NotFound from "./pages/NotFound";
 import Transactions from "./pages/Transactions";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import RequireAuth from "./components/RequireAuth";
+import { useAuth } from "./context/AuthContext";
 
 import { ALL_MONTHS, availableMonths, filterByMonth } from "./utils/months";
 import { formatBsMonth } from "./utils/nepaliDate";
@@ -26,23 +28,27 @@ import "./App.css";
 function App() {
   // Passed as a function so storage is read once on mount rather than on
   // every render. The samples are only a first-run seed.
+  const { user } = useAuth();
   const [transactions, setTransactions] = useState([]);
   const [budgets, setBudgets] = useState({});
   const [selectedMonth, setSelectedMonth] = useState(ALL_MONTHS);
   const [editingId, setEditingId] = useState(null);
 
   // Runs once after the first render, because of the empty [] at the end.
+  // Reload when the signed-in user changes, and clear the data on logout.
   useEffect(() => {
+    if (!user) {
+      setTransactions([]);
+      setBudgets({});
+      return;
+    }
     fetchTransactions()
       .then(setTransactions)
       .catch((error) => console.error("Failed to load transactions:", error));
-  }, []);
-
-  useEffect(() => {
     fetchBudgets()
       .then(setBudgets)
       .catch((error) => console.error("Failed to load budgets:", error));
-  }, []);
+  }, [user]);
 
   // Derived rather than trusted: the row being edited can be deleted from
   // under the form, and looking it up each render means a missing row simply
@@ -134,60 +140,64 @@ function App() {
 
   return (
     <div className="app">
-      <Navbar />
+      {user && <Navbar />}
       <RouteEffects />
 
       <main id="main" className="app-main" tabIndex={-1}>
         <Routes>
-          <Route
-            path="/"
-            element={
-              <Dashboard
-                months={months}
-                activeMonth={activeMonth}
-                onMonthChange={setSelectedMonth}
-                transactions={transactions}
-                visibleTransactions={visibleTransactions}
-                periodLabel={periodLabel}
-                budgets={budgets}
-              />
-            }
-          />
-          <Route
-            path="/transactions"
-            element={
-              <Transactions
-                editingTransaction={editingTransaction}
-                onSubmit={handleSubmitTransaction}
-                onCancelEdit={() => setEditingId(null)}
-                sortedTransactions={sortedTransactions}
-                editingId={editingTransaction?.id ?? null}
-                // A real toggle, so clicking Edit on the row already being
-                // edited backs out - which is what the button's
-                // aria-pressed state claims.
-                onEditTransaction={(id) =>
-                  setEditingId((prev) => (prev === id ? null : id))
-                }
-                onDeleteTransaction={handleDeleteTransaction}
-              />
-            }
-          />
-          <Route
-            path="/budget"
-            element={<Budget budgets={budgets} onSaveLimit={handleSaveLimit} />}
-          />
-          <Route
-            path="/backup"
-            element={
-              <Backup
-                transactions={transactions}
-                budgets={budgets}
-                onRestore={handleRestore}
-              />
-            }
-          />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route element={<RequireAuth />}>
+            <Route
+              path="/"
+              element={
+                <Dashboard
+                  months={months}
+                  activeMonth={activeMonth}
+                  onMonthChange={setSelectedMonth}
+                  transactions={transactions}
+                  visibleTransactions={visibleTransactions}
+                  periodLabel={periodLabel}
+                  budgets={budgets}
+                />
+              }
+            />
+            <Route
+              path="/transactions"
+              element={
+                <Transactions
+                  editingTransaction={editingTransaction}
+                  onSubmit={handleSubmitTransaction}
+                  onCancelEdit={() => setEditingId(null)}
+                  sortedTransactions={sortedTransactions}
+                  editingId={editingTransaction?.id ?? null}
+                  // A real toggle, so clicking Edit on the row already being
+                  // edited backs out - which is what the button's
+                  // aria-pressed state claims.
+                  onEditTransaction={(id) =>
+                    setEditingId((prev) => (prev === id ? null : id))
+                  }
+                  onDeleteTransaction={handleDeleteTransaction}
+                />
+              }
+            />
+            <Route
+              path="/budget"
+              element={
+                <Budget budgets={budgets} onSaveLimit={handleSaveLimit} />
+              }
+            />
+            <Route
+              path="/backup"
+              element={
+                <Backup
+                  transactions={transactions}
+                  budgets={budgets}
+                  onRestore={handleRestore}
+                />
+              }
+            />
+          </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
