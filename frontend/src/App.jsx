@@ -20,6 +20,7 @@ import {
   deleteTransaction,
   fetchBudgets,
   fetchTransactions,
+  importData,
   saveBudgetLimit,
   updateTransaction,
 } from "./utils/api";
@@ -108,14 +109,19 @@ function App() {
     }
   }
 
-  // Replaces everything with a backup's contents. Resets the view state too:
-  // an old editing id or selected month may not exist in the restored data.
-  function handleRestore({
+  // Saves the backup to the account, then reloads from the server so the
+  // ids on screen are the real ones. Throws if the import fails.
+  async function handleRestore({
     transactions: nextTransactions,
     budgets: nextBudgets,
   }) {
-    setTransactions(nextTransactions);
-    setBudgets(nextBudgets);
+    await importData(nextTransactions, nextBudgets);
+    const [savedTransactions, savedBudgets] = await Promise.all([
+      fetchTransactions(),
+      fetchBudgets(),
+    ]);
+    setTransactions(savedTransactions);
+    setBudgets(savedBudgets);
     setEditingId(null);
     setSelectedMonth(ALL_MONTHS);
   }

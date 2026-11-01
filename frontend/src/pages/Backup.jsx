@@ -1,5 +1,5 @@
-import { useRef, useState } from 'react'
-import ConfirmDialog from '../components/ConfirmDialog'
+import { useRef, useState } from "react";
+import ConfirmDialog from "../components/ConfirmDialog";
 import {
   backupFileName,
   createBackup,
@@ -8,19 +8,19 @@ import {
   parseBackup,
   readLastBackup,
   saveLastBackup,
-} from '../utils/backup'
-import { todayIso } from '../utils/format'
-import { formatBsDate } from '../utils/nepaliDate'
-import './Backup.css'
+} from "../utils/backup";
+import { todayIso } from "../utils/format";
+import { formatBsDate } from "../utils/nepaliDate";
+import "./Backup.css";
 
 function count(n, singular, plural = `${singular}s`) {
-  return `${n} ${n === 1 ? singular : plural}`
+  return `${n} ${n === 1 ? singular : plural}`;
 }
 
 /** A timestamp as a Nepali date, or null when it has no BS form. */
 function bsLabel(timestamp) {
-  const iso = timestamp ? isoFromTimestamp(timestamp) : null
-  return iso ? formatBsDate(iso) : null
+  const iso = timestamp ? isoFromTimestamp(timestamp) : null;
+  return iso ? formatBsDate(iso) : null;
 }
 
 /**
@@ -29,84 +29,96 @@ function bsLabel(timestamp) {
  * person keeps, and loads such a file back.
  */
 function Backup({ transactions, budgets, onRestore }) {
-  const limitCount = Object.keys(budgets).length
-  const hasData = transactions.length > 0 || limitCount > 0
+  const limitCount = Object.keys(budgets).length;
+  const hasData = transactions.length > 0 || limitCount > 0;
 
-  const [lastBackup, setLastBackup] = useState(() => readLastBackup())
-  const [error, setError] = useState('')
-  const [notice, setNotice] = useState('')
+  const [lastBackup, setLastBackup] = useState(() => readLastBackup());
+  const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
   // A successfully read file waiting for the person to confirm replacing data.
-  const [pending, setPending] = useState(null)
-  const fileInputRef = useRef(null)
+  const [pending, setPending] = useState(null);
+  const fileInputRef = useRef(null);
 
   function handleDownload() {
-    const backup = createBackup(transactions, budgets)
+    const backup = createBackup(transactions, budgets);
     const blob = new Blob([JSON.stringify(backup, null, 2)], {
-      type: 'application/json',
-    })
-    const url = URL.createObjectURL(blob)
+      type: "application/json",
+    });
+    const url = URL.createObjectURL(blob);
 
-    const link = document.createElement('a')
-    link.href = url
-    link.download = backupFileName(todayIso())
-    document.body.appendChild(link)
-    link.click()
-    link.remove()
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = backupFileName(todayIso());
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
     // Not straight away: some browsers have not started the download yet.
-    setTimeout(() => URL.revokeObjectURL(url), 1000)
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
 
-    saveLastBackup(backup.exportedAt)
-    setLastBackup(backup.exportedAt)
-    setError('')
-    setNotice('')
+    saveLastBackup(backup.exportedAt);
+    setLastBackup(backup.exportedAt);
+    setError("");
+    setNotice("");
   }
 
   async function handleFileChosen(event) {
-    const input = event.target
-    const file = input.files?.[0]
+    const input = event.target;
+    const file = input.files?.[0];
     // Cleared so choosing the same file again still fires a change event.
-    input.value = ''
+    input.value = "";
 
-    setError('')
-    setNotice('')
-    if (!file) return
+    setError("");
+    setNotice("");
+    if (!file) return;
 
     if (file.size > MAX_BACKUP_BYTES) {
-      setError('That file is too large to be a backup (the limit is 5 MB).')
-      return
+      setError("That file is too large to be a backup (the limit is 5 MB).");
+      return;
     }
 
-    let text
+    let text;
     try {
-      text = await file.text()
+      text = await file.text();
     } catch {
-      setError('The file could not be read. Try choosing it again.')
-      return
+      setError("The file could not be read. Try choosing it again.");
+      return;
     }
 
-    const result = parseBackup(text)
+    const result = parseBackup(text);
     if (!result.ok) {
-      setError(result.error)
-      return
+      setError(result.error);
+      return;
     }
-    setPending(result)
+    setPending(result);
   }
 
-  function handleConfirmRestore() {
-    if (!pending) return
+  async function handleConfirmRestore() {
+    if (!pending) return;
+    const restoring = pending;
+    setPending(null);
 
-    onRestore({ transactions: pending.transactions, budgets: pending.budgets })
+    try {
+      await onRestore({
+        transactions: restoring.transactions,
+        budgets: restoring.budgets,
+      });
+    } catch {
+      setError(
+        "Restore failed, and nothing was changed. Check that the backend is running and try again.",
+      );
+      return;
+    }
+
     setNotice(
-      `Restored ${count(pending.transactions.length, 'transaction')} and ${count(
-        Object.keys(pending.budgets).length,
-        'budget limit',
+      `Restored ${count(restoring.transactions.length, "transaction")} and ${count(
+        Object.keys(restoring.budgets).length,
+        "budget limit",
       )}.`,
-    )
-    setPending(null)
+    );
   }
 
-  const lastBackupLabel = bsLabel(lastBackup)
-  const savedOnLabel = pending ? bsLabel(pending.exportedAt) : null
+  const lastBackupLabel = bsLabel(lastBackup);
+  const savedOnLabel = pending ? bsLabel(pending.exportedAt) : null;
 
   return (
     <div className="page">
@@ -126,8 +138,8 @@ function Backup({ transactions, budgets, onRestore }) {
             Download a backup
           </h2>
           <p className="backup-text">
-            Saves your {count(transactions.length, 'transaction')} and{' '}
-            {count(limitCount, 'budget limit')} to a file on this device.
+            Saves your {count(transactions.length, "transaction")} and{" "}
+            {count(limitCount, "budget limit")} to a file on this device.
           </p>
 
           <div className="backup-actions">
@@ -156,10 +168,10 @@ function Backup({ transactions, budgets, onRestore }) {
             </button>
             <span className="backup-meta">
               {!hasData
-                ? 'Nothing to back up yet.'
+                ? "Nothing to back up yet."
                 : lastBackupLabel
                   ? `Last backup: ${lastBackupLabel}`
-                  : 'No backup yet.'}
+                  : "No backup yet."}
             </span>
           </div>
         </section>
@@ -216,27 +228,29 @@ function Backup({ transactions, budgets, onRestore }) {
           <>
             <p className="restore-summary">
               <strong>
-                {count(pending.transactions.length, 'transaction')} and{' '}
-                {count(Object.keys(pending.budgets).length, 'budget limit')}
+                {count(pending.transactions.length, "transaction")} and{" "}
+                {count(Object.keys(pending.budgets).length, "budget limit")}
               </strong>
               {savedOnLabel && <span>Saved on {savedOnLabel}</span>}
             </p>
             <p>
-              This replaces your current {count(transactions.length, 'transaction')}{' '}
-              and {count(limitCount, 'budget limit')}, and it can&rsquo;t be undone. If
-              you might need your current data, download a backup of it first.
+              This replaces your current{" "}
+              {count(transactions.length, "transaction")} and{" "}
+              {count(limitCount, "budget limit")}, and it can&rsquo;t be undone.
+              If you might need your current data, download a backup of it
+              first.
             </p>
             {pending.skipped > 0 && (
               <p className="restore-warning">
-                {count(pending.skipped, 'entry', 'entries')} in the file could not
-                be read and will be left out.
+                {count(pending.skipped, "entry", "entries")} in the file could
+                not be read and will be left out.
               </p>
             )}
           </>
         )}
       </ConfirmDialog>
     </div>
-  )
+  );
 }
 
-export default Backup
+export default Backup;

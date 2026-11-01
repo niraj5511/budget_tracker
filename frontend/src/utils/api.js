@@ -108,3 +108,19 @@ export function loginRequest(email, password) {
 export function registerRequest(email, password) {
   return request('/auth/register', { method: 'POST', body: JSON.stringify({ email, password }) })
 }
+
+export async function importData(transactions, budgets) {
+  const cleaned = transactions.map(
+    ({ description, amount, type, category, date }) => ({
+      description,
+      amount,
+      type,
+      category,
+      date,
+    }),
+  );
+  return request("/import", {
+    method: "POST",
+    body: JSON.stringify({ transactions: cleaned, budgets }),
+  });
+}
