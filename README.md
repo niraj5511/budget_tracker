@@ -15,7 +15,8 @@ budget_tracker/
 - **Dashboard**: balance summary, category breakdown, category pie chart, monthly trend, month-to-month comparison and top spending category, with a month filter.
 - **Transactions**: add, edit and delete income and expense entries, with categories and filters.
 - **Budgets**: set a spending limit per category and track progress against it.
-- **Backup**: export and restore data.
+- **Accounts**: register and log in. Each user sees only their own data.
+- **Backup**: download your data as a file, and restore it into your account.
 - **Theme**: light and dark mode toggle.
 
 ## Tech stack
@@ -23,7 +24,7 @@ budget_tracker/
 | Part | Tools |
 |---|---|
 | Frontend | React 19, Vite, React Router, Recharts |
-| Backend | Java 21, Spring Boot 4.1, Maven, Spring Web, Validation, Spring Data JPA |
+| Backend | Java 21, Spring Boot 4.1, Maven, Spring Web, Validation, Spring Data JPA, Spring Security (JWT, BCrypt) |
 | Database | PostgreSQL on Supabase |
 
 ## Requirements
@@ -39,6 +40,7 @@ Create `backend/secrets.properties` with your database details. It is listed in 
 spring.datasource.url=jdbc:postgresql://<host>:5432/postgres
 spring.datasource.username=<user>
 spring.datasource.password=<password>
+app.jwt.secret=<long random string, at least 32 characters>
 ```
 Use the Session pooler connection details from the Supabase Connect panel. Always start the backend from the `backend` folder, because the file is read from the current directory.
 Start the backend first.
@@ -74,9 +76,13 @@ Restart `npm run dev` after changing it. If the backend port changes, update thi
 
 Base path: `/api`
 
+All endpoints except `/health` and `/auth/*` need the header `Authorization: Bearer <token>`. Each user can only read and change their own transactions and budgets.
+
 | Method | Path | Description |
 |---|---|---|
 | GET | `/health` | Returns `{"status":"ok"}` |
+| POST | `/auth/register` | Create an account (returns 201, `409` if the email is taken) |
+| POST | `/auth/login` | Returns `{ token, user }`. The token lasts 24 hours. Bad credentials return `401`. |
 | GET | `/transactions` | List all transactions |
 | POST | `/transactions` | Create a transaction (returns 201) |
 | PUT | `/transactions/{id}` | Update a transaction |
@@ -84,8 +90,9 @@ Base path: `/api`
 | GET | `/budgets` | List all budgets |
 | PUT | `/budgets/{category}` | Set the limit for a category |
 | DELETE | `/budgets/{category}` | Remove the limit for a category |
+| POST | `/import` | Replace the user's transactions and budgets with the body's contents, all or nothing |
 
-Missing records return `404`. Invalid input returns `400`.
+Missing records return `404`. Invalid input returns `400`. A missing or expired token returns `401`.
 
 ### Transaction body
 
@@ -103,6 +110,25 @@ Missing records return `404`. Invalid input returns `400`.
 - `amount` must be greater than 0.
 - `type` must be `income` or `expense`.
 - `date` must be in `YYYY-MM-DD` format.
+
+### Auth body
+
+```json
+{ "email": "you@example.com", "password": "at-least-8-characters" }
+```
+
+The password must be 8 to 72 characters. Emails are stored in lowercase.
+
+### Import body
+
+```json
+{
+  "transactions": [ { "description": "Groceries", "amount": 3200, "type": "expense", "category": "Food", "date": "2026-10-03" } ],
+  "budgets": { "Food": 5000 }
+}
+```
+
+Each transaction follows the transaction rules above. Each limit must be greater than 0.
 
 ### Budget body
 
@@ -122,6 +148,10 @@ Source is in `backend/src/main/java/com/niraj/backend/`.
 | `TransactionService`, `BudgetService` | Business rules and database access through the repositories |
 | `Transaction`, `Budget` | Data returned by the API |
 | `TransactionRequest`, `BudgetRequest` | Input accepted by the API, with validation |
+| `AuthController`, `AuthService` | Register and login |
+| `ImportController`, `ImportService`, `ImportRequest` | Bulk replace of a user's data from a backup |
+| `SecurityConfig`, `JwtConfig`, `PasswordConfig` | Token checks, JWT signing, password hashing |
+| `UserEntity`, `UserRepository` | User accounts |
 | `HealthController` | Health check |
 | `WebConfig` | CORS settings for the frontend |
 | `TransactionEntity`, `BudgetEntity` | Database tables, created automatically on startup |
@@ -129,4 +159,6 @@ Source is in `backend/src/main/java/com/niraj/backend/`.
 
 ## Current limitations
 
-- Backup restore updates only the data on screen and does not send it to the backend.
+- The allowed CORS origin and the API address are set for local use only.
+- The login token is kept in the browser's `localStorage`.
+- There are no automated tests and no limit on login attempts.
