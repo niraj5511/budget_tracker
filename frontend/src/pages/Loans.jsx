@@ -1,4 +1,6 @@
-import { useMemo } from "react";
+import { useMemo, useRef, useState } from "react";
+import ConfirmDialog from "../components/ConfirmDialog";
+import LoanForm from "../components/LoanForm";
 import { formatCurrency, todayIso } from "../utils/format";
 import { formatBsDate } from "../utils/nepaliDate";
 import "./Loans.css";
@@ -9,20 +11,38 @@ const EPSILON = 0.005;
 function describe(loan) {
   const outstanding = Math.max(loan.amount - loan.repaid, 0);
   const settled = outstanding < EPSILON;
-  const overdue = !settled && Boolean(loan.dueDate) && loan.dueDate < todayIso();
+  const overdue =
+    !settled && Boolean(loan.dueDate) && loan.dueDate < todayIso();
   const percent = Math.min(Math.round((loan.repaid / loan.amount) * 100), 100);
   return { ...loan, outstanding, settled, overdue, percent };
 }
 
-function Loans({ loans }) {
+function Loans({
+  loans,
+  editingLoan,
+  onSubmit,
+  onCancelEdit,
+  onEditLoan,
+  onDeleteLoan,
+}) {
+  // The record waiting for a yes/no. One dialog serves the whole list.
+  const [pendingDelete, setPendingDelete] = useState(null);
+  const titleRef = useRef(null);
+
+  function handleConfirmDelete() {
+    if (!pendingDelete) return;
+    onDeleteLoan(pendingDelete.id);
+    setPendingDelete(null);
+    // The row that opened the dialog is gone; the list heading is the
+    // nearest stable place for focus.
+    titleRef.current?.focus();
+  }
   const items = useMemo(() => {
     // Open loans first, newest first within each group.
-    return loans
-      .map(describe)
-      .sort((a, b) => {
-        if (a.settled !== b.settled) return a.settled ? 1 : -1;
-        return b.date.localeCompare(a.date);
-      });
+    return loans.map(describe).sort((a, b) => {
+      if (a.settled !== b.settled) return a.settled ? 1 : -1;
+      return b.date.localeCompare(a.date);
+    });
   }, [loans]);
 
   const owedToYou = items
@@ -53,7 +73,8 @@ function Loans({ loans }) {
             {formatCurrency(owedToYou)}
           </span>
           <span className="loan-stat-meta">
-            {openCount("lent")} open {openCount("lent") === 1 ? "loan" : "loans"}
+            {openCount("lent")} open{" "}
+            {openCount("lent") === 1 ? "loan" : "loans"}
           </span>
         </div>
         <div className="loan-stat">
@@ -68,80 +89,180 @@ function Loans({ loans }) {
         </div>
       </section>
 
-      <section className="loan-list-section" aria-labelledby="loan-list-title">
-        <h2 id="loan-list-title" className="loan-list-title">
-          Records
-        </h2>
+      <div className="loans-layout">
+        <div className="loans-form-col">
+          {/* The key remounts the form when a different record is loaded. */}
+          <LoanForm
+            key={editingLoan?.id ?? "new"}
+            loan={editingLoan}
+            onSubmit={onSubmit}
+            onCancel={onCancelEdit}
+          />
+        </div>
 
-        {items.length === 0 ? (
-          <p className="loan-empty">No lend or borrow records yet.</p>
-        ) : (
-          <ul className="loan-list">
-            {items.map((loan) => {
-              const lent = loan.direction === "lent";
-              const date = formatBsDate(loan.date) ?? loan.date;
-              const due = loan.dueDate
-                ? (formatBsDate(loan.dueDate) ?? loan.dueDate)
-                : null;
+        <section
+          className="loan-list-section"
+          aria-labelledby="loan-list-title"
+        >
+          <h2
+            id="loan-list-title"
+            className="loan-list-title"
+            ref={titleRef}
+            tabIndex={-1}
+          >
+            Records
+          </h2>
 
-              return (
-                <li
-                  key={loan.id}
-                  className={`loan-item${loan.settled ? " is-settled" : ""}`}
-                >
-                  <div className="loan-top">
-                    <div className="loan-who">
-                      <strong className="loan-person">{loan.person}</strong>
-                      <span className={`loan-tag ${lent ? "is-lent" : "is-borrowed"}`}>
-                        {lent ? "You lent" : "You borrowed"}
-                      </span>
-                      {loan.settled && (
-                        <span className="loan-tag is-settled">Settled</span>
-                      )}
-                      {loan.overdue && (
-                        <span className="loan-tag is-overdue">Overdue</span>
-                      )}
-                    </div>
-                    <div className="loan-amounts num">
-                      <span className="loan-outstanding">
-                        {formatCurrency(loan.settled ? loan.amount : loan.outstanding)}
-                      </span>
-                      <span className="loan-of">
-                        {loan.settled
-                          ? "paid in full"
-                          : `left of ${formatCurrency(loan.amount)}`}
-                      </span>
-                    </div>
-                  </div>
+          {items.length === 0 ? (
+            <p className="loan-empty">No lend or borrow records yet.</p>
+          ) : (
+            <ul className="loan-list">
+              {items.map((loan) => {
+                const lent = loan.direction === "lent";
+                const date = formatBsDate(loan.date) ?? loan.date;
+                const due = loan.dueDate
+                  ? (formatBsDate(loan.dueDate) ?? loan.dueDate)
+                  : null;
 
-                  <div
-                    className="loan-bar"
-                    role="progressbar"
-                    aria-label={`${loan.person}: repaid`}
-                    aria-valuemin={0}
-                    aria-valuemax={100}
-                    aria-valuenow={loan.percent}
+                return (
+                  <li
+                    key={loan.id}
+                    className={`loan-item${loan.settled ? " is-settled" : ""}${
+                      loan.id === editingLoan?.id ? " is-being-edited" : ""
+                    }`}
                   >
-                    <div
-                      className={`loan-bar-fill ${lent ? "is-lent" : "is-borrowed"}`}
-                      style={{ width: `${loan.percent}%` }}
-                    />
-                  </div>
+                    <div className="loan-top">
+                      <div className="loan-who">
+                        <strong className="loan-person">{loan.person}</strong>
+                        <span
+                          className={`loan-tag ${lent ? "is-lent" : "is-borrowed"}`}
+                        >
+                          {lent ? "You lent" : "You borrowed"}
+                        </span>
+                        {loan.settled && (
+                          <span className="loan-tag is-settled">Settled</span>
+                        )}
+                        {loan.overdue && (
+                          <span className="loan-tag is-overdue">Overdue</span>
+                        )}
+                      </div>
+                      <div className="loan-amounts num">
+                        <span className="loan-outstanding">
+                          {formatCurrency(
+                            loan.settled ? loan.amount : loan.outstanding,
+                          )}
+                        </span>
+                        <span className="loan-of">
+                          {loan.settled
+                            ? "paid in full"
+                            : `left of ${formatCurrency(loan.amount)}`}
+                        </span>
+                      </div>
+                      <div className="transaction-actions">
+                        <button
+                          className="transaction-edit"
+                          type="button"
+                          onClick={() => onEditLoan(loan.id)}
+                          aria-label={`Edit ${loan.person}`}
+                          aria-pressed={loan.id === editingLoan?.id}
+                          title="Edit"
+                        >
+                          <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            aria-hidden="true"
+                            focusable="false"
+                          >
+                            <path d="M12 20h9" />
+                            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+                          </svg>
+                        </button>
+                        <button
+                          className="transaction-delete"
+                          type="button"
+                          onClick={() => setPendingDelete(loan)}
+                          aria-label={`Delete ${loan.person}`}
+                          title="Delete"
+                        >
+                          <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            aria-hidden="true"
+                            focusable="false"
+                          >
+                            <path d="M3 6h18" />
+                            <path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2" />
+                            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                            <path d="M10 11v6M14 11v6" />
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
 
-                  <p className="loan-meta">
-                    {lent ? "Lent" : "Borrowed"} on {date}
-                    {due ? ` \u00b7 Due ${due}` : ""}
-                    {loan.repayments.length > 0
-                      ? ` \u00b7 ${loan.repayments.length} ${loan.repayments.length === 1 ? "repayment" : "repayments"}`
-                      : ""}
-                    {loan.note ? ` \u00b7 ${loan.note}` : ""}
-                  </p>
-                </li>
-              );
-            })}
-          </ul>
+                    <div
+                      className="loan-bar"
+                      role="progressbar"
+                      aria-label={`${loan.person}: repaid`}
+                      aria-valuemin={0}
+                      aria-valuemax={100}
+                      aria-valuenow={loan.percent}
+                    >
+                      <div
+                        className={`loan-bar-fill ${lent ? "is-lent" : "is-borrowed"}`}
+                        style={{ width: `${loan.percent}%` }}
+                      />
+                    </div>
+
+                    <p className="loan-meta">
+                      {lent ? "Lent" : "Borrowed"} on {date}
+                      {due ? ` \u00b7 Due ${due}` : ""}
+                      {loan.repayments.length > 0
+                        ? ` \u00b7 ${loan.repayments.length} ${loan.repayments.length === 1 ? "repayment" : "repayments"}`
+                        : ""}
+                      {loan.note ? ` \u00b7 ${loan.note}` : ""}
+                    </p>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </section>
+      </div>
+
+      <ConfirmDialog
+        open={Boolean(pendingDelete)}
+        title="Delete this record?"
+        confirmLabel="Delete"
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setPendingDelete(null)}
+      >
+        {pendingDelete && (
+          <>
+            <p className="delete-summary">
+              <strong>{pendingDelete.person}</strong>
+              <span className="num">
+                {formatCurrency(pendingDelete.amount)}
+              </span>
+              <span>
+                {pendingDelete.direction === "lent"
+                  ? "You lent"
+                  : "You borrowed"}
+              </span>
+            </p>
+            <p>
+              Its repayments will be deleted too. This can&rsquo;t be undone.
+            </p>
+          </>
         )}
-      </section>
+      </ConfirmDialog>
     </div>
   );
 }

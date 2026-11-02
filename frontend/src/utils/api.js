@@ -128,3 +128,15 @@ export async function importData(transactions, budgets) {
 export function fetchLoans() {
   return request("/loans");
 }
+
+export function createLoan(values) {
+  return request("/loans", { method: "POST", body: JSON.stringify(values) });
+}
+
+export function updateLoan(id, values) {
+  return request(`/loans/${id}`, { method: "PUT", body: JSON.stringify(values) });
+}
+
+export async function deleteLoan(id) {
+  await request(`/loans/${id}`, { method: "DELETE" });
+}

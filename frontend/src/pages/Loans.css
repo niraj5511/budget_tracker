@@ -186,3 +186,49 @@
     padding: var(--space-4);
   }
 }
+
+/* ---- Form + list layout (same idea as the Transactions page) ---------- */
+.loans-layout {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.loans-form-col,
+.loan-list-section {
+  min-width: 0;
+}
+
+@media (min-width: 1024px) {
+  .loans-layout {
+    display: grid;
+    grid-template-columns: minmax(340px, 400px) minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .loans-form-col {
+    position: sticky;
+    top: 88px; /* header height plus a little air */
+  }
+}
+
+/* The row loaded in the form: tint plus a bar, so it isn't colour alone. */
+.loan-item.is-being-edited {
+  background: var(--accent-soft);
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+
+.loan-check {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 0.875rem;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.loan-check input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent);
+}

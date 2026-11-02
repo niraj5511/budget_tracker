@@ -16,14 +16,17 @@ import Loans from "./pages/Loans";
 import { ALL_MONTHS, availableMonths, filterByMonth } from "./utils/months";
 import { formatBsMonth } from "./utils/nepaliDate";
 import {
+  createLoan,
   createTransaction,
   deleteBudgetLimit,
+  deleteLoan,
   deleteTransaction,
   fetchBudgets,
   fetchLoans,
   fetchTransactions,
   importData,
   saveBudgetLimit,
+  updateLoan,
   updateTransaction,
 } from "./utils/api";
 import "./App.css";
@@ -35,6 +38,7 @@ function App() {
   const [transactions, setTransactions] = useState([]);
   const [budgets, setBudgets] = useState({});
   const [loans, setLoans] = useState([]);
+  const [editingLoanId, setEditingLoanId] = useState(null);
   const [selectedMonth, setSelectedMonth] = useState(ALL_MONTHS);
   const [editingId, setEditingId] = useState(null);
 
@@ -151,6 +155,31 @@ function App() {
   const periodLabel =
     activeMonth === ALL_MONTHS ? "All time" : formatBsMonth(activeMonth);
 
+  const editingLoan = loans.find((loan) => loan.id === editingLoanId) ?? null;
+
+  // Throws on failure, so the form can keep what was typed and show an error.
+  async function handleSubmitLoan(values) {
+    if (editingLoan) {
+      const saved = await updateLoan(editingLoan.id, values);
+      setLoans((prev) =>
+        prev.map((loan) => (loan.id === saved.id ? saved : loan)),
+      );
+      setEditingLoanId(null);
+      return;
+    }
+    const saved = await createLoan(values);
+    setLoans((prev) => [...prev, saved]);
+  }
+
+  async function handleDeleteLoan(id) {
+    try {
+      await deleteLoan(id);
+      setLoans((prev) => prev.filter((loan) => loan.id !== id));
+      setEditingLoanId((prev) => (prev === id ? null : prev));
+    } catch (error) {
+      console.error("Failed to delete loan:", error);
+    }
+  }
   return (
     <div className="app">
       {user && <Navbar />}
@@ -200,7 +229,21 @@ function App() {
                 <Budget budgets={budgets} onSaveLimit={handleSaveLimit} />
               }
             />
-            <Route path="/loans" element={<Loans loans={loans} />} />
+            <Route
+              path="/loans"
+              element={
+                <Loans
+                  loans={loans}
+                  editingLoan={editingLoan}
+                  onSubmit={handleSubmitLoan}
+                  onCancelEdit={() => setEditingLoanId(null)}
+                  onEditLoan={(id) =>
+                    setEditingLoanId((prev) => (prev === id ? null : id))
+                  }
+                  onDeleteLoan={handleDeleteLoan}
+                />
+              }
+            />
             <Route
               path="/backup"
               element={
