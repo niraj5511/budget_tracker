@@ -16,10 +16,12 @@ import Loans from "./pages/Loans";
 import { ALL_MONTHS, availableMonths, filterByMonth } from "./utils/months";
 import { formatBsMonth } from "./utils/nepaliDate";
 import {
+  addRepayment,
   createLoan,
   createTransaction,
   deleteBudgetLimit,
   deleteLoan,
+  deleteRepayment,
   deleteTransaction,
   fetchBudgets,
   fetchLoans,
@@ -171,6 +173,41 @@ function App() {
     setLoans((prev) => [...prev, saved]);
   }
 
+  // A loan's repaid total is the sum of its repayments, as on the server.
+  function withRepayments(loan, repayments) {
+    return {
+      ...loan,
+      repayments,
+      repaid: repayments.reduce((sum, repayment) => sum + repayment.amount, 0),
+    };
+  }
+
+  // Both throw on failure, so the panel can show the error.
+  async function handleAddRepayment(loanId, values) {
+    const saved = await addRepayment(loanId, values);
+    setLoans((prev) =>
+      prev.map((loan) =>
+        loan.id === loanId
+          ? withRepayments(loan, [...loan.repayments, saved])
+          : loan,
+      ),
+    );
+  }
+
+  async function handleDeleteRepayment(loanId, id) {
+    await deleteRepayment(loanId, id);
+    setLoans((prev) =>
+      prev.map((loan) =>
+        loan.id === loanId
+          ? withRepayments(
+              loan,
+              loan.repayments.filter((repayment) => repayment.id !== id),
+            )
+          : loan,
+      ),
+    );
+  }
+
   async function handleDeleteLoan(id) {
     try {
       await deleteLoan(id);
@@ -241,6 +278,8 @@ function App() {
                     setEditingLoanId((prev) => (prev === id ? null : id))
                   }
                   onDeleteLoan={handleDeleteLoan}
+                  onAddRepayment={handleAddRepayment}
+                  onDeleteRepayment={handleDeleteRepayment}
                 />
               }
             />

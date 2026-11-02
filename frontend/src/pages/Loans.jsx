@@ -1,6 +1,7 @@
 import { useMemo, useRef, useState } from "react";
 import ConfirmDialog from "../components/ConfirmDialog";
 import LoanForm from "../components/LoanForm";
+import RepaymentPanel from "../components/RepaymentPanel";
 import { formatCurrency, todayIso } from "../utils/format";
 import { formatBsDate } from "../utils/nepaliDate";
 import "./Loans.css";
@@ -24,11 +25,22 @@ function Loans({
   onCancelEdit,
   onEditLoan,
   onDeleteLoan,
+  onAddRepayment,
+  onDeleteRepayment,
 }) {
+  // Ids of the records whose repayments are showing.
+  const [expanded, setExpanded] = useState(() => new Set());
   // The record waiting for a yes/no. One dialog serves the whole list.
   const [pendingDelete, setPendingDelete] = useState(null);
   const titleRef = useRef(null);
-
+  function toggleExpanded(id) {
+    setExpanded((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
   function handleConfirmDelete() {
     if (!pendingDelete) return;
     onDeleteLoan(pendingDelete.id);
@@ -229,6 +241,39 @@ function Loans({
                         : ""}
                       {loan.note ? ` \u00b7 ${loan.note}` : ""}
                     </p>
+
+                    <button
+                      type="button"
+                      className="loan-toggle"
+                      aria-expanded={expanded.has(loan.id)}
+                      onClick={() => toggleExpanded(loan.id)}
+                    >
+                      {loan.repayments.length > 0
+                        ? `Repayments (${loan.repayments.length})`
+                        : loan.settled
+                          ? "Repayments"
+                          : "Add repayment"}
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.4"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        aria-hidden="true"
+                        focusable="false"
+                      >
+                        <path d="M6 9l6 6 6-6" />
+                      </svg>
+                    </button>
+
+                    {expanded.has(loan.id) && (
+                      <RepaymentPanel
+                        loan={loan}
+                        onAdd={onAddRepayment}
+                        onDelete={onDeleteRepayment}
+                      />
+                    )}
                   </li>
                 );
               })}

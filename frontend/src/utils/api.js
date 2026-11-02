@@ -140,3 +140,14 @@ export function updateLoan(id, values) {
 export async function deleteLoan(id) {
   await request(`/loans/${id}`, { method: "DELETE" });
 }
+
+export function addRepayment(loanId, values) {
+  return request(`/loans/${loanId}/repayments`, {
+    method: "POST",
+    body: JSON.stringify(values),
+  });
+}
+
+export async function deleteRepayment(loanId, id) {
+  await request(`/loans/${loanId}/repayments/${id}`, { method: "DELETE" });
+}
