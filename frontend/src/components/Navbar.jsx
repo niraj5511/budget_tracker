@@ -40,6 +40,16 @@ const NAV_ITEMS = [
     ),
   },
   {
+    to: "/loans",
+    label: "Lend / Borrow",
+    icon: (
+      <>
+        <path d="M7 7h13M16 3l4 4-4 4" />
+        <path d="M17 17H4M8 13l-4 4 4 4" />
+      </>
+    ),
+  },
+  {
     to: "/backup",
     label: "Backup",
     icon: (

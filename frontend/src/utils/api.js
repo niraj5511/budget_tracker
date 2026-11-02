@@ -124,3 +124,7 @@ export async function importData(transactions, budgets) {
     body: JSON.stringify({ transactions: cleaned, budgets }),
   });
 }
+
+export function fetchLoans() {
+  return request("/loans");
+}

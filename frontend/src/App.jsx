@@ -11,6 +11,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import RequireAuth from "./components/RequireAuth";
 import { useAuth } from "./context/AuthContext";
+import Loans from "./pages/Loans";
 
 import { ALL_MONTHS, availableMonths, filterByMonth } from "./utils/months";
 import { formatBsMonth } from "./utils/nepaliDate";
@@ -19,6 +20,7 @@ import {
   deleteBudgetLimit,
   deleteTransaction,
   fetchBudgets,
+  fetchLoans,
   fetchTransactions,
   importData,
   saveBudgetLimit,
@@ -32,6 +34,7 @@ function App() {
   const { user } = useAuth();
   const [transactions, setTransactions] = useState([]);
   const [budgets, setBudgets] = useState({});
+  const [loans, setLoans] = useState([]);
   const [selectedMonth, setSelectedMonth] = useState(ALL_MONTHS);
   const [editingId, setEditingId] = useState(null);
 
@@ -41,6 +44,7 @@ function App() {
     if (!user) {
       setTransactions([]);
       setBudgets({});
+      setLoans([]);
       return;
     }
     fetchTransactions()
@@ -49,6 +53,9 @@ function App() {
     fetchBudgets()
       .then(setBudgets)
       .catch((error) => console.error("Failed to load budgets:", error));
+    fetchLoans()
+      .then(setLoans)
+      .catch((error) => console.error("Failed to load loans:", error));
   }, [user]);
 
   // Derived rather than trusted: the row being edited can be deleted from
@@ -193,6 +200,7 @@ function App() {
                 <Budget budgets={budgets} onSaveLimit={handleSaveLimit} />
               }
             />
+            <Route path="/loans" element={<Loans loans={loans} />} />
             <Route
               path="/backup"
               element={
