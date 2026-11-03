@@ -127,15 +127,19 @@ function App() {
   async function handleRestore({
     transactions: nextTransactions,
     budgets: nextBudgets,
+    loans: nextLoans,
   }) {
-    await importData(nextTransactions, nextBudgets);
-    const [savedTransactions, savedBudgets] = await Promise.all([
+    await importData(nextTransactions, nextBudgets, nextLoans);
+    const [savedTransactions, savedBudgets, savedLoans] = await Promise.all([
       fetchTransactions(),
       fetchBudgets(),
+      fetchLoans(),
     ]);
     setTransactions(savedTransactions);
     setBudgets(savedBudgets);
+    setLoans(savedLoans);
     setEditingId(null);
+    setEditingLoanId(null);
     setSelectedMonth(ALL_MONTHS);
   }
 
@@ -290,6 +294,7 @@ function App() {
                 <Backup
                   transactions={transactions}
                   budgets={budgets}
+                  loans={loans}
                   onRestore={handleRestore}
                 />
               }

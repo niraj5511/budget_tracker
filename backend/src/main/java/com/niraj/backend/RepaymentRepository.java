@@ -22,4 +22,8 @@ public interface RepaymentRepository extends JpaRepository<RepaymentEntity, Long
     @Modifying(flushAutomatically = true, clearAutomatically = true)
     @Query("delete from RepaymentEntity r where r.loanId = :loanId")
     void deleteAllForLoan(@Param("loanId") Long loanId);
+
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
+    @Query("delete from RepaymentEntity r where r.userId = :userId")
+    void deleteAllForUser(@Param("userId") Long userId);
 }

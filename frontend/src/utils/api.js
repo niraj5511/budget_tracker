@@ -102,14 +102,20 @@ export async function deleteBudgetLimit(category) {
 }
 
 export function loginRequest(email, password) {
-  return request('/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) })
+  return request("/auth/login", {
+    method: "POST",
+    body: JSON.stringify({ email, password }),
+  });
 }
 
 export function registerRequest(email, password) {
-  return request('/auth/register', { method: 'POST', body: JSON.stringify({ email, password }) })
+  return request("/auth/register", {
+    method: "POST",
+    body: JSON.stringify({ email, password }),
+  });
 }
 
-export async function importData(transactions, budgets) {
+export async function importData(transactions, budgets, loans) {
   const cleaned = transactions.map(
     ({ description, amount, type, category, date }) => ({
       description,
@@ -121,7 +127,7 @@ export async function importData(transactions, budgets) {
   );
   return request("/import", {
     method: "POST",
-    body: JSON.stringify({ transactions: cleaned, budgets }),
+    body: JSON.stringify({ transactions: cleaned, budgets, loans }),
   });
 }
 
@@ -134,7 +140,10 @@ export function createLoan(values) {
 }
 
 export function updateLoan(id, values) {
-  return request(`/loans/${id}`, { method: "PUT", body: JSON.stringify(values) });
+  return request(`/loans/${id}`, {
+    method: "PUT",
+    body: JSON.stringify(values),
+  });
 }
 
 export async function deleteLoan(id) {

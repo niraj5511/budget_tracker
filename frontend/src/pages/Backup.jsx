@@ -17,6 +17,14 @@ function count(n, singular, plural = `${singular}s`) {
   return `${n} ${n === 1 ? singular : plural}`;
 }
 
+/** "3 transactions, 2 budget limits and 1 Lend / Borrow record". A null loan count leaves the loans out. */
+function describeData(transactionCount, limitCount, loanCount = null) {
+  const transactions = count(transactionCount, "transaction");
+  const limits = count(limitCount, "budget limit");
+  if (loanCount === null) return `${transactions} and ${limits}`;
+  return `${transactions}, ${limits} and ${count(loanCount, "Lend / Borrow record")}`;
+}
+
 /** A timestamp as a Nepali date, or null when it has no BS form. */
 function bsLabel(timestamp) {
   const iso = timestamp ? isoFromTimestamp(timestamp) : null;
@@ -28,9 +36,9 @@ function bsLabel(timestamp) {
  * to another device loses it. This page turns that data into a file the
  * person keeps, and loads such a file back.
  */
-function Backup({ transactions, budgets, onRestore }) {
+function Backup({ transactions, budgets, loans, onRestore }) {
   const limitCount = Object.keys(budgets).length;
-  const hasData = transactions.length > 0 || limitCount > 0;
+  const hasData = transactions.length > 0 || limitCount > 0 || loans.length > 0;
 
   const [lastBackup, setLastBackup] = useState(() => readLastBackup());
   const [error, setError] = useState("");
@@ -40,7 +48,7 @@ function Backup({ transactions, budgets, onRestore }) {
   const fileInputRef = useRef(null);
 
   function handleDownload() {
-    const backup = createBackup(transactions, budgets);
+    const backup = createBackup(transactions, budgets, loans);
     const blob = new Blob([JSON.stringify(backup, null, 2)], {
       type: "application/json",
     });
@@ -101,6 +109,7 @@ function Backup({ transactions, budgets, onRestore }) {
       await onRestore({
         transactions: restoring.transactions,
         budgets: restoring.budgets,
+        loans: restoring.loans,
       });
     } catch {
       setError(
@@ -110,9 +119,10 @@ function Backup({ transactions, budgets, onRestore }) {
     }
 
     setNotice(
-      `Restored ${count(restoring.transactions.length, "transaction")} and ${count(
+      `Restored ${describeData(
+        restoring.transactions.length,
         Object.keys(restoring.budgets).length,
-        "budget limit",
+        restoring.loans?.length ?? null,
       )}.`,
     );
   }
@@ -126,8 +136,8 @@ function Backup({ transactions, budgets, onRestore }) {
         <div>
           <h1 className="page-title">Backup</h1>
           <p className="page-subtitle">
-            Your data is stored only in this browser. Keep a copy, or move it to
-            another device.
+            Your data is saved in your account. Keep a copy as a file, or use it
+            to move to another account.
           </p>
         </div>
       </header>
@@ -138,8 +148,9 @@ function Backup({ transactions, budgets, onRestore }) {
             Download a backup
           </h2>
           <p className="backup-text">
-            Saves your {count(transactions.length, "transaction")} and{" "}
-            {count(limitCount, "budget limit")} to a file on this device.
+            Saves your{" "}
+            {describeData(transactions.length, limitCount, loans.length)} to a
+            file on this device.
           </p>
 
           <div className="backup-actions">
@@ -228,18 +239,30 @@ function Backup({ transactions, budgets, onRestore }) {
           <>
             <p className="restore-summary">
               <strong>
-                {count(pending.transactions.length, "transaction")} and{" "}
-                {count(Object.keys(pending.budgets).length, "budget limit")}
+                {describeData(
+                  pending.transactions.length,
+                  Object.keys(pending.budgets).length,
+                  pending.loans?.length ?? null,
+                )}
               </strong>
               {savedOnLabel && <span>Saved on {savedOnLabel}</span>}
             </p>
             <p>
               This replaces your current{" "}
-              {count(transactions.length, "transaction")} and{" "}
-              {count(limitCount, "budget limit")}, and it can&rsquo;t be undone.
-              If you might need your current data, download a backup of it
-              first.
+              {describeData(
+                transactions.length,
+                limitCount,
+                pending.loans ? loans.length : null,
+              )}
+              , and it can&rsquo;t be undone. If you might need your current
+              data, download a backup of it first.
             </p>
+            {pending.loans === null && (
+              <p>
+                This file has no Lend / Borrow records, so the ones you have now
+                are kept.
+              </p>
+            )}
             {pending.skipped > 0 && (
               <p className="restore-warning">
                 {count(pending.skipped, "entry", "entries")} in the file could

@@ -11,5 +11,7 @@ import jakarta.validation.constraints.Size;
 
 public record ImportRequest(
         @NotNull @Size(max = 10000) List<@Valid @NotNull TransactionRequest> transactions,
-        @NotNull @Size(max = 1000) Map<@NotBlank String, @NotNull @Positive Double> budgets) {
+        @NotNull @Size(max = 1000) Map<@NotBlank String, @NotNull @Positive Double> budgets,
+        // null = the backup has no loans section, so the user's loans are left alone
+        @Size(max = 1000) List<@Valid @NotNull ImportLoan> loans) {
 }
