@@ -80,7 +80,7 @@ function Loans({
 
       <section className="loan-summary" aria-label="Lend and borrow summary">
         <div className="loan-stat">
-          <span className="loan-stat-label">You are owed</span>
+          <span className="loan-stat-label">To get back</span>
           <span className="loan-stat-value num is-owed">
             {formatCurrency(owedToYou)}
           </span>
@@ -90,7 +90,7 @@ function Loans({
           </span>
         </div>
         <div className="loan-stat">
-          <span className="loan-stat-label">You owe</span>
+          <span className="loan-stat-label">To pay back</span>
           <span className="loan-stat-value num is-owing">
             {formatCurrency(youOwe)}
           </span>
