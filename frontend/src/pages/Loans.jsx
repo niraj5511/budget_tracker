@@ -2,7 +2,8 @@ import { useMemo, useRef, useState } from "react";
 import ConfirmDialog from "../components/ConfirmDialog";
 import LoanForm from "../components/LoanForm";
 import RepaymentPanel from "../components/RepaymentPanel";
-import { formatCurrency, todayIso } from "../utils/format";
+import { formatCurrency } from "../utils/format";
+import { describeLoan } from "../utils/loans";
 import { formatBsDate } from "../utils/nepaliDate";
 import "./Loans.css";
 
@@ -12,8 +13,7 @@ const EPSILON = 0.005;
 function describe(loan) {
   const outstanding = Math.max(loan.amount - loan.repaid, 0);
   const settled = outstanding < EPSILON;
-  const overdue =
-    !settled && Boolean(loan.dueDate) && loan.dueDate < todayIso();
+  const overdue = !settled && Boolean(loan.dueDate) && loan.dueDate < todayIso();
   const percent = Math.min(Math.round((loan.repaid / loan.amount) * 100), 100);
   return { ...loan, outstanding, settled, overdue, percent };
 }
@@ -51,7 +51,7 @@ function Loans({
   }
   const items = useMemo(() => {
     // Open loans first, newest first within each group.
-    return loans.map(describe).sort((a, b) => {
+    return loans.map(describeLoan).sort((a, b) => {
       if (a.settled !== b.settled) return a.settled ? 1 : -1;
       return b.date.localeCompare(a.date);
     });

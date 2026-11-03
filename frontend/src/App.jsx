@@ -238,6 +238,7 @@ function App() {
                   visibleTransactions={visibleTransactions}
                   periodLabel={periodLabel}
                   budgets={budgets}
+                  loans={loans}
                 />
               }
             />
