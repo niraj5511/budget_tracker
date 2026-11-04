@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Route, Routes } from "react-router-dom";
 import Navbar from "./components/Navbar";
+import DataStatus from "./components/DataStatus";
 import RouteEffects from "./components/RouteEffects";
 import Backup from "./pages/Backup";
 import Budget from "./pages/Budget";
@@ -44,25 +45,43 @@ function App() {
   const [selectedMonth, setSelectedMonth] = useState(ALL_MONTHS);
   const [editingId, setEditingId] = useState(null);
 
-  // Runs once after the first render, because of the empty [] at the end.
-  // Reload when the signed-in user changes, and clear the data on logout.
+  // "loading", "ready" or "error". The pages wait for "ready", so a signed-in
+  // user never sees empty screens while the server wakes up.
+  const [loadState, setLoadState] = useState("loading");
+  // Bumped on every load and on logout, so a late answer from an old load
+  // cannot overwrite newer state.
+  const loadId = useRef(0);
+
+  const loadAll = useCallback(() => {
+    const id = ++loadId.current;
+    setLoadState("loading");
+    return Promise.all([fetchTransactions(), fetchBudgets(), fetchLoans()])
+      .then(([savedTransactions, savedBudgets, savedLoans]) => {
+        if (id !== loadId.current) return;
+        setTransactions(savedTransactions);
+        setBudgets(savedBudgets);
+        setLoans(savedLoans);
+        setLoadState("ready");
+      })
+      .catch((error) => {
+        if (id !== loadId.current) return;
+        console.error("Failed to load data:", error);
+        setLoadState("error");
+      });
+  }, []);
+
+  // Load when the signed-in user changes, and clear the data on logout.
   useEffect(() => {
     if (!user) {
+      loadId.current += 1;
       setTransactions([]);
       setBudgets({});
       setLoans([]);
+      setLoadState("loading");
       return;
     }
-    fetchTransactions()
-      .then(setTransactions)
-      .catch((error) => console.error("Failed to load transactions:", error));
-    fetchBudgets()
-      .then(setBudgets)
-      .catch((error) => console.error("Failed to load budgets:", error));
-    fetchLoans()
-      .then(setLoans)
-      .catch((error) => console.error("Failed to load loans:", error));
-  }, [user]);
+    loadAll();
+  }, [user, loadAll]);
 
   // Derived rather than trusted: the row being edited can be deleted from
   // under the form, and looking it up each render means a missing row simply
@@ -227,81 +246,85 @@ function App() {
       <RouteEffects />
 
       <main id="main" className="app-main" tabIndex={-1}>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route element={<RequireAuth />}>
-            <Route
-              path="/"
-              element={
-                <Dashboard
-                  months={months}
-                  activeMonth={activeMonth}
-                  onMonthChange={setSelectedMonth}
-                  transactions={transactions}
-                  visibleTransactions={visibleTransactions}
-                  periodLabel={periodLabel}
-                  budgets={budgets}
-                  loans={loans}
-                />
-              }
-            />
-            <Route
-              path="/transactions"
-              element={
-                <Transactions
-                  editingTransaction={editingTransaction}
-                  onSubmit={handleSubmitTransaction}
-                  onCancelEdit={() => setEditingId(null)}
-                  sortedTransactions={sortedTransactions}
-                  editingId={editingTransaction?.id ?? null}
-                  // A real toggle, so clicking Edit on the row already being
-                  // edited backs out - which is what the button's
-                  // aria-pressed state claims.
-                  onEditTransaction={(id) =>
-                    setEditingId((prev) => (prev === id ? null : id))
-                  }
-                  onDeleteTransaction={handleDeleteTransaction}
-                />
-              }
-            />
-            <Route
-              path="/budget"
-              element={
-                <Budget budgets={budgets} onSaveLimit={handleSaveLimit} />
-              }
-            />
-            <Route
-              path="/loans"
-              element={
-                <Loans
-                  loans={loans}
-                  editingLoan={editingLoan}
-                  onSubmit={handleSubmitLoan}
-                  onCancelEdit={() => setEditingLoanId(null)}
-                  onEditLoan={(id) =>
-                    setEditingLoanId((prev) => (prev === id ? null : id))
-                  }
-                  onDeleteLoan={handleDeleteLoan}
-                  onAddRepayment={handleAddRepayment}
-                  onDeleteRepayment={handleDeleteRepayment}
-                />
-              }
-            />
-            <Route
-              path="/backup"
-              element={
-                <Backup
-                  transactions={transactions}
-                  budgets={budgets}
-                  loans={loans}
-                  onRestore={handleRestore}
-                />
-              }
-            />
-          </Route>
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        {user && loadState !== "ready" ? (
+          <DataStatus state={loadState} onRetry={loadAll} />
+        ) : (
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route element={<RequireAuth />}>
+              <Route
+                path="/"
+                element={
+                  <Dashboard
+                    months={months}
+                    activeMonth={activeMonth}
+                    onMonthChange={setSelectedMonth}
+                    transactions={transactions}
+                    visibleTransactions={visibleTransactions}
+                    periodLabel={periodLabel}
+                    budgets={budgets}
+                    loans={loans}
+                  />
+                }
+              />
+              <Route
+                path="/transactions"
+                element={
+                  <Transactions
+                    editingTransaction={editingTransaction}
+                    onSubmit={handleSubmitTransaction}
+                    onCancelEdit={() => setEditingId(null)}
+                    sortedTransactions={sortedTransactions}
+                    editingId={editingTransaction?.id ?? null}
+                    // A real toggle, so clicking Edit on the row already being
+                    // edited backs out - which is what the button's
+                    // aria-pressed state claims.
+                    onEditTransaction={(id) =>
+                      setEditingId((prev) => (prev === id ? null : id))
+                    }
+                    onDeleteTransaction={handleDeleteTransaction}
+                  />
+                }
+              />
+              <Route
+                path="/budget"
+                element={
+                  <Budget budgets={budgets} onSaveLimit={handleSaveLimit} />
+                }
+              />
+              <Route
+                path="/loans"
+                element={
+                  <Loans
+                    loans={loans}
+                    editingLoan={editingLoan}
+                    onSubmit={handleSubmitLoan}
+                    onCancelEdit={() => setEditingLoanId(null)}
+                    onEditLoan={(id) =>
+                      setEditingLoanId((prev) => (prev === id ? null : id))
+                    }
+                    onDeleteLoan={handleDeleteLoan}
+                    onAddRepayment={handleAddRepayment}
+                    onDeleteRepayment={handleDeleteRepayment}
+                  />
+                }
+              />
+              <Route
+                path="/backup"
+                element={
+                  <Backup
+                    transactions={transactions}
+                    budgets={budgets}
+                    loans={loans}
+                    onRestore={handleRestore}
+                  />
+                }
+              />
+            </Route>
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        )}
       </main>
     </div>
   );

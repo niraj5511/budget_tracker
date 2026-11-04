@@ -1,32 +1,34 @@
-import { useState } from 'react'
-import { Link, Navigate } from 'react-router-dom'
-import { useAuth } from '../context/AuthContext'
-import './Auth.css'
+import { useState } from "react";
+import { Link, Navigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import { useSlow } from "../utils/useSlow";
+import "./Auth.css";
 
 export default function Login() {
-  const { user, login } = useAuth()
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
-  const [submitting, setSubmitting] = useState(false)
+  const { user, login } = useAuth();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const slow = useSlow(submitting);
 
   // Already signed in: go to the dashboard.
-  if (user) return <Navigate to="/" replace />
+  if (user) return <Navigate to="/" replace />;
 
   async function handleSubmit(event) {
-    event.preventDefault()
-    setError('')
-    setSubmitting(true)
+    event.preventDefault();
+    setError("");
+    setSubmitting(true);
     try {
-      await login(email, password)
+      await login(email, password);
     } catch (err) {
       setError(
         err.status === 401
-          ? 'Invalid email or password.'
-          : 'Could not sign in. Please try again.',
-      )
+          ? "Invalid email or password."
+          : "Could not sign in. Please try again.",
+      );
     } finally {
-      setSubmitting(false)
+      setSubmitting(false);
     }
   }
 
@@ -64,13 +66,19 @@ export default function Login() {
         )}
 
         <button className="btn btn-primary" type="submit" disabled={submitting}>
-          {submitting ? 'Logging in...' : 'Log in'}
+          {submitting ? "Logging in..." : "Log in"}
         </button>
+
+        {slow && (
+          <p className="auth-hint" role="status">
+            The server was asleep and is starting. This can take up to a minute.
+          </p>
+        )}
 
         <p className="auth-switch">
           No account? <Link to="/register">Register</Link>
         </p>
       </form>
     </section>
-  )
+  );
 }
