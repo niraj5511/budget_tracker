@@ -73,7 +73,7 @@ The app runs at `http://localhost:5173`.
 VITE_API_URL=http://localhost:8080/api
 ```
 
-Restart `npm run dev` after changing it. If the backend port changes, update this value and the allowed origin in `backend/src/main/java/com/niraj/backend/WebConfig.java`.
+Restart `npm run dev` after changing it. If the backend runs on a different port, update this value. If the frontend runs on a different address, set `app.cors.origins` for the backend (see Deployment).
 
 ## API
 
@@ -220,9 +220,56 @@ Source is in `backend/src/main/java/com/niraj/backend/`.
 | `TransactionEntity`, `BudgetEntity`                                      | Database tables, created automatically on startup                    |
 | `TransactionRepository`, `BudgetRepository`                              | Database access                                                      |
 
+
+## Deployment
+
+The backend runs on Render and the frontend on Netlify, both on free plans. The database is the Supabase project the app also uses locally, so testing on a local copy changes the live data.
+
+### Backend (Render)
+
+Create a Web Service from the GitHub repository:
+
+| Setting | Value |
+|---|---|
+| Language | Docker |
+| Branch | `main` |
+| Region | Singapore (closest to the Supabase database) |
+| Root Directory | empty |
+| Dockerfile Path | `backend/Dockerfile` |
+| Docker Build Context Directory | `backend` |
+| Instance Type | Free |
+| Health Check Path | `/api/health` |
+
+Environment variables (names only; keep the values private):
+
+| Name | Value |
+|---|---|
+| `SPRING_DATASOURCE_URL` | The Supabase Session pooler JDBC URL |
+| `SPRING_DATASOURCE_USERNAME` | The database user |
+| `SPRING_DATASOURCE_PASSWORD` | The database password |
+| `APP_JWT_SECRET` | A long random secret, different from the local one |
+| `APP_CORS_ORIGINS` | The Netlify address, with no trailing slash. Several can be given, separated by commas. |
+
+Render sets `PORT` itself. The `Dockerfile` in `backend` builds the jar with Maven and runs it on a small JVM, to fit the free plan's memory.
+
+### Frontend (Netlify)
+
+Import the same repository:
+
+| Setting | Value |
+|---|---|
+| Base directory | `frontend` |
+| Build command | `npm run build` |
+| Publish directory | `frontend/dist` (the form shows the base directory as a prefix) |
+| Environment variable `VITE_API_URL` | The Render address followed by `/api`, with no trailing slash |
+
+`VITE_API_URL` is written into the build, so changing it needs a new deploy. `frontend/public/_redirects` makes a page refresh work on routes like `/loans`, and `frontend/.nvmrc` sets the Node version for the build.
+
+Pushing to `main` redeploys both services.
+
 ## Current limitations
 
-- The allowed CORS origin and the API address are set for local use only.
+- The free hosting sleeps when idle, so the first request after a quiet period can take up to a minute. The Supabase project also pauses after a week without use and has to be restored from its dashboard.
 - The login token is kept in the browser's `localStorage`.
 - There are no automated tests and no limit on login attempts.
 - Repayments cannot be edited, only deleted and added again.
