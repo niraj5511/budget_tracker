@@ -1,4 +1,4 @@
-import { isValidBudgetMap, isValidTransaction, withCategory } from "./storage";
+import { isValidBudgetMap, isValidTransaction, withCategory } from "./validation";
 
 /**
  * Backup file format. A plain JSON file the person downloads and keeps:

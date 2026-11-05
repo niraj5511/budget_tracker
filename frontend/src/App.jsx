@@ -35,8 +35,6 @@ import {
 import "./App.css";
 
 function App() {
-  // Passed as a function so storage is read once on mount rather than on
-  // every render. The samples are only a first-run seed.
   const { user } = useAuth();
   const [transactions, setTransactions] = useState([]);
   const [budgets, setBudgets] = useState({});
