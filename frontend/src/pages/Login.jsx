@@ -22,11 +22,10 @@ export default function Login() {
     try {
       await login(email, password);
     } catch (err) {
-      setError(
-        err.status === 401
-          ? "Invalid email or password."
-          : "Could not sign in. Please try again.",
-      );
+      if (err.status === 401) setError("Invalid email or password.");
+      else if (err.status === 429)
+        setError("Too many attempts. Try again in a few minutes.");
+      else setError("Could not sign in. Please try again.");
     } finally {
       setSubmitting(false);
     }

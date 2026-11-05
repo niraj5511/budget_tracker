@@ -19,11 +19,14 @@ public class AuthService {
     private final UserRepository users;
     private final PasswordEncoder encoder;
     private final JwtEncoder jwtEncoder;
+    private final LoginAttemptLimiter limiter;
 
-    public AuthService(UserRepository users, PasswordEncoder encoder, JwtEncoder jwtEncoder) {
+    public AuthService(UserRepository users, PasswordEncoder encoder, JwtEncoder jwtEncoder,
+            LoginAttemptLimiter limiter) {
         this.users = users;
         this.encoder = encoder;
         this.jwtEncoder = jwtEncoder;
+        this.limiter = limiter;
     }
 
     public UserResponse register(RegisterRequest request) {
@@ -37,10 +40,17 @@ public class AuthService {
 
     public LoginResponse login(LoginRequest request) {
         String email = request.email().trim().toLowerCase();
+        if (limiter.isLocked(email)) {
+            throw new ResponseStatusException(HttpStatus.TOO_MANY_REQUESTS, "Too many login attempts");
+        }
         UserEntity user = users.findByEmail(email)
                 .filter(found -> encoder.matches(request.password(), found.getPasswordHash()))
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.UNAUTHORIZED, "Invalid email or password"));
+                .orElse(null);
+        if (user == null) {
+            limiter.recordFailure(email);
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password");
+        }
+        limiter.recordSuccess(email);
         return new LoginResponse(createToken(user), new UserResponse(user.getId(), user.getEmail()));
     }
 
