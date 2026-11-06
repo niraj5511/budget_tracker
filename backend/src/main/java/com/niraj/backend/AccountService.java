@@ -10,17 +10,45 @@ import org.springframework.web.server.ResponseStatusException;
 public class AccountService {
 
     private final UserRepository users;
+    private final TransactionRepository transactions;
+    private final BudgetRepository budgets;
+    private final LoanRepository loans;
+    private final RepaymentRepository repayments;
     private final PasswordEncoder encoder;
     private final LoginAttemptLimiter limiter;
 
-    public AccountService(UserRepository users, PasswordEncoder encoder, LoginAttemptLimiter limiter) {
+    public AccountService(UserRepository users, TransactionRepository transactions,
+            BudgetRepository budgets, LoanRepository loans, RepaymentRepository repayments,
+            PasswordEncoder encoder, LoginAttemptLimiter limiter) {
         this.users = users;
+        this.transactions = transactions;
+        this.budgets = budgets;
+        this.loans = loans;
+        this.repayments = repayments;
         this.encoder = encoder;
         this.limiter = limiter;
     }
 
     @Transactional
     public void changePassword(Long userId, ChangePasswordRequest request) {
+        UserEntity user = verify(userId, request.currentPassword());
+        user.setPasswordHash(encoder.encode(request.newPassword()));
+        users.save(user);
+    }
+
+    // One database transaction: if anything throws, nothing is deleted.
+    @Transactional
+    public void deleteAccount(Long userId, DeleteAccountRequest request) {
+        verify(userId, request.password());
+        repayments.deleteAllForUser(userId);
+        loans.deleteAllForUser(userId);
+        transactions.deleteAllForUser(userId);
+        budgets.deleteAllForUser(userId);
+        users.deleteById(userId);
+    }
+
+    // Finds the user and checks the password. Failures count in the login limiter.
+    private UserEntity verify(Long userId, String password) {
         // Valid token but the user no longer exists: 401 makes the frontend log out.
         UserEntity user = users.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found"));
@@ -29,14 +57,12 @@ public class AccountService {
         if (limiter.isLocked(email)) {
             throw new ResponseStatusException(HttpStatus.TOO_MANY_REQUESTS, "Too many attempts");
         }
-        if (!encoder.matches(request.currentPassword(), user.getPasswordHash())) {
+        if (!encoder.matches(password, user.getPasswordHash())) {
             limiter.recordFailure(email);
             // 403, not 401, so the frontend does not treat it as an expired login.
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Current password is wrong");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Password is wrong");
         }
-
         limiter.recordSuccess(email);
-        user.setPasswordHash(encoder.encode(request.newPassword()));
-        users.save(user);
+        return user;
     }
 }
