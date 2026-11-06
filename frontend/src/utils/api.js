@@ -167,3 +167,10 @@ export function changePassword(currentPassword, newPassword) {
     body: JSON.stringify({ currentPassword, newPassword }),
   });
 }
+
+export function deleteAccount(password) {
+  return request("/account/delete", {
+    method: "POST",
+    body: JSON.stringify({ password }),
+  });
+}

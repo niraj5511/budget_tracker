@@ -1,16 +1,20 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { changePassword } from "../utils/api";
+import { changePassword, deleteAccount } from "../utils/api";
 import "./Auth.css";
 
 export default function Account() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [done, setDone] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [deletePassword, setDeletePassword] = useState("");
+  const [deleteError, setDeleteError] = useState("");
+  const [deleting, setDeleting] = useState(false);
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -37,11 +41,26 @@ export default function Account() {
     }
   }
 
+  async function handleDelete(event) {
+    event.preventDefault();
+    setDeleteError("");
+    setDeleting(true);
+    try {
+      await deleteAccount(deletePassword);
+      logout();
+    } catch (err) {
+      if (err.status === 403) setDeleteError("Password is wrong.");
+      else if (err.status === 429)
+        setDeleteError("Too many attempts. Try again in a few minutes.");
+      else setDeleteError("Could not delete the account. Please try again.");
+      setDeleting(false);
+    }
+  }
   return (
     <section className="auth-page">
       <form className="auth-card" onSubmit={handleSubmit}>
         <h1 className="auth-title">Account</h1>
-        <p className="auth-switch">{user.email}</p>
+        <p className="auth-switch">{user?.email}</p>
 
         <label className="auth-field">
           <span>Current password</span>
@@ -93,6 +112,36 @@ export default function Account() {
 
         <button className="btn btn-primary" type="submit" disabled={submitting}>
           {submitting ? "Saving..." : "Change password"}
+        </button>
+      </form>
+
+      <form className="auth-card" onSubmit={handleDelete}>
+        <h2 className="auth-title">Delete account</h2>
+        <p className="auth-switch">
+          This permanently deletes your account and all your transactions,
+          budgets and loans. It cannot be undone. To keep a copy first, use the{" "}
+          <Link to="/backup">Backup page</Link>.
+        </p>
+
+        <label className="auth-field">
+          <span>Password</span>
+          <input
+            type="password"
+            autoComplete="current-password"
+            value={deletePassword}
+            onChange={(event) => setDeletePassword(event.target.value)}
+            required
+          />
+        </label>
+
+        {deleteError && (
+          <p className="auth-error" role="alert">
+            {deleteError}
+          </p>
+        )}
+
+        <button className="btn btn-danger" type="submit" disabled={deleting}>
+          {deleting ? "Deleting..." : "Delete my account"}
         </button>
       </form>
     </section>
