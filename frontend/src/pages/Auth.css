@@ -63,3 +63,8 @@
   font-size: 0.8125rem;
   color: var(--text-muted);
 }
+
+.auth-success {
+  font-size: 0.8125rem;
+  color: var(--income);
+}

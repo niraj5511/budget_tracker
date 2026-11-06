@@ -118,7 +118,9 @@ export default function Navbar() {
           </nav>
 
           <ThemeToggle />
-
+          <NavLink to="/account" className="logout-button account-link">
+            Account
+          </NavLink>
           <button type="button" className="logout-button" onClick={logout}>
             Log out
           </button>

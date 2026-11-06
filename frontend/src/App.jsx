@@ -13,6 +13,7 @@ import Register from "./pages/Register";
 import RequireAuth from "./components/RequireAuth";
 import { useAuth } from "./context/AuthContext";
 import Loans from "./pages/Loans";
+import Account from "./pages/Account";
 
 import { ALL_MONTHS, availableMonths, filterByMonth } from "./utils/months";
 import { formatBsMonth } from "./utils/nepaliDate";
@@ -319,6 +320,7 @@ function App() {
                   />
                 }
               />
+              <Route path="/account" element={<Account />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>

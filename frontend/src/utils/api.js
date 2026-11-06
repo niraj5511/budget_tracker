@@ -160,3 +160,10 @@ export function addRepayment(loanId, values) {
 export async function deleteRepayment(loanId, id) {
   await request(`/loans/${loanId}/repayments/${id}`, { method: "DELETE" });
 }
+
+export function changePassword(currentPassword, newPassword) {
+  return request("/account/password", {
+    method: "PUT",
+    body: JSON.stringify({ currentPassword, newPassword }),
+  });
+}

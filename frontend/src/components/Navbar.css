@@ -190,3 +190,12 @@
   color: var(--text);
   background: var(--surface);
 }
+
+.account-link {
+  text-decoration: none;
+}
+
+.account-link.active {
+  color: var(--text);
+  background: var(--surface);
+}
