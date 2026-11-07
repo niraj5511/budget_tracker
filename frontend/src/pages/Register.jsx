@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useSlow } from "../utils/useSlow";
+import PasswordField from "../components/PasswordField";
 import "./Auth.css";
 
 export default function Register() {
@@ -13,6 +14,13 @@ export default function Register() {
   const slow = useSlow(submitting);
 
   if (user) return <Navigate to="/" replace />;
+
+  // Shows how many characters are still missing while the user types.
+  const missing = 8 - password.length;
+  const passwordHint =
+    password.length === 0 || missing <= 0
+      ? "8 to 72 characters"
+      : `${missing} more character${missing === 1 ? "" : "s"} needed`;
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -40,24 +48,22 @@ export default function Register() {
           <input
             type="email"
             autoComplete="email"
+            autoFocus
             value={email}
             onChange={(event) => setEmail(event.target.value)}
             required
           />
         </label>
 
-        <label className="auth-field">
-          <span>Password (8 to 72 characters)</span>
-          <input
-            type="password"
-            autoComplete="new-password"
-            minLength={8}
-            maxLength={72}
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            required
-          />
-        </label>
+        <PasswordField
+          label="Password"
+          autoComplete="new-password"
+          minLength={8}
+          maxLength={72}
+          value={password}
+          onChange={setPassword}
+          hint={passwordHint}
+        />
 
         {error && (
           <p className="auth-error" role="alert">

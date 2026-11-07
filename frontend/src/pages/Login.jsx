@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useSlow } from "../utils/useSlow";
+import PasswordField from "../components/PasswordField";
 import "./Auth.css";
 
 export default function Login() {
@@ -41,22 +42,19 @@ export default function Login() {
           <input
             type="email"
             autoComplete="email"
+            autoFocus
             value={email}
             onChange={(event) => setEmail(event.target.value)}
             required
           />
         </label>
 
-        <label className="auth-field">
-          <span>Password</span>
-          <input
-            type="password"
-            autoComplete="current-password"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            required
-          />
-        </label>
+        <PasswordField
+          label="Password"
+          autoComplete="current-password"
+          value={password}
+          onChange={setPassword}
+        />
 
         {error && (
           <p className="auth-error" role="alert">

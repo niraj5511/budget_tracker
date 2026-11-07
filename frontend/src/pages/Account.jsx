@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import PasswordField from "../components/PasswordField";
 import { changePassword, deleteAccount } from "../utils/api";
 import "./Auth.css";
 
@@ -56,48 +57,37 @@ export default function Account() {
       setDeleting(false);
     }
   }
+
   return (
     <section className="auth-page">
       <form className="auth-card" onSubmit={handleSubmit}>
         <h1 className="auth-title">Account</h1>
         <p className="auth-switch">{user?.email}</p>
 
-        <label className="auth-field">
-          <span>Current password</span>
-          <input
-            type="password"
-            autoComplete="current-password"
-            value={currentPassword}
-            onChange={(event) => setCurrentPassword(event.target.value)}
-            required
-          />
-        </label>
+        <PasswordField
+          label="Current password"
+          autoComplete="current-password"
+          value={currentPassword}
+          onChange={setCurrentPassword}
+        />
 
-        <label className="auth-field">
-          <span>New password</span>
-          <input
-            type="password"
-            autoComplete="new-password"
-            minLength={8}
-            maxLength={72}
-            value={newPassword}
-            onChange={(event) => setNewPassword(event.target.value)}
-            required
-          />
-        </label>
+        <PasswordField
+          label="New password"
+          autoComplete="new-password"
+          minLength={8}
+          maxLength={72}
+          value={newPassword}
+          onChange={setNewPassword}
+        />
 
-        <label className="auth-field">
-          <span>Confirm new password</span>
-          <input
-            type="password"
-            autoComplete="new-password"
-            minLength={8}
-            maxLength={72}
-            value={confirmPassword}
-            onChange={(event) => setConfirmPassword(event.target.value)}
-            required
-          />
-        </label>
+        <PasswordField
+          label="Confirm new password"
+          autoComplete="new-password"
+          minLength={8}
+          maxLength={72}
+          value={confirmPassword}
+          onChange={setConfirmPassword}
+        />
 
         {error && (
           <p className="auth-error" role="alert">
@@ -119,20 +109,16 @@ export default function Account() {
         <h2 className="auth-title">Delete account</h2>
         <p className="auth-switch">
           This permanently deletes your account and all your transactions,
-          budgets and loans. It cannot be undone. To keep a copy first, use the{" "}
-          <Link to="/backup">Backup page</Link>.
+          budgets and loans. It cannot be undone. To keep a copy first, use
+          the <Link to="/backup">Backup page</Link>.
         </p>
 
-        <label className="auth-field">
-          <span>Password</span>
-          <input
-            type="password"
-            autoComplete="current-password"
-            value={deletePassword}
-            onChange={(event) => setDeletePassword(event.target.value)}
-            required
-          />
-        </label>
+        <PasswordField
+          label="Password"
+          autoComplete="current-password"
+          value={deletePassword}
+          onChange={setDeletePassword}
+        />
 
         {deleteError && (
           <p className="auth-error" role="alert">
