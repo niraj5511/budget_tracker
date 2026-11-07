@@ -35,7 +35,7 @@ export default function Account() {
     } catch (err) {
       if (err.status === 403) setError("Current password is wrong.");
       else if (err.status === 429)
-        setError("Too many attempts. Try again in a few minutes.");
+        setError("Too many attempts. Try again in 15 minutes.");
       else setError("Could not change the password. Please try again.");
     } finally {
       setSubmitting(false);
@@ -52,7 +52,7 @@ export default function Account() {
     } catch (err) {
       if (err.status === 403) setDeleteError("Password is wrong.");
       else if (err.status === 429)
-        setDeleteError("Too many attempts. Try again in a few minutes.");
+        setDeleteError("Too many attempts. Try again in 15 minutes.");
       else setDeleteError("Could not delete the account. Please try again.");
       setDeleting(false);
     }

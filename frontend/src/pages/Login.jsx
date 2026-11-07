@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, Navigate } from "react-router-dom";
+import { Link, Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useSlow } from "../utils/useSlow";
 import PasswordField from "../components/PasswordField";
@@ -12,9 +12,11 @@ export default function Login() {
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const slow = useSlow(submitting);
+  const location = useLocation();
 
-  // Already signed in: go to the dashboard.
-  if (user) return <Navigate to="/" replace />;
+  // Signed in: go back to the page the user was sent from, or the dashboard.
+  const from = location.state?.from?.pathname || "/";
+  if (user) return <Navigate to={from} replace />;
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -25,7 +27,7 @@ export default function Login() {
     } catch (err) {
       if (err.status === 401) setError("Invalid email or password.");
       else if (err.status === 429)
-        setError("Too many attempts. Try again in a few minutes.");
+        setError("Too many attempts. Try again in 15 minutes.");
       else setError("Could not sign in. Please try again.");
     } finally {
       setSubmitting(false);
