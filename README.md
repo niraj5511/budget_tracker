@@ -16,7 +16,7 @@ budget_tracker/
 - **Transactions**: add, edit and delete income and expense entries, with categories and filters.
 - **Budgets**: set a spending limit per category and track progress against it.
 - **Lend / Borrow**: record money you lent or borrowed, with an optional due date and a history of repayments. These records are kept apart from your income, expenses and balance.
-- **Accounts**: register and log in. Each user sees only their own data.
+- **Accounts**: register and log in, change your password, or delete your account and all its data. Each user sees only their own data.
 - **Backup**: download your data (transactions, budgets and Lend / Borrow records) as a file, and restore it into your account.
 - **Theme**: light and dark mode toggle.
 
@@ -100,8 +100,10 @@ All endpoints except `/health` and `/auth/*` need the header `Authorization: Bea
 | POST   | `/loans/{id}/repayments`               | Add a repayment (returns 201)                                                                                  |
 | DELETE | `/loans/{id}/repayments/{repaymentId}` | Delete a repayment (returns 204)                                                                               |
 | POST   | `/import`                              | Replace the user's transactions and budgets, and their loans when the body has a `loans` list. All or nothing. |
+| PUT    | `/account/password`                    | Change the password. Body `{ currentPassword, newPassword }`. Returns 204, `403` if the current password is wrong. |
+| POST   | `/account/delete`                      | Delete the account and all its data. Body `{ password }`. Returns 204, `403` if the password is wrong.            |
 
-Missing records return `404`. Invalid input returns `400`. A missing or expired token returns `401`.
+Missing records return `404`. Invalid input returns `400`. A missing or expired token returns `401`. After 5 wrong passwords in a row on `/auth/login` or `/account/*`, that email is locked for 15 minutes and these endpoints return `429`.
 
 ### Transaction body
 
@@ -208,6 +210,7 @@ Source is in `backend/src/main/java/com/niraj/backend/`.
 | `Transaction`, `Budget`                                                  | Data returned by the API                                             |
 | `TransactionRequest`, `BudgetRequest`                                    | Input accepted by the API, with validation                           |
 | `AuthController`, `AuthService`                                          | Register and login                                                   |
+| `AccountController`, `AccountService`, `ChangePasswordRequest`, `DeleteAccountRequest` | Change password and delete account                       |
 | `ImportController`, `ImportService`, `ImportRequest`                     | Bulk replace of a user's data from a backup                          |
 | `SecurityConfig`, `JwtConfig`, `PasswordConfig`                          | Token checks, JWT signing, password hashing                          |
 | `LoanController`, `RepaymentController`                                  | Handle loan and repayment requests                                   |
@@ -271,5 +274,8 @@ Pushing to `main` redeploys both services.
 
 - The free hosting sleeps when idle, so the first request after a quiet period can take up to a minute. The Supabase project also pauses after a week without use and has to be restored from its dashboard.
 - The login token is kept in the browser's `localStorage`.
-- There are no automated tests and no limit on login attempts.
+- There are no automated tests.
+- Login attempts are counted in memory, so the count resets when the backend restarts or the free hosting sleeps.
+- Old login tokens stay valid until they expire, even after a password change.
+- There is no forgot-password flow and the email address cannot be changed.
 - Repayments cannot be edited, only deleted and added again.
