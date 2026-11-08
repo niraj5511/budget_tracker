@@ -1,6 +1,7 @@
 package com.niraj.backend;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -12,6 +13,8 @@ public interface CategoryRepository extends JpaRepository<CategoryEntity, Long> 
     List<CategoryEntity> findByUserIdOrderByTypeAscNameAsc(Long userId);
 
     List<CategoryEntity> findByUserIdAndType(Long userId, String type);
+
+    Optional<CategoryEntity> findByIdAndUserId(Long id, Long userId);
 
     @Modifying(flushAutomatically = true, clearAutomatically = true)
     @Query("delete from CategoryEntity c where c.userId = :userId")

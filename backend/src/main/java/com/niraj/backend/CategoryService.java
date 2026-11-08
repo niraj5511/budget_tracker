@@ -4,12 +4,14 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class CategoryService {
 
     static final int MAX_PER_TYPE = 30;
+    static final String DEFAULT_CATEGORY = "Other";
 
     // The built-in categories. Keep in step with frontend/src/data/categories.js.
     static final List<String> INCOME_DEFAULTS =
@@ -19,9 +21,14 @@ public class CategoryService {
                     "Entertainment", "Education", "Other");
 
     private final CategoryRepository repository;
+    private final TransactionRepository transactions;
+    private final BudgetRepository budgets;
 
-    public CategoryService(CategoryRepository repository) {
+    public CategoryService(CategoryRepository repository, TransactionRepository transactions,
+            BudgetRepository budgets) {
         this.repository = repository;
+        this.transactions = transactions;
+        this.budgets = budgets;
     }
 
     public List<Category> findAll(long userId) {
@@ -42,6 +49,57 @@ public class CategoryService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Category already exists");
         }
         return toCategory(repository.save(new CategoryEntity(userId, type, name)));
+    }
+
+    // One database transaction: the category, its transactions and its budget change together.
+    @Transactional
+    public Category rename(long userId, long id, CategoryRenameRequest request) {
+        CategoryEntity category = find(userId, id);
+        String type = category.getType();
+        String oldName = category.getName();
+        String newName = request.name().trim();
+
+        List<CategoryEntity> others = repository.findByUserIdAndType(userId, type).stream()
+                .filter(c -> !c.getId().equals(id)).toList();
+        if (isTaken(type, newName, others)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Category already exists");
+        }
+        boolean isExpense = type.equals("expense");
+        if (isExpense && !newName.equals(oldName)
+                && budgets.findByUserIdAndCategory(userId, newName).isPresent()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "A budget already uses that name");
+        }
+
+        category.setName(newName);
+        repository.save(category);
+        if (!newName.equals(oldName)) {
+            transactions.renameCategory(userId, type, oldName, newName);
+            if (isExpense) {
+                budgets.renameCategory(userId, oldName, newName);
+            }
+        }
+        return toCategory(category);
+    }
+
+    // Transactions are kept: they move to "Other". The category's budget is removed.
+    @Transactional
+    public void delete(long userId, long id) {
+        CategoryEntity category = find(userId, id);
+        String type = category.getType();
+        String name = category.getName();
+
+        transactions.renameCategory(userId, type, name, DEFAULT_CATEGORY);
+        if (type.equals("expense")) {
+            budgets.deleteForCategory(userId, name);
+        }
+        repository.delete(category);
+    }
+
+    private CategoryEntity find(long userId, long id) {
+        return repository.findByIdAndUserId(id, userId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "No such category"));
     }
 
     // A name is taken if it matches a built-in or a custom one of the same type, ignoring case.

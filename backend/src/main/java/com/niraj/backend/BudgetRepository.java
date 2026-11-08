@@ -17,4 +17,14 @@ public interface BudgetRepository extends JpaRepository<BudgetEntity, Long> {
     @Modifying(flushAutomatically = true, clearAutomatically = true)
     @Query("delete from BudgetEntity b where b.userId = :userId")
     void deleteAllForUser(@Param("userId") Long userId);
+
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
+    @Query("update BudgetEntity b set b.category = :newName "
+            + "where b.userId = :userId and b.category = :oldName")
+    void renameCategory(@Param("userId") Long userId,
+            @Param("oldName") String oldName, @Param("newName") String newName);
+
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
+    @Query("delete from BudgetEntity b where b.userId = :userId and b.category = :category")
+    void deleteForCategory(@Param("userId") Long userId, @Param("category") String category);
 }
