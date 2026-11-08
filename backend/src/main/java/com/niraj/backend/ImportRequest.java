@@ -13,5 +13,7 @@ public record ImportRequest(
         @NotNull @Size(max = 10000) List<@Valid @NotNull TransactionRequest> transactions,
         @NotNull @Size(max = 1000) Map<@NotBlank String, @NotNull @Positive Double> budgets,
         // null = the backup has no loans section, so the user's loans are left alone
-        @Size(max = 1000) List<@Valid @NotNull ImportLoan> loans) {
+        @Size(max = 1000) List<@Valid @NotNull ImportLoan> loans,
+        // null = the backup has no categories section, so the user's categories are left alone
+        @Size(max = 60) List<@Valid @NotNull CategoryRequest> categories) {
 }

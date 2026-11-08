@@ -10,23 +10,27 @@ import org.springframework.web.server.ResponseStatusException;
 @Service
 public class ImportService {
 
-    public record ImportResult(int transactions, int budgets, int loans) {
+    public record ImportResult(int transactions, int budgets, int loans, int categories) {
     }
 
     private final TransactionRepository transactions;
     private final BudgetRepository budgets;
     private final LoanRepository loans;
     private final RepaymentRepository repayments;
+    private final CategoryService categoryService;
 
     public ImportService(TransactionRepository transactions, BudgetRepository budgets,
-            LoanRepository loans, RepaymentRepository repayments) {
+            LoanRepository loans, RepaymentRepository repayments,
+            CategoryService categoryService) {
         this.transactions = transactions;
         this.budgets = budgets;
         this.loans = loans;
         this.repayments = repayments;
+        this.categoryService = categoryService;
     }
 
-    // One database transaction: if anything throws, every delete is rolled back too.
+    // One database transaction: if anything throws, every delete is rolled back
+    // too.
     @Transactional
     public ImportResult replaceAll(long userId, ImportRequest request) {
         transactions.deleteAllForUser(userId);
@@ -60,7 +64,13 @@ public class ImportService {
             loanCount = request.loans().size();
         }
 
-        return new ImportResult(newTransactions.size(), newBudgets.size(), loanCount);
+        int categoryCount = 0;
+        if (request.categories() != null) {
+            categoryCount = categoryService.replaceAll(userId, request.categories());
+        }
+
+        return new ImportResult(newTransactions.size(), newBudgets.size(), loanCount,
+                categoryCount);
     }
 
     private void saveLoan(long userId, ImportLoan item) {

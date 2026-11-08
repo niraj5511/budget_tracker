@@ -1,6 +1,7 @@
 package com.niraj.backend;
 
 import java.util.List;
+import java.util.ArrayList;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -14,11 +15,10 @@ public class CategoryService {
     static final String DEFAULT_CATEGORY = "Other";
 
     // The built-in categories. Keep in step with frontend/src/data/categories.js.
-    static final List<String> INCOME_DEFAULTS =
-            List.of("Salary", "Freelance", "Business", "Investment", "Gift", "Other");
-    static final List<String> EXPENSE_DEFAULTS =
-            List.of("Food", "Rent", "Transport", "Utilities", "Shopping", "Health",
-                    "Entertainment", "Education", "Other");
+    static final List<String> INCOME_DEFAULTS = List.of("Salary", "Freelance", "Business", "Investment", "Gift",
+            "Other");
+    static final List<String> EXPENSE_DEFAULTS = List.of("Food", "Rent", "Transport", "Utilities", "Shopping", "Health",
+            "Entertainment", "Education", "Other");
 
     private final CategoryRepository repository;
     private final TransactionRepository transactions;
@@ -51,7 +51,8 @@ public class CategoryService {
         return toCategory(repository.save(new CategoryEntity(userId, type, name)));
     }
 
-    // One database transaction: the category, its transactions and its budget change together.
+    // One database transaction: the category, its transactions and its budget
+    // change together.
     @Transactional
     public Category rename(long userId, long id, CategoryRenameRequest request) {
         CategoryEntity category = find(userId, id);
@@ -82,7 +83,8 @@ public class CategoryService {
         return toCategory(category);
     }
 
-    // Transactions are kept: they move to "Other". The category's budget is removed.
+    // Transactions are kept: they move to "Other". The category's budget is
+    // removed.
     @Transactional
     public void delete(long userId, long id) {
         CategoryEntity category = find(userId, id);
@@ -96,13 +98,40 @@ public class CategoryService {
         repository.delete(category);
     }
 
+    // Used by import. Replaces all of the user's categories with the given ones,
+    // under the same rules as create. Runs inside the import's database
+    // transaction.
+    @Transactional
+    public int replaceAll(long userId, List<CategoryRequest> items) {
+        repository.deleteAllForUser(userId);
+
+        List<CategoryEntity> saved = new ArrayList<>();
+        for (CategoryRequest item : items) {
+            String name = item.name().trim();
+            List<CategoryEntity> sameType = saved.stream()
+                    .filter(c -> c.getType().equals(item.type())).toList();
+            if (sameType.size() >= MAX_PER_TYPE) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "At most " + MAX_PER_TYPE + " custom categories");
+            }
+            if (isTaken(item.type(), name, sameType)) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "Duplicate or built-in category: " + name);
+            }
+            saved.add(new CategoryEntity(userId, item.type(), name));
+        }
+        repository.saveAll(saved);
+        return saved.size();
+    }
+
     private CategoryEntity find(long userId, long id) {
         return repository.findByIdAndUserId(id, userId)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "No such category"));
     }
 
-    // A name is taken if it matches a built-in or a custom one of the same type, ignoring case.
+    // A name is taken if it matches a built-in or a custom one of the same type,
+    // ignoring case.
     private boolean isTaken(String type, String name, List<CategoryEntity> existing) {
         List<String> defaults = type.equals("income") ? INCOME_DEFAULTS : EXPENSE_DEFAULTS;
         return defaults.stream().anyMatch(d -> d.equalsIgnoreCase(name))
