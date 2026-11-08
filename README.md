@@ -12,7 +12,7 @@ budget_tracker/
 
 - **Dashboard**: balance summary, category breakdown and pie chart, monthly trend, month-to-month comparison, top spending category, and a month filter. A Lend / Borrow card shows what you are owed and what you owe.
 - **Transactions**: add, edit and delete income and expenses, with categories and filters.
-- **Budgets**: set a spending limit per category and track progress.
+- **Budgets**: set a spending limit per category, track progress, and get a warning while adding an expense that nears or passes the limit.
 - **Lend / Borrow**: record money lent or borrowed, with an optional due date and repayment history. Kept apart from your balance.
 - **Accounts**: register, log in, change your password, or delete your account and all its data. Each user sees only their own data.
 - **Backup**: download your data as a file and restore it into your account.
@@ -62,22 +62,22 @@ Local runs use whichever database `secrets.properties` points to. If that is the
 
 Base path `/api`. Every endpoint except `/health` and `/auth/*` needs the header `Authorization: Bearer <token>`.
 
-| Method | Path | Description |
-| --- | --- | --- |
-| GET | `/health` | Health check |
-| POST | `/auth/register` | Create an account (201, `409` if the email is taken) |
-| POST | `/auth/login` | Returns `{ token, user }`. The token lasts 24 hours. |
-| PUT | `/account/password` | Body `{ currentPassword, newPassword }`. Returns 204, `403` if the current password is wrong. |
-| POST | `/account/delete` | Body `{ password }`. Deletes the account and all its data. Returns 204, `403` if the password is wrong. |
-| GET, POST | `/transactions` | List or create transactions |
-| PUT, DELETE | `/transactions/{id}` | Update or delete a transaction |
-| GET | `/budgets` | List budgets |
-| PUT, DELETE | `/budgets/{category}` | Set or remove a category limit |
-| GET, POST | `/loans` | List loans (with repayments) or create one |
-| PUT, DELETE | `/loans/{id}` | Update or delete a loan |
-| POST | `/loans/{id}/repayments` | Add a repayment |
-| DELETE | `/loans/{id}/repayments/{repaymentId}` | Delete a repayment |
-| POST | `/import` | Replace the user's transactions and budgets, and loans if the body has a `loans` list. All or nothing. |
+| Method      | Path                                   | Description                                                                                             |
+| ----------- | -------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| GET         | `/health`                              | Health check                                                                                            |
+| POST        | `/auth/register`                       | Create an account (201, `409` if the email is taken)                                                    |
+| POST        | `/auth/login`                          | Returns `{ token, user }`. The token lasts 24 hours.                                                    |
+| PUT         | `/account/password`                    | Body `{ currentPassword, newPassword }`. Returns 204, `403` if the current password is wrong.           |
+| POST        | `/account/delete`                      | Body `{ password }`. Deletes the account and all its data. Returns 204, `403` if the password is wrong. |
+| GET, POST   | `/transactions`                        | List or create transactions                                                                             |
+| PUT, DELETE | `/transactions/{id}`                   | Update or delete a transaction                                                                          |
+| GET         | `/budgets`                             | List budgets                                                                                            |
+| PUT, DELETE | `/budgets/{category}`                  | Set or remove a category limit                                                                          |
+| GET, POST   | `/loans`                               | List loans (with repayments) or create one                                                              |
+| PUT, DELETE | `/loans/{id}`                          | Update or delete a loan                                                                                 |
+| POST        | `/loans/{id}/repayments`               | Add a repayment                                                                                         |
+| DELETE      | `/loans/{id}/repayments/{repaymentId}` | Delete a repayment                                                                                      |
+| POST        | `/import`                              | Replace the user's transactions and budgets, and loans if the body has a `loans` list. All or nothing.  |
 
 - Errors: `400` invalid input, `401` missing, expired or wrong login, `404` not found, `429` too many attempts.
 - Passwords are 8 to 72 characters. Emails are stored in lowercase.

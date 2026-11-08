@@ -262,3 +262,22 @@
 .form-notice:empty {
   display: none;
 }
+
+.budget-warning {
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  border-radius: var(--radius-sm);
+}
+
+.budget-warning--warning {
+  color: var(--warning);
+  background: var(--warning-soft);
+}
+
+.budget-warning--danger,
+.budget-warning--over {
+  color: var(--expense);
+  background: var(--expense-soft);
+}

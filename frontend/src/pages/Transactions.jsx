@@ -12,6 +12,8 @@ function Transactions({
   editingId,
   onEditTransaction,
   onDeleteTransaction,
+  transactions,
+  budgets,
 }) {
   const [search, setSearch] = useState("");
   const [type, setType] = useState("all");
@@ -78,6 +80,8 @@ function Transactions({
             transaction={editingTransaction}
             onSubmit={onSubmit}
             onCancel={onCancelEdit}
+            transactions={transactions}
+            budgets={budgets}
           />
         </div>
 

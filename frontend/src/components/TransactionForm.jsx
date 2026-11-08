@@ -1,25 +1,26 @@
-import { useEffect, useRef, useState } from 'react'
-import { categoriesFor, DEFAULT_CATEGORY } from '../data/categories'
-import { todayIso } from '../utils/format'
-import { toBs } from '../utils/nepaliDate'
-import NepaliDateField from './NepaliDateField'
-import './TransactionForm.css'
+import { useEffect, useRef, useState } from "react";
+import { categoriesFor, DEFAULT_CATEGORY } from "../data/categories";
+import { budgetWarning } from "../utils/budgetWarning";
+import { formatCurrency, todayIso } from "../utils/format";
+import { toBs } from "../utils/nepaliDate";
+import NepaliDateField from "./NepaliDateField";
+import "./TransactionForm.css";
 
 // A function, not a constant: the default date must be today at the moment
 // the form resets, not whenever the module happened to load.
 function createEmptyForm() {
   return {
-    description: '',
-    amount: '',
-    type: 'expense',
+    description: "",
+    amount: "",
+    type: "expense",
     category: DEFAULT_CATEGORY,
     date: todayIso(),
-  }
+  };
 }
 
 // Inputs hold strings, so a stored amount has to be widened back out.
 function createFormState(transaction) {
-  if (!transaction) return createEmptyForm()
+  if (!transaction) return createEmptyForm();
 
   return {
     description: transaction.description,
@@ -30,44 +31,44 @@ function createFormState(transaction) {
     // outside it has no Nepali form to show, so the field starts from today
     // rather than sitting blank and unusable.
     date: toBs(transaction.date) ? transaction.date : todayIso(),
-  }
+  };
 }
 
 function validate({ description, amount, date }) {
-  const errors = {}
+  const errors = {};
 
   if (!description.trim()) {
-    errors.description = 'Enter a description.'
+    errors.description = "Enter a description.";
   }
 
   if (!amount.trim()) {
-    errors.amount = 'Enter an amount.'
+    errors.amount = "Enter an amount.";
   } else if (!Number.isFinite(Number(amount)) || Number(amount) <= 0) {
-    errors.amount = 'Amount must be greater than 0.'
+    errors.amount = "Amount must be greater than 0.";
   }
 
   // Not just "is it set": a date the calendar cannot express would save as a
   // row whose date never renders.
   if (!toBs(date)) {
-    errors.date = 'Pick a date.'
+    errors.date = "Pick a date.";
   }
 
-  return errors
+  return errors;
 }
 
 // Same top-to-bottom order as the fields on screen.
-const ERROR_ORDER = ['amount', 'description', 'date']
+const ERROR_ORDER = ["amount", "description", "date"];
 
 /** Moves focus to the first field with an error, so a failed submit isn't silent. */
 function focusFirstError(formElement, errors) {
-  const key = ERROR_ORDER.find((name) => errors[name])
-  if (!key) return
+  const key = ERROR_ORDER.find((name) => errors[name]);
+  if (!key) return;
 
   const target =
-    key === 'date'
-      ? formElement.querySelector('.nepali-date-part')
-      : formElement.querySelector(`#${key}`)
-  target?.focus()
+    key === "date"
+      ? formElement.querySelector(".nepali-date-part")
+      : formElement.querySelector(`#${key}`);
+  target?.focus();
 }
 
 /**
@@ -75,74 +76,87 @@ function focusFirstError(formElement, errors) {
  * this component a `key` that changes per edited row, so React remounts it
  * with fresh state instead of the component having to sync props into state.
  */
-function TransactionForm({ transaction, onSubmit, onCancel }) {
-  const isEditing = Boolean(transaction)
-  const [form, setForm] = useState(() => createFormState(transaction))
-  const [errors, setErrors] = useState({})
-  const [notice, setNotice] = useState('')
-  const formRef = useRef(null)
-  const descriptionRef = useRef(null)
+function TransactionForm({
+  transaction,
+  onSubmit,
+  onCancel,
+  transactions = [],
+  budgets = {},
+}) {
+  const isEditing = Boolean(transaction);
+  const [form, setForm] = useState(() => createFormState(transaction));
+  const [errors, setErrors] = useState({});
+  const [notice, setNotice] = useState("");
+  const formRef = useRef(null);
+  const descriptionRef = useRef(null);
+
+  // Recalculated on every render, so it follows the amount, category and date
+  // as they are typed. It only informs; saving is never blocked.
+  const warning = budgetWarning(form, transactions, budgets, transaction?.id);
 
   useEffect(() => {
-    if (!isEditing) return
+    if (!isEditing) return;
 
     // On wide screens the form is a sticky sidebar and already in view;
     // only scroll when it isn't.
-    const rect = formRef.current?.getBoundingClientRect()
-    const fullyVisible = rect && rect.top >= 0 && rect.bottom <= window.innerHeight
+    const rect = formRef.current?.getBoundingClientRect();
+    const fullyVisible =
+      rect && rect.top >= 0 && rect.bottom <= window.innerHeight;
     if (!fullyVisible) {
-      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      const reduceMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)",
+      ).matches;
       formRef.current?.scrollIntoView({
-        behavior: reduceMotion ? 'auto' : 'smooth',
-        block: 'center',
-      })
+        behavior: reduceMotion ? "auto" : "smooth",
+        block: "center",
+      });
     }
     // preventScroll, or focus would fight the smooth scroll above.
-    descriptionRef.current?.focus({ preventScroll: true })
-  }, [isEditing])
+    descriptionRef.current?.focus({ preventScroll: true });
+  }, [isEditing]);
 
   // The "added" confirmation clears itself.
   useEffect(() => {
-    if (!notice) return
-    const timer = setTimeout(() => setNotice(''), 2500)
-    return () => clearTimeout(timer)
-  }, [notice])
+    if (!notice) return;
+    const timer = setTimeout(() => setNotice(""), 2500);
+    return () => clearTimeout(timer);
+  }, [notice]);
 
   function handleChange(event) {
-    const { name, value } = event.target
+    const { name, value } = event.target;
     setForm((prev) => {
-      const next = { ...prev, [name]: value }
+      const next = { ...prev, [name]: value };
       // Switching type swaps the category list underneath, so a selection
       // carried over from the other type may no longer be on offer.
-      if (name === 'type' && !categoriesFor(value).includes(next.category)) {
-        next.category = DEFAULT_CATEGORY
+      if (name === "type" && !categoriesFor(value).includes(next.category)) {
+        next.category = DEFAULT_CATEGORY;
       }
-      return next
-    })
+      return next;
+    });
     // Clear this field's error as soon as it's edited, so the message
     // doesn't linger while the user is fixing it.
-    setErrors((prev) => ({ ...prev, [name]: undefined }))
+    setErrors((prev) => ({ ...prev, [name]: undefined }));
   }
 
   function handleKeyDown(event) {
-    if (isEditing && event.key === 'Escape') onCancel()
+    if (isEditing && event.key === "Escape") onCancel();
   }
 
   // The date field reports a whole ISO date rather than one field's value, so
   // it gets its own handler instead of going through handleChange.
   function handleDateChange(date) {
-    setForm((prev) => ({ ...prev, date }))
-    setErrors((prev) => ({ ...prev, date: undefined }))
+    setForm((prev) => ({ ...prev, date }));
+    setErrors((prev) => ({ ...prev, date: undefined }));
   }
 
   function handleSubmit(event) {
-    event.preventDefault()
+    event.preventDefault();
 
-    const nextErrors = validate(form)
-    setErrors(nextErrors)
+    const nextErrors = validate(form);
+    setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) {
-      focusFirstError(formRef.current, nextErrors)
-      return
+      focusFirstError(formRef.current, nextErrors);
+      return;
     }
 
     // Values only - App owns ids and decides whether this replaces a row or
@@ -154,20 +168,20 @@ function TransactionForm({ transaction, onSubmit, onCancel }) {
       type: form.type,
       category: form.category,
       date: form.date,
-    })
+    });
 
     // Saving an edit hands control back to App, which remounts this form
     // empty. Only the add case has to clear up after itself.
     if (!isEditing) {
-      setForm(createEmptyForm())
-      setErrors({})
-      setNotice('Transaction added.')
+      setForm(createEmptyForm());
+      setErrors({});
+      setNotice("Transaction added.");
     }
   }
 
   return (
     <form
-      className={`transaction-form${isEditing ? ' is-editing' : ''}`}
+      className={`transaction-form${isEditing ? " is-editing" : ""}`}
       ref={formRef}
       onSubmit={handleSubmit}
       onKeyDown={handleKeyDown}
@@ -176,12 +190,12 @@ function TransactionForm({ transaction, onSubmit, onCancel }) {
       <div className="transaction-form-header">
         <div>
           <h2 className="transaction-form-title">
-            {isEditing ? 'Edit transaction' : 'Add transaction'}
+            {isEditing ? "Edit transaction" : "Add transaction"}
           </h2>
           <p className="transaction-form-hint">
             {isEditing
-              ? 'Update the details, then save. Press Esc to cancel.'
-              : 'Record an income or an expense.'}
+              ? "Update the details, then save. Press Esc to cancel."
+              : "Record an income or an expense."}
           </p>
         </div>
         {/* Backs up the border-colour cue on .is-editing with text, so the
@@ -198,7 +212,7 @@ function TransactionForm({ transaction, onSubmit, onCancel }) {
                 type="radio"
                 name="type"
                 value="expense"
-                checked={form.type === 'expense'}
+                checked={form.type === "expense"}
                 onChange={handleChange}
               />
               <span>Expense</span>
@@ -208,7 +222,7 @@ function TransactionForm({ transaction, onSubmit, onCancel }) {
                 type="radio"
                 name="type"
                 value="income"
-                checked={form.type === 'income'}
+                checked={form.type === "income"}
                 onChange={handleChange}
               />
               <span>Income</span>
@@ -235,7 +249,7 @@ function TransactionForm({ transaction, onSubmit, onCancel }) {
               value={form.amount}
               onChange={handleChange}
               aria-invalid={Boolean(errors.amount)}
-              aria-describedby={errors.amount ? 'amount-error' : undefined}
+              aria-describedby={errors.amount ? "amount-error" : undefined}
             />
           </div>
           {errors.amount && (
@@ -276,7 +290,9 @@ function TransactionForm({ transaction, onSubmit, onCancel }) {
             value={form.description}
             onChange={handleChange}
             aria-invalid={Boolean(errors.description)}
-            aria-describedby={errors.description ? 'description-error' : undefined}
+            aria-describedby={
+              errors.description ? "description-error" : undefined
+            }
           />
           {errors.description && (
             <p className="form-error" id="description-error" role="alert">
@@ -292,7 +308,7 @@ function TransactionForm({ transaction, onSubmit, onCancel }) {
           <NepaliDateField
             value={form.date}
             invalid={Boolean(errors.date)}
-            describedBy={errors.date ? 'date-error' : undefined}
+            describedBy={errors.date ? "date-error" : undefined}
             onChange={handleDateChange}
           />
           {errors.date && (
@@ -302,13 +318,26 @@ function TransactionForm({ transaction, onSubmit, onCancel }) {
           )}
         </fieldset>
       </div>
-
+      {warning && (
+        <p
+          className={`budget-warning budget-warning--${warning.level}`}
+          role="status"
+        >
+          {warning.level === "over"
+            ? `This puts ${warning.category} over budget by ${formatCurrency(warning.spent - warning.limit)}.`
+            : `${warning.category}: ${formatCurrency(warning.spent)} of ${formatCurrency(warning.limit)} used this month (${Math.round(warning.percent)}%) with this expense.`}
+        </p>
+      )}
       <div className="form-actions">
         <button className="btn btn-primary form-submit" type="submit">
-          {isEditing ? 'Save changes' : 'Add transaction'}
+          {isEditing ? "Save changes" : "Add transaction"}
         </button>
         {isEditing && (
-          <button className="btn btn-secondary" type="button" onClick={onCancel}>
+          <button
+            className="btn btn-secondary"
+            type="button"
+            onClick={onCancel}
+          >
             Cancel
           </button>
         )}
@@ -319,7 +348,7 @@ function TransactionForm({ transaction, onSubmit, onCancel }) {
         {notice}
       </p>
     </form>
-  )
+  );
 }
 
-export default TransactionForm
+export default TransactionForm;

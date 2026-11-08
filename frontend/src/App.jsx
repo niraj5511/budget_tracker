@@ -283,6 +283,8 @@ function App() {
                       setEditingId((prev) => (prev === id ? null : id))
                     }
                     onDeleteTransaction={handleDeleteTransaction}
+                    transactions={transactions}
+                    budgets={budgets}
                   />
                 }
               />
