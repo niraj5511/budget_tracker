@@ -82,6 +82,7 @@ function TransactionForm({
   onCancel,
   transactions = [],
   budgets = {},
+  categories = [],
 }) {
   const isEditing = Boolean(transaction);
   const [form, setForm] = useState(() => createFormState(transaction));
@@ -128,7 +129,10 @@ function TransactionForm({
       const next = { ...prev, [name]: value };
       // Switching type swaps the category list underneath, so a selection
       // carried over from the other type may no longer be on offer.
-      if (name === "type" && !categoriesFor(value).includes(next.category)) {
+      if (
+        name === "type" &&
+        !categoriesFor(value, categories).includes(next.category)
+      ) {
         next.category = DEFAULT_CATEGORY;
       }
       return next;
@@ -179,6 +183,13 @@ function TransactionForm({
     }
   }
 
+  // A saved transaction can carry a category that is not on offer any more
+  // (for example from an old backup). Keep it selectable so that editing the
+  // row does not silently change its category.
+  const offered = categoriesFor(form.type, categories);
+  const categoryOptions = offered.includes(form.category)
+    ? offered
+    : [form.category, ...offered];
   return (
     <form
       className={`transaction-form${isEditing ? " is-editing" : ""}`}
@@ -269,7 +280,7 @@ function TransactionForm({
             value={form.category}
             onChange={handleChange}
           >
-            {categoriesFor(form.type).map((category) => (
+            {categoryOptions.map((category) => (
               <option key={category} value={category}>
                 {category}
               </option>

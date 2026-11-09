@@ -14,6 +14,7 @@ function Transactions({
   onDeleteTransaction,
   transactions,
   budgets,
+  categories,
 }) {
   const [search, setSearch] = useState("");
   const [type, setType] = useState("all");
@@ -82,6 +83,7 @@ function Transactions({
             onCancel={onCancelEdit}
             transactions={transactions}
             budgets={budgets}
+            categories={categories}
           />
         </div>
 

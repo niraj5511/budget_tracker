@@ -26,6 +26,20 @@ export const EXPENSE_CATEGORIES = [
  */
 export const DEFAULT_CATEGORY = 'Other'
 
-export function categoriesFor(type) {
-  return type === 'income' ? INCOME_CATEGORIES : EXPENSE_CATEGORIES
+/**
+ * The categories on offer for a type: the built-in ones, then the user's own
+ * sorted by name, with 'Other' kept last. `custom` is the list from the
+ * server: [{ id, type, name }].
+ */
+export function categoriesFor(type, custom = []) {
+  const builtIn = type === 'income' ? INCOME_CATEGORIES : EXPENSE_CATEGORIES
+  const own = custom
+    .filter((category) => category.type === type)
+    .map((category) => category.name)
+    .sort((a, b) => a.localeCompare(b))
+  return [
+    ...builtIn.filter((name) => name !== DEFAULT_CATEGORY),
+    ...own,
+    DEFAULT_CATEGORY,
+  ]
 }

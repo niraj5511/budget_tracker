@@ -174,3 +174,7 @@ export function deleteAccount(password) {
     body: JSON.stringify({ password }),
   });
 }
+
+export function fetchCategories() {
+  return request("/categories");
+}

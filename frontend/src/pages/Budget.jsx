@@ -1,12 +1,12 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { EXPENSE_CATEGORIES } from "../data/categories";
+import { categoriesFor } from "../data/categories";
 import { formatCurrency } from "../utils/format";
 import "./Budget.css";
 
 /**
  * One editable row per expense category. Income has no notion of a spending
- * limit, so this deliberately only ever lists EXPENSE_CATEGORIES.
+ * limit, so this deliberately only ever lists expense categories.
  */
 function BudgetRow({ category, limit, onSave }) {
   // Local text, not the committed number - lets the field hold '' or '12.'
@@ -147,7 +147,7 @@ function BudgetRow({ category, limit, onSave }) {
  * every month until changed here - there is no per-month override, which
  * keeps this a one-time setup rather than something to revisit monthly.
  */
-function Budget({ budgets, onSaveLimit }) {
+function Budget({ budgets, categories = [], onSaveLimit }) {
   const limitCount = Object.keys(budgets).length;
   const totalLimit = Object.values(budgets).reduce(
     (sum, limit) => sum + limit,
@@ -184,7 +184,7 @@ function Budget({ budgets, onSaveLimit }) {
         </p>
 
         <div className="budget-rows">
-          {EXPENSE_CATEGORIES.map((category) => (
+          {categoriesFor("expense", categories).map((category) => (
             <BudgetRow
               key={category}
               category={category}

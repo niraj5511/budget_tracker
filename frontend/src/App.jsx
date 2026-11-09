@@ -26,6 +26,7 @@ import {
   deleteRepayment,
   deleteTransaction,
   fetchBudgets,
+  fetchCategories,
   fetchLoans,
   fetchTransactions,
   importData,
@@ -39,6 +40,7 @@ function App() {
   const { user } = useAuth();
   const [transactions, setTransactions] = useState([]);
   const [budgets, setBudgets] = useState({});
+  const [categories, setCategories] = useState([]);
   const [loans, setLoans] = useState([]);
   const [editingLoanId, setEditingLoanId] = useState(null);
   const [selectedMonth, setSelectedMonth] = useState(ALL_MONTHS);
@@ -54,14 +56,22 @@ function App() {
   const loadAll = useCallback(() => {
     const id = ++loadId.current;
     setLoadState("loading");
-    return Promise.all([fetchTransactions(), fetchBudgets(), fetchLoans()])
-      .then(([savedTransactions, savedBudgets, savedLoans]) => {
-        if (id !== loadId.current) return;
-        setTransactions(savedTransactions);
-        setBudgets(savedBudgets);
-        setLoans(savedLoans);
-        setLoadState("ready");
-      })
+    return Promise.all([
+      fetchTransactions(),
+      fetchBudgets(),
+      fetchLoans(),
+      fetchCategories(),
+    ])
+      .then(
+        ([savedTransactions, savedBudgets, savedLoans, savedCategories]) => {
+          if (id !== loadId.current) return;
+          setTransactions(savedTransactions);
+          setBudgets(savedBudgets);
+          setLoans(savedLoans);
+          setCategories(savedCategories);
+          setLoadState("ready");
+        },
+      )
       .catch((error) => {
         if (id !== loadId.current) return;
         console.error("Failed to load data:", error);
@@ -75,6 +85,7 @@ function App() {
       loadId.current += 1;
       setTransactions([]);
       setBudgets({});
+      setCategories([]);
       setLoans([]);
       setLoadState("loading");
       return;
@@ -285,13 +296,18 @@ function App() {
                     onDeleteTransaction={handleDeleteTransaction}
                     transactions={transactions}
                     budgets={budgets}
+                    categories={categories}
                   />
                 }
               />
               <Route
                 path="/budget"
                 element={
-                  <Budget budgets={budgets} onSaveLimit={handleSaveLimit} />
+                  <Budget
+                    budgets={budgets}
+                    categories={categories}
+                    onSaveLimit={handleSaveLimit}
+                  />
                 }
               />
               <Route
