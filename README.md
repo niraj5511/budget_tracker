@@ -13,9 +13,10 @@ budget_tracker/
 - **Dashboard**: balance summary, category breakdown and pie chart, monthly trend, month-to-month comparison, top spending category, and a month filter. A Lend / Borrow card shows what you are owed and what you owe.
 - **Transactions**: add, edit and delete income and expenses, with categories and filters.
 - **Budgets**: set a spending limit per category, track progress, and get a warning while adding an expense that nears or passes the limit.
+- **Categories**: add your own income and expense categories on top of the built-in ones. Rename them, or delete them (their transactions move to Other).
 - **Lend / Borrow**: record money lent or borrowed, with an optional due date and repayment history. Kept apart from your balance.
 - **Accounts**: register, log in, change your password, or delete your account and all its data. Each user sees only their own data.
-- **Backup**: download your data as a file and restore it into your account.
+- **Backup**: download your transactions, budgets, loans and custom categories as a file and restore it into your account.
 - **Theme**: light and dark mode.
 
 ## Tech stack
@@ -77,9 +78,10 @@ Base path `/api`. Every endpoint except `/health` and `/auth/*` needs the header
 | PUT, DELETE | `/loans/{id}`                          | Update or delete a loan                                                                                 |
 | POST        | `/loans/{id}/repayments`               | Add a repayment                                                                                         |
 | DELETE      | `/loans/{id}/repayments/{repaymentId}` | Delete a repayment                                                                                      |
-| POST        | `/import`                              | Replace the user's transactions and budgets, and loans if the body has a `loans` list. All or nothing.  |
+| POST | `/import` | Replace the user's transactions and budgets, and loans or categories if the body has those lists. All or nothing. |
 
 - Errors: `400` invalid input, `401` missing, expired or wrong login, `404` not found, `429` too many attempts.
+- Custom category names are 1 to 30 characters, unique within income or expense (ignoring case, and not matching a built-in name), with at most 30 per type.
 - Passwords are 8 to 72 characters. Emails are stored in lowercase.
 - After 5 wrong passwords in a row on login or `/account/*`, that email is locked for 15 minutes.
 - Amounts must be greater than 0. Dates use `YYYY-MM-DD`.
@@ -116,3 +118,4 @@ The backend runs on Render and the frontend on Netlify, both on free plans. Push
 - No forgot-password, and the email address cannot be changed.
 - No automated tests.
 - Repayments cannot be edited, only deleted and added again.
+- The built-in categories cannot be renamed or removed.
