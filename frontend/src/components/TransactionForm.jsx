@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import { categoriesFor, DEFAULT_CATEGORY } from "../data/categories";
 import { budgetWarning } from "../utils/budgetWarning";
 import { formatCurrency, todayIso } from "../utils/format";
@@ -286,6 +287,9 @@ function TransactionForm({
               </option>
             ))}
           </select>
+          <Link className="manage-link" to="/categories">
+            Manage categories
+          </Link>
         </div>
 
         <div className="form-field form-field--wide">

@@ -14,6 +14,7 @@ import RequireAuth from "./components/RequireAuth";
 import { useAuth } from "./context/AuthContext";
 import Loans from "./pages/Loans";
 import Account from "./pages/Account";
+import Categories from "./pages/Categories";
 
 import { ALL_MONTHS, availableMonths, filterByMonth } from "./utils/months";
 import { formatBsMonth } from "./utils/nepaliDate";
@@ -27,6 +28,9 @@ import {
   deleteTransaction,
   fetchBudgets,
   fetchCategories,
+  createCategory,
+  deleteCategory,
+  renameCategory,
   fetchLoans,
   fetchTransactions,
   importData,
@@ -171,7 +175,34 @@ function App() {
     setEditingLoanId(null);
     setSelectedMonth(ALL_MONTHS);
   }
+  async function handleAddCategory(type, name) {
+    const created = await createCategory(type, name);
+    setCategories((prev) => [...prev, created]);
+  }
 
+  // A rename or delete also changes transactions and budgets on the server,
+  // so reload those along with the categories.
+  async function reloadAfterCategoryChange() {
+    const [savedTransactions, savedBudgets, savedCategories] =
+      await Promise.all([
+        fetchTransactions(),
+        fetchBudgets(),
+        fetchCategories(),
+      ]);
+    setTransactions(savedTransactions);
+    setBudgets(savedBudgets);
+    setCategories(savedCategories);
+  }
+
+  async function handleRenameCategory(id, name) {
+    await renameCategory(id, name);
+    await reloadAfterCategoryChange();
+  }
+
+  async function handleDeleteCategory(id) {
+    await deleteCategory(id);
+    await reloadAfterCategoryChange();
+  }
   const months = availableMonths(transactions);
 
   const activeMonth =
@@ -335,6 +366,19 @@ function App() {
                     budgets={budgets}
                     loans={loans}
                     onRestore={handleRestore}
+                  />
+                }
+              />
+              <Route
+                path="/categories"
+                element={
+                  <Categories
+                    categories={categories}
+                    transactions={transactions}
+                    budgets={budgets}
+                    onAdd={handleAddCategory}
+                    onRename={handleRenameCategory}
+                    onDelete={handleDeleteCategory}
                   />
                 }
               />

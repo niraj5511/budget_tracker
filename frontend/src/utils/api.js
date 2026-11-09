@@ -178,3 +178,21 @@ export function deleteAccount(password) {
 export function fetchCategories() {
   return request("/categories");
 }
+
+export function createCategory(type, name) {
+  return request("/categories", {
+    method: "POST",
+    body: JSON.stringify({ type, name }),
+  });
+}
+
+export function renameCategory(id, name) {
+  return request(`/categories/${id}`, {
+    method: "PUT",
+    body: JSON.stringify({ name }),
+  });
+}
+
+export async function deleteCategory(id) {
+  await request(`/categories/${id}`, { method: "DELETE" });
+}

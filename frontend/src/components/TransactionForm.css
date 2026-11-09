@@ -281,3 +281,8 @@
   color: var(--expense);
   background: var(--expense-soft);
 }
+
+.manage-link {
+  align-self: flex-start;
+  font-size: 0.8125rem;
+}
