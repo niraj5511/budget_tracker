@@ -115,7 +115,7 @@ export function registerRequest(email, password) {
   });
 }
 
-export async function importData(transactions, budgets, loans) {
+export async function importData(transactions, budgets, loans, categories) {
   const cleaned = transactions.map(
     ({ description, amount, type, category, date }) => ({
       description,
@@ -127,7 +127,12 @@ export async function importData(transactions, budgets, loans) {
   );
   return request("/import", {
     method: "POST",
-    body: JSON.stringify({ transactions: cleaned, budgets, loans }),
+    body: JSON.stringify({
+      transactions: cleaned,
+      budgets,
+      loans,
+      categories,
+    }),
   });
 }
 

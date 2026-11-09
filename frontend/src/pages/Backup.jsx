@@ -17,12 +17,25 @@ function count(n, singular, plural = `${singular}s`) {
   return `${n} ${n === 1 ? singular : plural}`;
 }
 
-/** "3 transactions, 2 budget limits and 1 Lend / Borrow record". A null loan count leaves the loans out. */
-function describeData(transactionCount, limitCount, loanCount = null) {
-  const transactions = count(transactionCount, "transaction");
-  const limits = count(limitCount, "budget limit");
-  if (loanCount === null) return `${transactions} and ${limits}`;
-  return `${transactions}, ${limits} and ${count(loanCount, "Lend / Borrow record")}`;
+/**
+ * "3 transactions, 2 budget limits and 1 Lend / Borrow record". A null loan or
+ * category count leaves that part out.
+ */
+function describeData(
+  transactionCount,
+  limitCount,
+  loanCount = null,
+  categoryCount = null,
+) {
+  const parts = [
+    count(transactionCount, "transaction"),
+    count(limitCount, "budget limit"),
+  ];
+  if (loanCount !== null) parts.push(count(loanCount, "Lend / Borrow record"));
+  if (categoryCount !== null) {
+    parts.push(count(categoryCount, "custom category", "custom categories"));
+  }
+  return `${parts.slice(0, -1).join(", ")} and ${parts[parts.length - 1]}`;
 }
 
 /** A timestamp as a Nepali date, or null when it has no BS form. */
@@ -36,9 +49,13 @@ function bsLabel(timestamp) {
  * to another device loses it. This page turns that data into a file the
  * person keeps, and loads such a file back.
  */
-function Backup({ transactions, budgets, loans, onRestore }) {
+function Backup({ transactions, budgets, loans, categories, onRestore }) {
   const limitCount = Object.keys(budgets).length;
-  const hasData = transactions.length > 0 || limitCount > 0 || loans.length > 0;
+  const hasData =
+    transactions.length > 0 ||
+    limitCount > 0 ||
+    loans.length > 0 ||
+    categories.length > 0;
 
   const [lastBackup, setLastBackup] = useState(() => readLastBackup());
   const [error, setError] = useState("");
@@ -48,7 +65,7 @@ function Backup({ transactions, budgets, loans, onRestore }) {
   const fileInputRef = useRef(null);
 
   function handleDownload() {
-    const backup = createBackup(transactions, budgets, loans);
+    const backup = createBackup(transactions, budgets, loans, categories);
     const blob = new Blob([JSON.stringify(backup, null, 2)], {
       type: "application/json",
     });
@@ -110,6 +127,7 @@ function Backup({ transactions, budgets, loans, onRestore }) {
         transactions: restoring.transactions,
         budgets: restoring.budgets,
         loans: restoring.loans,
+        categories: restoring.categories,
       });
     } catch {
       setError(
@@ -123,12 +141,24 @@ function Backup({ transactions, budgets, loans, onRestore }) {
         restoring.transactions.length,
         Object.keys(restoring.budgets).length,
         restoring.loans?.length ?? null,
+        restoring.categories?.length ?? null,
       )}.`,
     );
   }
 
   const lastBackupLabel = bsLabel(lastBackup);
   const savedOnLabel = pending ? bsLabel(pending.exportedAt) : null;
+
+  // Older backups have no loans or categories; restoring one keeps yours.
+  const missing = pending
+    ? [
+        pending.loans === null && "Lend / Borrow records",
+        pending.categories === null && "custom categories",
+      ].filter(Boolean)
+    : [];
+  const keptNote = missing.length
+    ? `This file has no ${missing.join(" or ")}, so the ones you have now are kept.`
+    : "";
 
   return (
     <div className="page">
@@ -149,8 +179,13 @@ function Backup({ transactions, budgets, loans, onRestore }) {
           </h2>
           <p className="backup-text">
             Saves your{" "}
-            {describeData(transactions.length, limitCount, loans.length)} to a
-            file on this device.
+            {describeData(
+              transactions.length,
+              limitCount,
+              loans.length,
+              categories.length,
+            )}{" "}
+            to a file on this device.
           </p>
 
           <div className="backup-actions">
@@ -243,6 +278,7 @@ function Backup({ transactions, budgets, loans, onRestore }) {
                   pending.transactions.length,
                   Object.keys(pending.budgets).length,
                   pending.loans?.length ?? null,
+                  pending.categories?.length ?? null,
                 )}
               </strong>
               {savedOnLabel && <span>Saved on {savedOnLabel}</span>}
@@ -253,16 +289,12 @@ function Backup({ transactions, budgets, loans, onRestore }) {
                 transactions.length,
                 limitCount,
                 pending.loans ? loans.length : null,
+                pending.categories ? categories.length : null,
               )}
               , and it can&rsquo;t be undone. If you might need your current
               data, download a backup of it first.
             </p>
-            {pending.loans === null && (
-              <p>
-                This file has no Lend / Borrow records, so the ones you have now
-                are kept.
-              </p>
-            )}
+            {keptNote && <p>{keptNote}</p>}
             {pending.skipped > 0 && (
               <p className="restore-warning">
                 {count(pending.skipped, "entry", "entries")} in the file could

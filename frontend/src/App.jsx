@@ -161,16 +161,20 @@ function App() {
     transactions: nextTransactions,
     budgets: nextBudgets,
     loans: nextLoans,
+    categories: nextCategories,
   }) {
-    await importData(nextTransactions, nextBudgets, nextLoans);
-    const [savedTransactions, savedBudgets, savedLoans] = await Promise.all([
-      fetchTransactions(),
-      fetchBudgets(),
-      fetchLoans(),
-    ]);
+    await importData(nextTransactions, nextBudgets, nextLoans, nextCategories);
+    const [savedTransactions, savedBudgets, savedLoans, savedCategories] =
+      await Promise.all([
+        fetchTransactions(),
+        fetchBudgets(),
+        fetchLoans(),
+        fetchCategories(),
+      ]);
     setTransactions(savedTransactions);
     setBudgets(savedBudgets);
     setLoans(savedLoans);
+    setCategories(savedCategories);
     setEditingId(null);
     setEditingLoanId(null);
     setSelectedMonth(ALL_MONTHS);
@@ -365,6 +369,7 @@ function App() {
                     transactions={transactions}
                     budgets={budgets}
                     loans={loans}
+                    categories={categories}
                     onRestore={handleRestore}
                   />
                 }

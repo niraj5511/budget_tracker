@@ -1,24 +1,36 @@
-import { isValidBudgetMap, isValidTransaction, withCategory } from "./validation";
+import { categoriesFor } from "../data/categories";
+import {
+  isValidBudgetMap,
+  isValidTransaction,
+  withCategory,
+} from "./validation";
 
 /**
  * Backup file format. A plain JSON file the person downloads and keeps:
  *
  *   { app, version, exportedAt, transactions: [...], budgets: { category: limit },
- *     loans: [...] }
+ *     loans: [...], categories: [{ type, name }] }
  *
- * Version 1 files have no `loans`. Restoring one leaves the loans alone.
+ * Version 1 files have no `loans`, and versions 1 and 2 have no `categories`.
+ * Restoring such a file leaves those alone.
  *
  * `app` and `version` exist so a file from some other tool - or from a future
  * version of this one - is refused with a clear reason instead of being
  * half-understood and quietly wiping what is on screen.
  */
 export const BACKUP_APP = "artha-budget-tracker";
-export const BACKUP_VERSION = 2;
+export const BACKUP_VERSION = 3;
 export const MAX_BACKUP_BYTES = 5 * 1024 * 1024;
 
 const LAST_BACKUP_KEY = "budget-tracker:last-backup";
 
-export function createBackup(transactions, budgets, loans, now = new Date()) {
+export function createBackup(
+  transactions,
+  budgets,
+  loans,
+  categories,
+  now = new Date(),
+) {
   return {
     app: BACKUP_APP,
     version: BACKUP_VERSION,
@@ -40,6 +52,8 @@ export function createBackup(transactions, budgets, loans, now = new Date()) {
         note: repayment.note,
       })),
     })),
+    // Only the user's own categories. The built-in ones are part of the app.
+    categories: categories.map(({ type, name }) => ({ type, name })),
   };
 }
 
@@ -134,6 +148,46 @@ function readLoan(item) {
       repayments,
     },
   };
+}
+
+const MAX_CATEGORY_NAME = 30;
+const MAX_CUSTOM_PER_TYPE = 30;
+
+/**
+ * The custom categories from a backup. Entries that are unusable, duplicate
+ * (ignoring case) or the same as a built-in name are dropped and counted, as
+ * are any beyond the limit per type.
+ */
+function readCategories(list) {
+  const categories = [];
+  let skipped = 0;
+  for (const item of list) {
+    const type = item && typeof item === "object" ? item.type : null;
+    const name = typeof item?.name === "string" ? item.name.trim() : "";
+    if (
+      (type !== "income" && type !== "expense") ||
+      !name ||
+      name.length > MAX_CATEGORY_NAME
+    ) {
+      skipped += 1;
+      continue;
+    }
+
+    const sameType = categories.filter((category) => category.type === type);
+    const known = [
+      ...categoriesFor(type),
+      ...sameType.map((category) => category.name),
+    ];
+    if (
+      sameType.length >= MAX_CUSTOM_PER_TYPE ||
+      known.some((existing) => existing.toLowerCase() === name.toLowerCase())
+    ) {
+      skipped += 1;
+      continue;
+    }
+    categories.push({ type, name });
+  }
+  return { categories, skipped };
 }
 /**
  * Reads backup text into data the app can load, or explains why it cannot.
@@ -243,11 +297,27 @@ export function parseBackup(text) {
     }
   }
 
+  // `null` means the file has no categories section (a version 1 or 2 backup),
+  // which is different from an empty list: null leaves the categories alone.
+  let categories = null;
+  if (data.categories !== undefined && data.categories !== null) {
+    if (!Array.isArray(data.categories)) {
+      return fail("The custom categories in this file could not be read.");
+    }
+    const read = readCategories(data.categories);
+    categories = read.categories;
+    skipped += read.skipped;
+    if (data.categories.length > 0 && categories.length === 0) {
+      return fail("None of the custom categories in this file could be read.");
+    }
+  }
+
   return {
     ok: true,
     transactions,
     budgets,
     loans,
+    categories,
     skipped,
     // ...the exportedAt lines stay as they are
     exportedAt:
