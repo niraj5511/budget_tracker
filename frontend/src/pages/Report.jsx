@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import MonthFilter from "../components/MonthFilter";
-import { formatCurrency } from "../utils/format";
+import { formatCurrency, todayIso } from "../utils/format";
 import { buildMonthlyReport } from "../utils/monthlyReport";
 import { formatBsDate, formatBsMonth } from "../utils/nepaliDate";
 import "./Report.css";
@@ -70,6 +70,8 @@ function Report({ months, transactions, budgets }) {
 
   const month = months.includes(selected) ? selected : months[0];
   const report = buildMonthlyReport(transactions, budgets, month);
+  const today = todayIso();
+  const generatedOn = formatBsDate(today) ?? today;
   const { comparison } = report;
   const hasComparison =
     comparison &&
@@ -83,15 +85,26 @@ function Report({ months, transactions, budgets }) {
         <div>
           <h1 className="page-title">Monthly report</h1>
           <p className="page-subtitle">{formatBsMonth(month)}</p>
+          {/* Only shown when printed. */}
+          <p className="report-generated">Generated on {generatedOn}</p>
         </div>
-        <div className="report-month">
-          <MonthFilter
-            months={months}
-            value={month}
-            onChange={setSelected}
-            includeAll={false}
-            label="Month"
-          />
+        <div className="report-actions">
+          <div className="report-month">
+            <MonthFilter
+              months={months}
+              value={month}
+              onChange={setSelected}
+              includeAll={false}
+              label="Month"
+            />
+          </div>
+          <button
+            type="button"
+            className="btn btn-secondary"
+            onClick={() => window.print()}
+          >
+            Print / Save as PDF
+          </button>
         </div>
       </header>
 
@@ -165,7 +178,9 @@ function Report({ months, transactions, budgets }) {
                     </td>
                     <td>
                       {row.budget ? (
-                        <span className={row.budget.isOver ? "report-over" : ""}>
+                        <span
+                          className={row.budget.isOver ? "report-over" : ""}
+                        >
                           {formatCurrency(row.budget.limit)} limit,{" "}
                           {percentText(row.budget.percent)} used
                         </span>

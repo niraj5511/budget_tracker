@@ -6,10 +6,24 @@
   margin-bottom: 0;
 }
 
+.report-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
 @media (max-width: 560px) {
-  .report-month {
+  .report-actions {
     width: 100%;
   }
+}
+
+.report-generated {
+  display: none;
+  margin-top: var(--space-1);
+  font-size: 0.8125rem;
+  color: var(--text-muted);
 }
 
 .report-summary {
@@ -117,4 +131,56 @@
 .report-over {
   font-weight: 600;
   color: var(--expense);
+}
+
+
+/* Printing, or saving as PDF from the print dialog. */
+@media print {
+  /* Always print in the light theme, whatever the screen is using. */
+  html:root,
+  html[data-theme='dark']:root {
+    color-scheme: light;
+    --bg: #ffffff;
+    --surface: #ffffff;
+    --surface-2: #f1f4f9;
+    --border: #e4e8ef;
+    --border-strong: #cbd2dd;
+    --text: #0f172a;
+    --text-muted: #5b6678;
+    --income: #0f7a52;
+    --expense: #cf3232;
+  }
+
+  /* The navbar (also the bottom tab bar on phones) and the report controls. */
+  .app-header,
+  .report-actions {
+    display: none !important;
+  }
+
+  .app-main {
+    max-width: none;
+    padding: 0;
+  }
+
+  .page {
+    animation: none;
+  }
+
+  .report-generated {
+    display: block;
+  }
+
+  .report-stat,
+  .report-card {
+    box-shadow: none;
+    break-inside: avoid;
+  }
+
+  .report-table thead {
+    display: table-header-group;
+  }
+
+  .report-table tr {
+    break-inside: avoid;
+  }
 }
