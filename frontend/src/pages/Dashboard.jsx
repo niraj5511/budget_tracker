@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import BalanceSummary from "../components/BalanceSummary";
 import BudgetOverview from "../components/BudgetOverview";
 import CategoryBreakdown from "../components/CategoryBreakdown";
@@ -49,15 +50,24 @@ function Dashboard({
 
         {/* With nothing saved there is nothing to filter, and the select
             would offer "All time" as its only option. */}
-        {months.length > 0 && (
-          <div className="dashboard-filter">
-            <MonthFilter
-              months={months}
-              value={activeMonth}
-              onChange={onMonthChange}
-            />
-          </div>
-        )}
+        <div className="dashboard-actions">
+          {months.length > 0 && (
+            <div className="dashboard-filter">
+              <MonthFilter
+                months={months}
+                value={activeMonth}
+                onChange={onMonthChange}
+              />
+            </div>
+          )}
+          <Link
+            to="/report"
+            state={{ month: activeMonth }}
+            className="btn btn-secondary"
+          >
+            Monthly report
+          </Link>
+        </div>
       </header>
 
       {/* The headline numbers come first; everything below explains them. */}

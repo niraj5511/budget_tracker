@@ -1,17 +1,23 @@
-import { useId } from 'react'
-import { ALL_MONTHS } from '../utils/months'
-import { formatBsMonth } from '../utils/nepaliDate'
-import './MonthFilter.css'
+import { useId } from "react";
+import { ALL_MONTHS } from "../utils/months";
+import { formatBsMonth } from "../utils/nepaliDate";
+import "./MonthFilter.css";
 
-function MonthFilter({ months, value, onChange }) {
+function MonthFilter({
+  months,
+  value,
+  onChange,
+  includeAll = true,
+  label = "Period",
+}) {
   // useId gives each MonthFilter its own unique id, so the label always
   // points at its own select even if the component is rendered twice.
-  const selectId = useId()
+  const selectId = useId();
 
   return (
     <div className="month-filter">
       <label className="month-filter-label" htmlFor={selectId}>
-        Period
+        {label}
       </label>
 
       {/* A native <select> on purpose: phones open their own picker, which
@@ -38,7 +44,7 @@ function MonthFilter({ months, value, onChange }) {
           value={value}
           onChange={(event) => onChange(event.target.value)}
         >
-          <option value={ALL_MONTHS}>All time</option>
+          {includeAll && <option value={ALL_MONTHS}>All time</option>}
           {months.map((month) => (
             <option key={month} value={month}>
               {formatBsMonth(month)}
@@ -47,7 +53,7 @@ function MonthFilter({ months, value, onChange }) {
         </select>
       </div>
     </div>
-  )
+  );
 }
 
-export default MonthFilter
+export default MonthFilter;

@@ -27,3 +27,20 @@
     width: 100%;
   }
 }
+
+.dashboard-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.dashboard-actions .btn {
+  text-decoration: none;
+}
+
+@media (max-width: 560px) {
+  .dashboard-actions {
+    width: 100%;
+  }
+}

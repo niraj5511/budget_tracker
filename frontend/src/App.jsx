@@ -15,6 +15,7 @@ import { useAuth } from "./context/AuthContext";
 import Loans from "./pages/Loans";
 import Account from "./pages/Account";
 import Categories from "./pages/Categories";
+import Report from "./pages/Report";
 
 import { ALL_MONTHS, availableMonths, filterByMonth } from "./utils/months";
 import { formatBsMonth } from "./utils/nepaliDate";
@@ -371,6 +372,16 @@ function App() {
                     loans={loans}
                     categories={categories}
                     onRestore={handleRestore}
+                  />
+                }
+              />
+              <Route
+                path="/report"
+                element={
+                  <Report
+                    months={months}
+                    transactions={transactions}
+                    budgets={budgets}
                   />
                 }
               />
