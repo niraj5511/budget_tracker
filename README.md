@@ -11,6 +11,7 @@ budget_tracker/
 ## Features
 
 - **Dashboard**: balance summary, category breakdown and pie chart, monthly trend, month-to-month comparison, top spending category, and a month filter. A Lend / Borrow card shows what you are owed and what you owe.
+- **Monthly report**: a summary of one month with totals, a comparison with the previous month, expenses by category against your budgets, and the largest expenses. Print it or save it as a PDF.
 - **Transactions**: add, edit and delete income and expenses, with categories and filters.
 - **Budgets**: set a spending limit per category, track progress, and get a warning while adding an expense that nears or passes the limit.
 - **Categories**: add your own income and expense categories on top of the built-in ones. Rename them, or delete them (their transactions move to Other).
