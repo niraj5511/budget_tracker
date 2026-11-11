@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import DataStatus from "./components/DataStatus";
 import RouteEffects from "./components/RouteEffects";
@@ -13,7 +13,7 @@ import Register from "./pages/Register";
 import RequireAuth from "./components/RequireAuth";
 import { useAuth } from "./context/AuthContext";
 import Loans from "./pages/Loans";
-import Account from "./pages/Account";
+import Profile from "./pages/Profile";
 import Categories from "./pages/Categories";
 import Report from "./pages/Report";
 
@@ -398,7 +398,12 @@ function App() {
                   />
                 }
               />
-              <Route path="/account" element={<Account />} />
+              <Route path="/profile" element={<Profile />} />
+              {/* The old address, kept so bookmarks still work. */}
+              <Route
+                path="/account"
+                element={<Navigate to="/profile" replace />}
+              />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>

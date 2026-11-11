@@ -102,7 +102,9 @@
   color: var(--text);
   font-weight: 600;
   background: var(--surface);
-  box-shadow: var(--shadow-sm), 0 0 0 1px var(--border);
+  box-shadow:
+    var(--shadow-sm),
+    0 0 0 1px var(--border);
 }
 
 .nav-item.active .nav-icon {
@@ -174,28 +176,20 @@
   }
 }
 
-.logout-button {
+.profile-link {
   padding: 7px 14px;
   font: inherit;
   font-size: 0.875rem;
   font-weight: 500;
   color: var(--text-muted);
+  text-decoration: none;
   background: transparent;
   border: 1px solid var(--border);
   border-radius: 9px;
-  cursor: pointer;
 }
 
-.logout-button:hover {
-  color: var(--text);
-  background: var(--surface);
-}
-
-.account-link {
-  text-decoration: none;
-}
-
-.account-link.active {
+.profile-link:hover,
+.profile-link.active {
   color: var(--text);
   background: var(--surface);
 }

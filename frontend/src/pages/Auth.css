@@ -101,3 +101,13 @@
   outline: 2px solid var(--accent);
   outline-offset: 1px;
 }
+
+.profile-card {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.profile-card .auth-switch {
+  overflow-wrap: anywhere;
+}

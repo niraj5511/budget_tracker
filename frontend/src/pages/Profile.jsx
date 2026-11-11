@@ -5,7 +5,7 @@ import PasswordField from "../components/PasswordField";
 import { changePassword, deleteAccount } from "../utils/api";
 import "./Auth.css";
 
-export default function Account() {
+export default function Profile() {
   const { user, logout } = useAuth();
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -60,9 +60,18 @@ export default function Account() {
 
   return (
     <section className="auth-page">
+      <div className="auth-card profile-card">
+        <div>
+          <h1 className="auth-title">Profile</h1>
+          <p className="auth-switch">{user?.email}</p>
+        </div>
+        <button type="button" className="btn btn-secondary" onClick={logout}>
+          Log out
+        </button>
+      </div>
+
       <form className="auth-card" onSubmit={handleSubmit}>
-        <h1 className="auth-title">Account</h1>
-        <p className="auth-switch">{user?.email}</p>
+        <h2 className="auth-title">Change password</h2>
 
         <PasswordField
           label="Current password"

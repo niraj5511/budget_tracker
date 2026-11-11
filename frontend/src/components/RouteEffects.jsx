@@ -1,12 +1,16 @@
-import { useEffect } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
 
 const TITLES = {
-  '/': 'Dashboard',
-  '/transactions': 'Transactions',
-  '/budget': 'Budget',
-  '/backup': 'Backup',
-}
+  "/": "Dashboard",
+  "/transactions": "Transactions",
+  "/budget": "Budget",
+  "/backup": "Backup",
+  "/loans": "Lend / Borrow",
+  "/report": "Monthly report",
+  "/categories": "Categories",
+  "/profile": "Profile",
+};
 
 /**
  * Two things a single-page app has to do by hand on every navigation, because
@@ -20,17 +24,17 @@ const TITLES = {
  * Renders nothing. Must sit inside the router.
  */
 function RouteEffects() {
-  const { pathname } = useLocation()
+  const { pathname } = useLocation();
 
   useEffect(() => {
     // '/budget/' and '/budget' are the same page to the router, so they
     // have to be the same title here too.
-    const path = pathname.replace(/\/+$/, '') || '/'
-    document.title = `${TITLES[path] ?? 'Page not found'} | Artha`
-    window.scrollTo(0, 0)
-  }, [pathname])
+    const path = pathname.replace(/\/+$/, "") || "/";
+    document.title = `${TITLES[path] ?? "Page not found"} | Artha`;
+    window.scrollTo(0, 0);
+  }, [pathname]);
 
-  return null
+  return null;
 }
 
-export default RouteEffects
+export default RouteEffects;

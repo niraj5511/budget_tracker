@@ -1,6 +1,5 @@
 import { NavLink } from "react-router-dom";
 import ThemeToggle from "./ThemeToggle";
-import { useAuth } from "../context/AuthContext";
 import "./Navbar.css";
 
 // Icons are 24x24 stroke paths; NavLink adds the `active` class and
@@ -63,7 +62,6 @@ const NAV_ITEMS = [
 ];
 
 export default function Navbar() {
-  const { logout } = useAuth();
   return (
     <header className="app-header">
       <a className="skip-link" href="#main">
@@ -118,12 +116,9 @@ export default function Navbar() {
           </nav>
 
           <ThemeToggle />
-          <NavLink to="/account" className="logout-button account-link">
-            Account
+          <NavLink to="/profile" className="profile-link">
+            Profile
           </NavLink>
-          <button type="button" className="logout-button" onClick={logout}>
-            Log out
-          </button>
         </div>
       </div>
     </header>
