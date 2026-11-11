@@ -26,6 +26,13 @@ public class UserEntity {
     @Column(name = "created_at", nullable = false)
     private Instant createdAt = Instant.now();
 
+    // The category a new transaction starts with. Empty means "Other".
+    @Column(name = "default_expense_category")
+    private String defaultExpenseCategory;
+
+    @Column(name = "default_income_category")
+    private String defaultIncomeCategory;
+
     protected UserEntity() {
     }
 
@@ -49,4 +56,11 @@ public class UserEntity {
     public void setPasswordHash(String passwordHash) {
         this.passwordHash = passwordHash;
     }
+
+    
+    public String getDefaultExpenseCategory() { return defaultExpenseCategory; }
+    public void setDefaultExpenseCategory(String name) { this.defaultExpenseCategory = name; }
+
+    public String getDefaultIncomeCategory() { return defaultIncomeCategory; }
+    public void setDefaultIncomeCategory(String name) { this.defaultIncomeCategory = name; }
 }
