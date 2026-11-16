@@ -7,21 +7,36 @@ import { toBs } from "../utils/nepaliDate";
 import NepaliDateField from "./NepaliDateField";
 import "./TransactionForm.css";
 
+/**
+ * The category a new transaction of this type starts with: the user's default
+ * for the type if it is still on offer, otherwise 'Other'. `settings` comes
+ * from the server: { defaultExpenseCategory, defaultIncomeCategory }.
+ */
+function startingCategory(type, categories, settings) {
+  const name =
+    type === "income"
+      ? settings.defaultIncomeCategory
+      : settings.defaultExpenseCategory;
+  return name && categoriesFor(type, categories).includes(name)
+    ? name
+    : DEFAULT_CATEGORY;
+}
+
 // A function, not a constant: the default date must be today at the moment
 // the form resets, not whenever the module happened to load.
-function createEmptyForm() {
+function createEmptyForm(category = DEFAULT_CATEGORY) {
   return {
     description: "",
     amount: "",
     type: "expense",
-    category: DEFAULT_CATEGORY,
+    category,
     date: todayIso(),
   };
 }
 
 // Inputs hold strings, so a stored amount has to be widened back out.
-function createFormState(transaction) {
-  if (!transaction) return createEmptyForm();
+function createFormState(transaction, newCategory) {
+  if (!transaction) return createEmptyForm(newCategory);
 
   return {
     description: transaction.description,
@@ -84,9 +99,15 @@ function TransactionForm({
   transactions = [],
   budgets = {},
   categories = [],
+  settings = {},
 }) {
   const isEditing = Boolean(transaction);
-  const [form, setForm] = useState(() => createFormState(transaction));
+  const [form, setForm] = useState(() =>
+    createFormState(
+      transaction,
+      startingCategory("expense", categories, settings),
+    ),
+  );
   const [errors, setErrors] = useState({});
   const [notice, setNotice] = useState("");
   const formRef = useRef(null);
@@ -128,13 +149,15 @@ function TransactionForm({
     const { name, value } = event.target;
     setForm((prev) => {
       const next = { ...prev, [name]: value };
-      // Switching type swaps the category list underneath, so a selection
-      // carried over from the other type may no longer be on offer.
-      if (
-        name === "type" &&
-        !categoriesFor(value, categories).includes(next.category)
-      ) {
-        next.category = DEFAULT_CATEGORY;
+      if (name === "type") {
+        // Switching type swaps the category list underneath. A new transaction
+        // starts again from the default for that type; an edited one keeps its
+        // category when the new type offers it, and falls back to 'Other'.
+        if (!isEditing) {
+          next.category = startingCategory(value, categories, settings);
+        } else if (!categoriesFor(value, categories).includes(next.category)) {
+          next.category = DEFAULT_CATEGORY;
+        }
       }
       return next;
     });
@@ -178,7 +201,9 @@ function TransactionForm({
     // Saving an edit hands control back to App, which remounts this form
     // empty. Only the add case has to clear up after itself.
     if (!isEditing) {
-      setForm(createEmptyForm());
+      setForm(
+        createEmptyForm(startingCategory("expense", categories, settings)),
+      );
       setErrors({});
       setNotice("Transaction added.");
     }

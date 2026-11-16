@@ -15,6 +15,7 @@ function Transactions({
   transactions,
   budgets,
   categories,
+  settings,
 }) {
   const [search, setSearch] = useState("");
   const [type, setType] = useState("all");
@@ -84,6 +85,7 @@ function Transactions({
             transactions={transactions}
             budgets={budgets}
             categories={categories}
+            settings={settings}
           />
         </div>
 

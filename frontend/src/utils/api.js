@@ -201,3 +201,7 @@ export function renameCategory(id, name) {
 export async function deleteCategory(id) {
   await request(`/categories/${id}`, { method: "DELETE" });
 }
+
+export function fetchSettings() {
+  return request("/settings");
+}

@@ -29,6 +29,7 @@ import {
   deleteTransaction,
   fetchBudgets,
   fetchCategories,
+  fetchSettings,
   createCategory,
   deleteCategory,
   renameCategory,
@@ -41,11 +42,18 @@ import {
 } from "./utils/api";
 import "./App.css";
 
+// What the server returns for an account that has not chosen any defaults.
+const NO_SETTINGS = {
+  defaultExpenseCategory: null,
+  defaultIncomeCategory: null,
+};
+
 function App() {
   const { user } = useAuth();
   const [transactions, setTransactions] = useState([]);
   const [budgets, setBudgets] = useState({});
   const [categories, setCategories] = useState([]);
+  const [settings, setSettings] = useState(NO_SETTINGS);
   const [loans, setLoans] = useState([]);
   const [editingLoanId, setEditingLoanId] = useState(null);
   const [selectedMonth, setSelectedMonth] = useState(ALL_MONTHS);
@@ -66,14 +74,22 @@ function App() {
       fetchBudgets(),
       fetchLoans(),
       fetchCategories(),
+      fetchSettings(),
     ])
       .then(
-        ([savedTransactions, savedBudgets, savedLoans, savedCategories]) => {
+        ([
+          savedTransactions,
+          savedBudgets,
+          savedLoans,
+          savedCategories,
+          savedSettings,
+        ]) => {
           if (id !== loadId.current) return;
           setTransactions(savedTransactions);
           setBudgets(savedBudgets);
           setLoans(savedLoans);
           setCategories(savedCategories);
+          setSettings(savedSettings);
           setLoadState("ready");
         },
       )
@@ -91,6 +107,7 @@ function App() {
       setTransactions([]);
       setBudgets({});
       setCategories([]);
+      setSettings(NO_SETTINGS);
       setLoans([]);
       setLoadState("loading");
       return;
@@ -165,17 +182,24 @@ function App() {
     categories: nextCategories,
   }) {
     await importData(nextTransactions, nextBudgets, nextLoans, nextCategories);
-    const [savedTransactions, savedBudgets, savedLoans, savedCategories] =
-      await Promise.all([
-        fetchTransactions(),
-        fetchBudgets(),
-        fetchLoans(),
-        fetchCategories(),
-      ]);
+    const [
+      savedTransactions,
+      savedBudgets,
+      savedLoans,
+      savedCategories,
+      savedSettings,
+    ] = await Promise.all([
+      fetchTransactions(),
+      fetchBudgets(),
+      fetchLoans(),
+      fetchCategories(),
+      fetchSettings(),
+    ]);
     setTransactions(savedTransactions);
     setBudgets(savedBudgets);
     setLoans(savedLoans);
     setCategories(savedCategories);
+    setSettings(savedSettings);
     setEditingId(null);
     setEditingLoanId(null);
     setSelectedMonth(ALL_MONTHS);
@@ -185,18 +209,20 @@ function App() {
     setCategories((prev) => [...prev, created]);
   }
 
-  // A rename or delete also changes transactions and budgets on the server,
-  // so reload those along with the categories.
+  // A rename or delete also changes transactions, budgets and the default
+  // categories on the server, so reload those along with the categories.
   async function reloadAfterCategoryChange() {
-    const [savedTransactions, savedBudgets, savedCategories] =
+    const [savedTransactions, savedBudgets, savedCategories, savedSettings] =
       await Promise.all([
         fetchTransactions(),
         fetchBudgets(),
         fetchCategories(),
+        fetchSettings(),
       ]);
     setTransactions(savedTransactions);
     setBudgets(savedBudgets);
     setCategories(savedCategories);
+    setSettings(savedSettings);
   }
 
   async function handleRenameCategory(id, name) {
@@ -333,6 +359,7 @@ function App() {
                     transactions={transactions}
                     budgets={budgets}
                     categories={categories}
+                    settings={settings}
                   />
                 }
               />
