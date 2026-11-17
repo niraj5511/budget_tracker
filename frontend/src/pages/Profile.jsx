@@ -2,10 +2,97 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import PasswordField from "../components/PasswordField";
+import { DEFAULT_CATEGORY, categoriesFor } from "../data/categories";
 import { changePassword, deleteAccount } from "../utils/api";
 import "./Auth.css";
 
-export default function Profile() {
+const TYPES = [
+  { type: "expense", label: "Expense" },
+  { type: "income", label: "Income" },
+];
+
+/** Which category a new transaction starts with, for expenses and for income. */
+function DefaultCategories({ categories, settings, onSave }) {
+  const [saving, setSaving] = useState(false);
+  // "" while nothing was saved yet, then "saved" or "error".
+  const [status, setStatus] = useState("");
+
+  const current = {
+    expense: settings.defaultExpenseCategory,
+    income: settings.defaultIncomeCategory,
+  };
+
+  async function handleChange(type, value) {
+    setSaving(true);
+    setStatus("");
+    // "Other" is what an empty default means, so it is saved as empty.
+    const next = {
+      ...current,
+      [type]: value === DEFAULT_CATEGORY ? null : value,
+    };
+    try {
+      await onSave({
+        defaultExpenseCategory: next.expense,
+        defaultIncomeCategory: next.income,
+      });
+      setStatus("saved");
+    } catch {
+      setStatus("error");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <section className="auth-card">
+      <h2 className="auth-title">Default categories</h2>
+      <p className="auth-switch">
+        A new transaction starts with these. You can still pick another category
+        for any transaction.
+      </p>
+
+      {TYPES.map(({ type, label }) => {
+        const offered = categoriesFor(type, categories);
+        // A default that is no longer on offer shows as Other.
+        const value = offered.includes(current[type])
+          ? current[type]
+          : DEFAULT_CATEGORY;
+        return (
+          <label className="auth-field" key={type}>
+            <span>{label}</span>
+            <select
+              value={value}
+              disabled={saving}
+              onChange={(event) => handleChange(type, event.target.value)}
+            >
+              {offered.map((name) => (
+                <option key={name} value={name}>
+                  {name}
+                </option>
+              ))}
+            </select>
+          </label>
+        );
+      })}
+
+      {status === "saved" && (
+        <p className="auth-success" role="status">
+          Saved.
+        </p>
+      )}
+      {status === "error" && (
+        <p className="auth-error" role="alert">
+          Could not save. Please try again.
+        </p>
+      )}
+      <p className="auth-switch">
+        Add your own on the <Link to="/categories">Categories page</Link>.
+      </p>
+    </section>
+  );
+}
+
+export default function Profile({ categories, settings, onSaveSettings }) {
   const { user, logout } = useAuth();
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -69,7 +156,11 @@ export default function Profile() {
           Log out
         </button>
       </div>
-
+      <DefaultCategories
+        categories={categories}
+        settings={settings}
+        onSave={onSaveSettings}
+      />
       <form className="auth-card" onSubmit={handleSubmit}>
         <h2 className="auth-title">Change password</h2>
 
@@ -118,8 +209,8 @@ export default function Profile() {
         <h2 className="auth-title">Delete account</h2>
         <p className="auth-switch">
           This permanently deletes your account and all your transactions,
-          budgets and loans. It cannot be undone. To keep a copy first, use
-          the <Link to="/backup">Backup page</Link>.
+          budgets and loans. It cannot be undone. To keep a copy first, use the{" "}
+          <Link to="/backup">Backup page</Link>.
         </p>
 
         <PasswordField

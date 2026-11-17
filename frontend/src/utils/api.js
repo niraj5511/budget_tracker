@@ -205,3 +205,10 @@ export async function deleteCategory(id) {
 export function fetchSettings() {
   return request("/settings");
 }
+
+export function saveSettings(settings) {
+  return request("/settings", {
+    method: "PUT",
+    body: JSON.stringify(settings),
+  });
+}

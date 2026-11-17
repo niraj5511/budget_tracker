@@ -30,6 +30,7 @@ import {
   fetchBudgets,
   fetchCategories,
   fetchSettings,
+  saveSettings,
   createCategory,
   deleteCategory,
   renameCategory,
@@ -203,6 +204,10 @@ function App() {
     setEditingId(null);
     setEditingLoanId(null);
     setSelectedMonth(ALL_MONTHS);
+  }
+  async function handleSaveSettings(next) {
+    const saved = await saveSettings(next);
+    setSettings(saved);
   }
   async function handleAddCategory(type, name) {
     const created = await createCategory(type, name);
@@ -425,7 +430,16 @@ function App() {
                   />
                 }
               />
-              <Route path="/profile" element={<Profile />} />
+              <Route
+                path="/profile"
+                element={
+                  <Profile
+                    categories={categories}
+                    settings={settings}
+                    onSaveSettings={handleSaveSettings}
+                  />
+                }
+              />
               {/* The old address, kept so bookmarks still work. */}
               <Route
                 path="/account"
