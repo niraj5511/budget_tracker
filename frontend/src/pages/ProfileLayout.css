@@ -1,0 +1,38 @@
+.profile-tabs {
+  display: flex;
+  gap: var(--space-1);
+  width: fit-content;
+  max-width: 100%;
+  margin: 0 auto var(--space-6);
+  padding: var(--space-1);
+  overflow-x: auto;
+  background: var(--surface-2);
+  border-radius: var(--radius);
+}
+
+.profile-tab {
+  flex: none;
+  padding: 7px 14px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-decoration: none;
+  white-space: nowrap;
+  border-radius: var(--radius-sm);
+}
+
+.profile-tab:hover {
+  color: var(--text);
+}
+
+.profile-tab.active {
+  color: var(--text);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+/* The tabs already sit below the navbar, so the Account page needs less
+   room above its cards. */
+.profile-layout .auth-page {
+  padding-top: 0;
+}

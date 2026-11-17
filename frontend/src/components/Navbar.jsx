@@ -19,16 +19,6 @@ const NAV_ITEMS = [
     ),
   },
   {
-    to: "/budget",
-    label: "Budget",
-    icon: (
-      <>
-        <path d="M21 12a9 9 0 1 1-9-9" />
-        <path d="M12 3v9h9" />
-      </>
-    ),
-  },
-  {
     to: "/transactions",
     label: "Transactions",
     icon: (

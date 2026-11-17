@@ -1,7 +1,7 @@
-import { Link } from 'react-router-dom'
-import { budgetProgress } from '../utils/budgetProgress'
-import BudgetProgressCard from './BudgetProgressCard'
-import './BudgetOverview.css'
+import { Link } from "react-router-dom";
+import { budgetProgress } from "../utils/budgetProgress";
+import BudgetProgressCard from "./BudgetProgressCard";
+import "./BudgetOverview.css";
 
 /**
  * Dashboard section showing every budgeted category's progress.
@@ -11,19 +11,19 @@ import './BudgetOverview.css'
  * cards. `transactions` should already be filtered to the chosen month.
  */
 export default function BudgetOverview({ transactions, budgets, isAllTime }) {
-  const rows = budgetProgress(transactions, budgets)
-  const overCount = rows.filter((row) => row.isOver).length
+  const rows = budgetProgress(transactions, budgets);
+  const overCount = rows.filter((row) => row.isOver).length;
 
-  let body
+  let body;
   if (rows.length === 0) {
     body = (
       <div className="budget-overview-empty">
         <p>You haven&rsquo;t set any spending limits yet.</p>
-        <Link to="/budget" className="btn btn-secondary">
+        <Link to="/profile/budgets" className="btn btn-secondary">
           Set budgets
         </Link>
       </div>
-    )
+    );
   } else if (isAllTime) {
     body = (
       <div className="budget-overview-empty">
@@ -32,7 +32,7 @@ export default function BudgetOverview({ transactions, budgets, isAllTime }) {
           month above to see it.
         </p>
       </div>
-    )
+    );
   } else {
     body = (
       <div className="budget-overview-grid">
@@ -40,11 +40,14 @@ export default function BudgetOverview({ transactions, budgets, isAllTime }) {
           <BudgetProgressCard key={row.category} {...row} />
         ))}
       </div>
-    )
+    );
   }
 
   return (
-    <section className="budget-overview" aria-labelledby="budget-overview-title">
+    <section
+      className="budget-overview"
+      aria-labelledby="budget-overview-title"
+    >
       <div className="budget-overview-header">
         <div>
           <h2 id="budget-overview-title" className="budget-overview-title">
@@ -52,13 +55,14 @@ export default function BudgetOverview({ transactions, budgets, isAllTime }) {
           </h2>
           {!isAllTime && overCount > 0 && (
             <p className="budget-overview-alert">
-              {overCount} categor{overCount === 1 ? 'y is' : 'ies are'} over budget
+              {overCount} categor{overCount === 1 ? "y is" : "ies are"} over
+              budget
             </p>
           )}
         </div>
 
         {rows.length > 0 && (
-          <Link to="/budget" className="budget-overview-link">
+          <Link to="/profile/budgets" className="budget-overview-link">
             Manage budgets
           </Link>
         )}
@@ -66,5 +70,5 @@ export default function BudgetOverview({ transactions, budgets, isAllTime }) {
 
       {body}
     </section>
-  )
+  );
 }

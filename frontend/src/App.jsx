@@ -14,6 +14,7 @@ import RequireAuth from "./components/RequireAuth";
 import { useAuth } from "./context/AuthContext";
 import Loans from "./pages/Loans";
 import Profile from "./pages/Profile";
+import ProfileLayout from "./pages/ProfileLayout";
 import Categories from "./pages/Categories";
 import Report from "./pages/Report";
 
@@ -368,15 +369,10 @@ function App() {
                   />
                 }
               />
+              {/* The old address, kept so bookmarks still work. */}
               <Route
                 path="/budget"
-                element={
-                  <Budget
-                    budgets={budgets}
-                    categories={categories}
-                    onSaveLimit={handleSaveLimit}
-                  />
-                }
+                element={<Navigate to="/profile/budgets" replace />}
               />
               <Route
                 path="/loans"
@@ -430,16 +426,28 @@ function App() {
                   />
                 }
               />
-              <Route
-                path="/profile"
-                element={
-                  <Profile
-                    categories={categories}
-                    settings={settings}
-                    onSaveSettings={handleSaveSettings}
-                  />
-                }
-              />
+              <Route path="/profile" element={<ProfileLayout />}>
+                <Route
+                  index
+                  element={
+                    <Profile
+                      categories={categories}
+                      settings={settings}
+                      onSaveSettings={handleSaveSettings}
+                    />
+                  }
+                />
+                <Route
+                  path="budgets"
+                  element={
+                    <Budget
+                      budgets={budgets}
+                      categories={categories}
+                      onSaveLimit={handleSaveLimit}
+                    />
+                  }
+                />
+              </Route>
               {/* The old address, kept so bookmarks still work. */}
               <Route
                 path="/account"

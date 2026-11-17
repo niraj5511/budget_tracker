@@ -4,7 +4,7 @@ import { useLocation } from "react-router-dom";
 const TITLES = {
   "/": "Dashboard",
   "/transactions": "Transactions",
-  "/budget": "Budget",
+  '/profile/budgets': 'Budget',
   "/backup": "Backup",
   "/loans": "Lend / Borrow",
   "/report": "Monthly report",
@@ -27,7 +27,7 @@ function RouteEffects() {
   const { pathname } = useLocation();
 
   useEffect(() => {
-    // '/budget/' and '/budget' are the same page to the router, so they
+    // '/profile/' and '/profile' are the same page to the router, so they
     // have to be the same title here too.
     const path = pathname.replace(/\/+$/, "") || "/";
     document.title = `${TITLES[path] ?? "Page not found"} | Artha`;

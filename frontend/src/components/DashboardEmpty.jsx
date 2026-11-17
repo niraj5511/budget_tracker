@@ -1,5 +1,5 @@
-import { Link } from 'react-router-dom'
-import './DashboardEmpty.css'
+import { Link } from "react-router-dom";
+import "./DashboardEmpty.css";
 
 /**
  * Shown instead of the dashboard cards when there are no transactions at all.
@@ -9,7 +9,10 @@ import './DashboardEmpty.css'
  */
 function DashboardEmpty() {
   return (
-    <section className="dashboard-empty" aria-labelledby="dashboard-empty-title">
+    <section
+      className="dashboard-empty"
+      aria-labelledby="dashboard-empty-title"
+    >
       <span className="dashboard-empty-icon" aria-hidden="true">
         <svg
           viewBox="0 0 24 24"
@@ -36,12 +39,12 @@ function DashboardEmpty() {
         <Link to="/transactions" className="btn btn-primary">
           Add a transaction
         </Link>
-        <Link to="/budget" className="btn btn-secondary">
+        <Link to="/profile/budgets" className="btn btn-secondary">
           Set budgets
         </Link>
       </div>
     </section>
-  )
+  );
 }
 
-export default DashboardEmpty
+export default DashboardEmpty;
