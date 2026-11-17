@@ -1,122 +1,57 @@
 # Budget Tracker
 
-A personal budget tracker for recording income and expenses, setting category budgets, and tracking money lent or borrowed. Dates use the Nepali (Bikram Sambat) calendar.
+A personal budget tracker for recording income and expenses, setting category budgets, and tracking money lent or borrowed. The app is called Artha. All dates use the Nepali (Bikram Sambat) calendar.
 
-```
-budget_tracker/
-  frontend/   React app (Vite)
-  backend/    Spring Boot REST API
-```
+## What it does
 
-## Features
+### Dashboard
+- Balance summary: income, expenses and what is left.
+- Spending by category, shown as a breakdown and a pie chart, and a monthly trend.
+- A comparison with the previous month and your top spending category.
+- Budget progress for your categories, and a Lend / Borrow card showing what you are owed and what you owe.
+- A month filter to look at one month or all time, and a button to open the monthly report.
 
-- **Dashboard**: balance summary, category breakdown and pie chart, monthly trend, month-to-month comparison, top spending category, and a month filter. A Lend / Borrow card shows what you are owed and what you owe.
-- **Monthly report**: a summary of one month with totals, a comparison with the previous month, expenses by category against your budgets, and the largest expenses. Print it or save it as a PDF.
-- **Transactions**: add, edit and delete income and expenses, with categories and filters.
-- **Budgets**: set a spending limit per category, track progress, and get a warning while adding an expense that nears or passes the limit.
-- **Categories**: add your own income and expense categories on top of the built-in ones. Rename them, or delete them (their transactions move to Other).
-- **Lend / Borrow**: record money lent or borrowed, with an optional due date and repayment history. Kept apart from your balance.
-- **Accounts**: register, log in, change your password, or delete your account and all its data. Each user sees only their own data.
-- **Backup**: download your transactions, budgets, loans and custom categories as a file and restore it into your account.
-- **Theme**: light and dark mode.
+### Transactions
+- Add, edit and delete income and expenses, each with a category and a date. Filter the list to find them.
+- A new transaction starts with your default category for its type. You can pick another one for any transaction.
+- While you add an expense, you get a notice if it takes its category to 75% of its monthly budget or more, and a stronger one at 90% or over the limit. The notice never stops you from saving.
+
+### Lend / Borrow
+- Record money you lent or borrowed, with an optional due date and a history of repayments.
+- Kept apart from your balance. Overdue items show on the Dashboard.
+
+### Monthly report
+- A summary of one month: income, expenses, balance, and a comparison with the month before.
+- Expenses by category next to your budget limits, income by category, and the five largest expenses.
+- Print it, or save it as a PDF from the print dialog.
+
+### Profile
+Opened from the **Profile** link in the header, with four tabs:
+
+- **Account**: your email and Log out, default categories for expenses and for income, change password, and delete account (this removes all your data).
+- **Budgets**: set a monthly spending limit per expense category. A limit saves when you leave the field. A card turns to a warning colour from 75% used, and to red from 90% or when over.
+- **Categories**: add your own income and expense categories on top of the built-in ones, up to 30 of each type. Rename them, or delete them: their transactions move to Other and their budget is removed. Built-in categories cannot be changed.
+- **Backup**: download your transactions, budgets, loans and custom categories as a file, and restore a file into your account. Restoring replaces what you have now. Older backup files still work and leave the parts they do not contain alone.
+
+### Accounts
+- Register and log in with an email and a password of 8 to 72 characters, with a button to show or hide the password.
+- Each user sees only their own data.
+- After five wrong passwords in a row, that email is locked for 15 minutes.
+- After logging in you return to the page you were on.
+
+### Other
+- Light and dark themes.
+
+## Good to know
+
+- The free hosting goes to sleep when idle, so the first request after a quiet period can take up to a minute.
+- There is no forgot-password option, and the email address cannot be changed.
+- Repayments cannot be edited, only deleted and added again.
+- You stay logged in until your login expires after 24 hours, even if you change your password.
 
 ## Tech stack
 
-- **Frontend**: React 19, Vite, React Router, Recharts
-- **Backend**: Java 21, Spring Boot 4.1, Spring Data JPA, Spring Security (JWT, BCrypt)
+- **Frontend** (`frontend/`): React 19, Vite, React Router, Recharts
+- **Backend** (`backend/`): Java 21, Spring Boot 4.1, Spring Data JPA, Spring Security with JWT login and BCrypt passwords
 - **Database**: PostgreSQL on Supabase
-
-## Running locally
-
-You need Node.js, JDK 21 and a Supabase project.
-
-1. Create `backend/secrets.properties` (it is in `.gitignore`, do not commit it):
-
-   ```
-   spring.datasource.url=jdbc:postgresql://<host>:5432/postgres
-   spring.datasource.username=<user>
-   spring.datasource.password=<password>
-   app.jwt.secret=<long random string, at least 32 characters>
-   ```
-
-   Use the Session pooler details from the Supabase Connect panel.
-
-2. Start the backend from the `backend` folder (it reads `secrets.properties` from there):
-
-   ```
-   cd backend
-   .\mvnw spring-boot:run
-   ```
-
-3. Start the frontend in a second terminal:
-
-   ```
-   cd frontend
-   npm install
-   npm run dev
-   ```
-
-The API runs at `http://localhost:8080` and the app at `http://localhost:5173`. `frontend/.env` holds `VITE_API_URL=http://localhost:8080/api`; restart `npm run dev` after changing it.
-
-Local runs use whichever database `secrets.properties` points to. If that is the live project, testing locally changes live data.
-
-## API
-
-Base path `/api`. Every endpoint except `/health` and `/auth/*` needs the header `Authorization: Bearer <token>`.
-
-| Method      | Path                                   | Description                                                                                             |
-| ----------- | -------------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| GET         | `/health`                              | Health check                                                                                            |
-| POST        | `/auth/register`                       | Create an account (201, `409` if the email is taken)                                                    |
-| POST        | `/auth/login`                          | Returns `{ token, user }`. The token lasts 24 hours.                                                    |
-| PUT         | `/account/password`                    | Body `{ currentPassword, newPassword }`. Returns 204, `403` if the current password is wrong.           |
-| POST        | `/account/delete`                      | Body `{ password }`. Deletes the account and all its data. Returns 204, `403` if the password is wrong. |
-| GET, POST   | `/transactions`                        | List or create transactions                                                                             |
-| PUT, DELETE | `/transactions/{id}`                   | Update or delete a transaction                                                                          |
-| GET         | `/budgets`                             | List budgets                                                                                            |
-| PUT, DELETE | `/budgets/{category}`                  | Set or remove a category limit                                                                          |
-| GET, POST   | `/loans`                               | List loans (with repayments) or create one                                                              |
-| PUT, DELETE | `/loans/{id}`                          | Update or delete a loan                                                                                 |
-| POST        | `/loans/{id}/repayments`               | Add a repayment                                                                                         |
-| DELETE      | `/loans/{id}/repayments/{repaymentId}` | Delete a repayment                                                                                      |
-| POST | `/import` | Replace the user's transactions and budgets, and loans or categories if the body has those lists. All or nothing. |
-
-- Errors: `400` invalid input, `401` missing, expired or wrong login, `404` not found, `429` too many attempts.
-- Custom category names are 1 to 30 characters, unique within income or expense (ignoring case, and not matching a built-in name), with at most 30 per type.
-- Passwords are 8 to 72 characters. Emails are stored in lowercase.
-- After 5 wrong passwords in a row on login or `/account/*`, that email is locked for 15 minutes.
-- Amounts must be greater than 0. Dates use `YYYY-MM-DD`.
-
-Example transaction body:
-
-```json
-{
-  "description": "Groceries",
-  "amount": 3200,
-  "type": "expense",
-  "category": "Food",
-  "date": "2026-10-03"
-}
-```
-
-## Deployment
-
-The backend runs on Render and the frontend on Netlify, both on free plans. Pushing to `main` redeploys both.
-
-**Render** (Web Service from the GitHub repository): language Docker, branch `main`, Dockerfile path `backend/Dockerfile`, build context `backend`, health check `/api/health`. Environment variables:
-
-- `SPRING_DATASOURCE_URL`, `SPRING_DATASOURCE_USERNAME`, `SPRING_DATASOURCE_PASSWORD`: the Supabase Session pooler details
-- `APP_JWT_SECRET`: a long random secret, different from the local one
-- `APP_CORS_ORIGINS`: the Netlify address with no trailing slash (separate several with commas)
-
-**Netlify**: base directory `frontend`, build command `npm run build`, publish directory `frontend/dist`. Set `VITE_API_URL` to the Render address followed by `/api`, with no trailing slash. It is built into the app, so changing it needs a new deploy. `frontend/public/_redirects` makes page refresh work on routes like `/loans`.
-
-## Current limitations
-
-- The free hosting sleeps when idle, so the first request can take up to a minute. The Supabase project pauses after a week without use and must be restored from its dashboard.
-- The login token is kept in the browser's `localStorage`, and stays valid until it expires, even after a password change.
-- Failed-login counts are kept in memory, so they reset when the backend restarts.
-- No forgot-password, and the email address cannot be changed.
-- No automated tests.
-- Repayments cannot be edited, only deleted and added again.
-- The built-in categories cannot be renamed or removed.
+- **Hosting**: Render (backend) and Netlify (frontend)
