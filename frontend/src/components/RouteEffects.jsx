@@ -5,7 +5,7 @@ const TITLES = {
   "/": "Dashboard",
   "/transactions": "Transactions",
   '/profile/budgets': 'Budget',
-  "/backup": "Backup",
+  '/profile/backup': 'Backup',
   "/loans": "Lend / Borrow",
   "/report": "Monthly report",
   "/categories": "Categories",

@@ -210,7 +210,7 @@ export default function Profile({ categories, settings, onSaveSettings }) {
         <p className="auth-switch">
           This permanently deletes your account and all your transactions,
           budgets and loans. It cannot be undone. To keep a copy first, use the{" "}
-          <Link to="/backup">Backup page</Link>.
+          the <Link to="/profile/backup">Backup tab</Link>.
         </p>
 
         <PasswordField

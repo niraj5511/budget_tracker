@@ -4,6 +4,7 @@ import "./ProfileLayout.css";
 const TABS = [
   { to: "/profile", label: "Account", end: true },
   { to: "/profile/budgets", label: "Budgets" },
+  { to: "/profile/backup", label: "Backup" },
 ];
 
 /** The frame around every page under /profile: a row of tabs, then the page. */

@@ -393,15 +393,7 @@ function App() {
               />
               <Route
                 path="/backup"
-                element={
-                  <Backup
-                    transactions={transactions}
-                    budgets={budgets}
-                    loans={loans}
-                    categories={categories}
-                    onRestore={handleRestore}
-                  />
-                }
+                element={<Navigate to="/profile/backup" replace />}
               />
               <Route
                 path="/report"
@@ -444,6 +436,18 @@ function App() {
                       budgets={budgets}
                       categories={categories}
                       onSaveLimit={handleSaveLimit}
+                    />
+                  }
+                />
+                <Route
+                  path="backup"
+                  element={
+                    <Backup
+                      transactions={transactions}
+                      budgets={budgets}
+                      loans={loans}
+                      categories={categories}
+                      onRestore={handleRestore}
                     />
                   }
                 />
