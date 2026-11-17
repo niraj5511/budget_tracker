@@ -4,6 +4,7 @@ import "./ProfileLayout.css";
 const TABS = [
   { to: "/profile", label: "Account", end: true },
   { to: "/profile/budgets", label: "Budgets" },
+  { to: "/profile/categories", label: "Categories" },
   { to: "/profile/backup", label: "Backup" },
 ];
 

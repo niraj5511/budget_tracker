@@ -312,7 +312,7 @@ function TransactionForm({
               </option>
             ))}
           </select>
-          <Link className="manage-link" to="/categories">
+          <Link className="manage-link" to="/profile/categories">
             Manage categories
           </Link>
         </div>

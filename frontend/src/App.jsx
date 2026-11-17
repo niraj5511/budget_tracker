@@ -407,16 +407,7 @@ function App() {
               />
               <Route
                 path="/categories"
-                element={
-                  <Categories
-                    categories={categories}
-                    transactions={transactions}
-                    budgets={budgets}
-                    onAdd={handleAddCategory}
-                    onRename={handleRenameCategory}
-                    onDelete={handleDeleteCategory}
-                  />
-                }
+                element={<Navigate to="/profile/categories" replace />}
               />
               <Route path="/profile" element={<ProfileLayout />}>
                 <Route
@@ -436,6 +427,19 @@ function App() {
                       budgets={budgets}
                       categories={categories}
                       onSaveLimit={handleSaveLimit}
+                    />
+                  }
+                />
+                <Route
+                  path="categories"
+                  element={
+                    <Categories
+                      categories={categories}
+                      transactions={transactions}
+                      budgets={budgets}
+                      onAdd={handleAddCategory}
+                      onRename={handleRenameCategory}
+                      onDelete={handleDeleteCategory}
                     />
                   }
                 />

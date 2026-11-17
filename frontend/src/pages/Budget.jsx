@@ -181,7 +181,7 @@ function Budget({ budgets, categories = [], onSaveLimit }) {
           Leave a field blank for no limit. Limits repeat every month until you
           change them, and save as soon as you leave the field. Press Enter to
           save or Esc to undo. Need another category?{" "}
-          <Link to="/categories">Manage categories</Link>.
+          <Link to="/profile/categories">Manage categories</Link>.
         </p>
 
         <div className="budget-rows">

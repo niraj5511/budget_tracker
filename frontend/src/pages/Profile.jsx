@@ -86,7 +86,7 @@ function DefaultCategories({ categories, settings, onSave }) {
         </p>
       )}
       <p className="auth-switch">
-        Add your own on the <Link to="/categories">Categories page</Link>.
+        Add your own on the <Link to="/profile/categories">Categories tab</Link>.
       </p>
     </section>
   );

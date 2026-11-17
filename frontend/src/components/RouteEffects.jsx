@@ -4,11 +4,11 @@ import { useLocation } from "react-router-dom";
 const TITLES = {
   "/": "Dashboard",
   "/transactions": "Transactions",
-  '/profile/budgets': 'Budget',
-  '/profile/backup': 'Backup',
+  "/profile/budgets": "Budget",
+  "/profile/backup": "Backup",
   "/loans": "Lend / Borrow",
   "/report": "Monthly report",
-  "/categories": "Categories",
+  "/profile/categories": "Categories",
   "/profile": "Profile",
 };
 
