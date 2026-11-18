@@ -3,6 +3,8 @@ import { useLocation } from "react-router-dom";
 
 const TITLES = {
   "/": "Dashboard",
+  "/login": "Log in",
+  "/register": "Create account",
   "/transactions": "Transactions",
   "/profile/budgets": "Budget",
   "/profile/backup": "Backup",

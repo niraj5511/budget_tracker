@@ -111,3 +111,9 @@
 .profile-card .auth-switch {
   overflow-wrap: anywhere;
 }
+
+.auth-tagline {
+  margin-top: var(--space-1);
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}

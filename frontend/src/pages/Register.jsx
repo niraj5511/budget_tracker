@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useSlow } from "../utils/useSlow";
+import Brand from "../components/Brand";
 import PasswordField from "../components/PasswordField";
 import "./Auth.css";
 
@@ -40,8 +41,14 @@ export default function Register() {
 
   return (
     <section className="auth-page">
+      <Brand />
       <form className="auth-card" onSubmit={handleSubmit}>
-        <h1 className="auth-title">Create account</h1>
+        <div>
+          <h1 className="auth-title">Create account</h1>
+          <p className="auth-tagline">
+            Track income, expenses and budgets, with Nepali dates.
+          </p>
+        </div>
 
         <label className="auth-field">
           <span>Email</span>
@@ -72,7 +79,7 @@ export default function Register() {
         )}
 
         <button className="btn btn-primary" type="submit" disabled={submitting}>
-          {submitting ? "Creating account..." : "Register"}
+          {submitting ? "Creating account..." : "Create account"}
         </button>
 
         {slow && (

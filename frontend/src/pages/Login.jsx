@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useSlow } from "../utils/useSlow";
+import Brand from "../components/Brand";
 import PasswordField from "../components/PasswordField";
 import "./Auth.css";
 
@@ -36,8 +37,14 @@ export default function Login() {
 
   return (
     <section className="auth-page">
+      <Brand />
       <form className="auth-card" onSubmit={handleSubmit}>
-        <h1 className="auth-title">Log in</h1>
+        <div>
+          <h1 className="auth-title">Log in</h1>
+          <p className="auth-tagline">
+            Welcome back. Pick up where you left off.
+          </p>
+        </div>
 
         <label className="auth-field">
           <span>Email</span>
@@ -75,7 +82,7 @@ export default function Login() {
         )}
 
         <p className="auth-switch">
-          No account? <Link to="/register">Register</Link>
+          New here? <Link to="/register">Create an account</Link>
         </p>
       </form>
     </section>
