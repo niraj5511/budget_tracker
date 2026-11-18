@@ -1,11 +1,13 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
-// Wraps the routes that need a login; others are sent to /login,
-// which sends them back here after they sign in.
+// Wraps the routes that need a login. Someone opening the bare address sees
+// the welcome page; anyone opening a deeper link goes to the login form, which
+// sends them back there after they sign in.
 export default function RequireAuth() {
   const { user } = useAuth()
   const location = useLocation()
   if (user) return <Outlet />
-  return <Navigate to="/login" replace state={{ from: location }} />
+  const target = location.pathname === '/' ? '/welcome' : '/login'
+  return <Navigate to={target} replace state={{ from: location }} />
 }

@@ -5,6 +5,7 @@ const TITLES = {
   "/": "Dashboard",
   "/login": "Log in",
   "/register": "Create account",
+  "/welcome": "Welcome",
   "/transactions": "Transactions",
   "/profile/budgets": "Budget",
   "/profile/backup": "Backup",

@@ -41,7 +41,7 @@ export default function Register() {
 
   return (
     <section className="auth-page">
-      <Brand />
+      <Brand to="/welcome" />
       <form className="auth-card" onSubmit={handleSubmit}>
         <div>
           <h1 className="auth-title">Create account</h1>

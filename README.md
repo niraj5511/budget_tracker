@@ -34,6 +34,7 @@ Opened from the **Profile** link in the header, with four tabs:
 - **Backup**: download your transactions, budgets, loans and custom categories as a file, and restore a file into your account. Restoring replaces what you have now. Older backup files still work and leave the parts they do not contain alone.
 
 ### Accounts
+- New visitors see a short welcome page with Log in and Create account buttons.
 - Register and log in with an email and a password of 8 to 72 characters, with a button to show or hide the password.
 - Each user sees only their own data.
 - After five wrong passwords in a row, that email is locked for 15 minutes.

@@ -10,6 +10,7 @@ import NotFound from "./pages/NotFound";
 import Transactions from "./pages/Transactions";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import Welcome from "./pages/Welcome";
 import RequireAuth from "./components/RequireAuth";
 import { useAuth } from "./context/AuthContext";
 import Loans from "./pages/Loans";
@@ -330,6 +331,7 @@ function App() {
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/welcome" element={<Welcome />} />
             <Route element={<RequireAuth />}>
               <Route
                 path="/"
