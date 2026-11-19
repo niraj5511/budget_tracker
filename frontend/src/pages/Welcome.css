@@ -190,6 +190,89 @@
   color: var(--text-muted);
 }
 
+.welcome-eyebrow {
+  margin-bottom: var(--space-1);
+  color: var(--accent);
+}
+
+.welcome-subheading {
+  margin: calc(var(--space-2) * -1) 0 var(--space-5);
+  color: var(--text-muted);
+}
+
+.welcome-feature {
+  transition:
+    transform 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.welcome-feature:hover {
+  transform: translateY(-2px);
+  border-color: var(--border-strong);
+}
+
+.welcome-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  margin-bottom: var(--space-3);
+  border-radius: var(--radius);
+}
+
+.welcome-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.welcome-icon--blue {
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+}
+.welcome-icon--green {
+  background: var(--income-soft);
+  color: var(--income);
+}
+.welcome-icon--slate {
+  background: var(--surface-2);
+  color: var(--text-muted);
+}
+.welcome-icon--amber {
+  background: #fef3c7;
+  color: #92400e;
+}
+.welcome-icon--purple {
+  background: #ede9fe;
+  color: #5b21b6;
+}
+.welcome-icon--teal {
+  background: #cffafe;
+  color: #0e7490;
+}
+
+:root[data-theme="dark"] .welcome-icon--amber {
+  background: #3a2a0a;
+  color: #fbbf24;
+}
+:root[data-theme="dark"] .welcome-icon--purple {
+  background: #2a1f4d;
+  color: #c4b5fd;
+}
+:root[data-theme="dark"] .welcome-icon--teal {
+  background: #0c3340;
+  color: #67e8f9;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .welcome-feature {
+    transition: none;
+  }
+  .welcome-feature:hover {
+    transform: none;
+  }
+}
+
 .welcome-final {
   padding: var(--space-8) var(--space-6);
   text-align: center;
